@@ -22,5 +22,8 @@
     "@prisma/engines@6.19.3": true,
     "@prisma/client@6.19.3": true,
     "@scarf/scarf": false
+  },
+  "overrides": {
+    "postcss": "8.5.30"
   }
 }

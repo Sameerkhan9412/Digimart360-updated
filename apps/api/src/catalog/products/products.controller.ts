@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import { ProductDetail, ProductPage } from '../dto/views';
 import { ListingQueryDto, SuggestQueryDto } from './listing.dto';
-import { ProductsService, Suggestions } from './products.service';
+import { ProductsService, SitemapData, Suggestions } from './products.service';
 
 @ApiTags('catalog')
 @Controller()
@@ -24,6 +24,14 @@ export class ProductsController {
   @ApiOkResponse({ type: ProductDetail })
   detail(@Param('slug') slug: string): Promise<ProductDetail> {
     return this.products.detail(slug);
+  }
+
+  /** Every public category, product and supplier URL with its last change. Used to build sitemap.xml. */
+  @Get('sitemap')
+  @Public()
+  @ApiOkResponse({ type: SitemapData })
+  sitemap(): Promise<SitemapData> {
+    return this.products.sitemap();
   }
 
   /** Search-box suggestions as the user types (2+ characters). */

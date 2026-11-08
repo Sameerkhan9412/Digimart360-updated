@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   api:
-    name: API · type check, unit + end-to-end tests, build
+    name: API + website · type check, unit + end-to-end tests, build
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -41,4 +41,7 @@ jobs:
       - run: npm test
       - name: End-to-end tests (rebuilds the test DB from all migrations, loads demo data)
         run: npm run test:e2e -w @digimart/api
-      - run: npm run build
+      - name: Build API and website
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'

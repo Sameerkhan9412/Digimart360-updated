@@ -6,6 +6,17 @@ import { CategoriesService } from '../categories/categories.service';
 import { Breadcrumb, FacetValue, ProductCard, ProductDetail, ProductPage, toProductCard, toSpecs } from '../dto/views';
 import { ListingQueryDto } from './listing.dto';
 
+export class SitemapEntry {
+  @ApiProperty() slug: string;
+  @ApiProperty() updatedAt: Date;
+}
+
+export class SitemapData {
+  @ApiProperty({ type: [SitemapEntry] }) categories: SitemapEntry[];
+  @ApiProperty({ type: [SitemapEntry] }) products: SitemapEntry[];
+  @ApiProperty({ type: [SitemapEntry] }) companies: SitemapEntry[];
+}
+
 export class Suggestions {
   @ApiProperty({ type: [Breadcrumb] }) categories: Breadcrumb[];
   @ApiProperty({ type: [String], description: 'Product names to use as search terms' }) products: string[];
@@ -142,14 +153,19 @@ export class ProductsService {
     return { categories, products: products.map((p) => p.name), companies };
   }
 
-  /** Public URLs for the sitemap. */
-  async sitemapEntries(): Promise<{ slug: string; updatedAt: Date }[]> {
-    return this.prisma.product.findMany({
-      where: PUBLIC_WHERE,
-      select: { slug: true, updatedAt: true },
-      orderBy: { updatedAt: 'desc' },
-      take: 50_000,
-    });
+  /** Every public URL with its last change, for sitemap.xml. */
+  async sitemap(): Promise<SitemapData> {
+    const [categories, products, companies] = await Promise.all([
+      this.prisma.category.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
+      this.prisma.product.findMany({
+        where: PUBLIC_WHERE,
+        select: { slug: true, updatedAt: true },
+        orderBy: { updatedAt: 'desc' },
+        take: 45_000,
+      }),
+      this.prisma.company.findMany({ where: { status: CompanyStatus.ACTIVE }, select: { slug: true, updatedAt: true } }),
+    ]);
+    return { categories, products, companies };
   }
 
   private async countOnly(from: Prisma.Sql, where: Prisma.Sql): Promise<number> {

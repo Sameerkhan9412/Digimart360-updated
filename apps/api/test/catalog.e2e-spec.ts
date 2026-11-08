@@ -128,6 +128,13 @@ describe('Catalog API (e2e)', () => {
       expect(body).not.toHaveProperty('phone');
     });
 
+    it('lists every public URL for the sitemap, and nothing pending', async () => {
+      const { body } = await http.get('/sitemap').expect(200);
+      expect(body.categories).toHaveLength(163);
+      expect(body.products).toHaveLength(25);
+      expect(body.companies.map((c: any) => c.slug)).not.toContain('nashik-steel-fabricators');
+    });
+
     it('hides suppliers awaiting approval and their products', async () => {
       await http.get('/companies/nashik-steel-fabricators').expect(404);
       await http.get('/products/pre-engineered-steel-shed-nash').expect(404);

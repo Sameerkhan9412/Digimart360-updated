@@ -13,7 +13,7 @@ India's verified B2B marketplace: buyers find manufacturers and post requirement
 | Path | What it is | Status |
 |---|---|---|
 | `apps/api` | NestJS + Prisma + PostgreSQL. One API for web and mobile. | Sign-in, catalog, search, supplier self-service, moderation |
-| `apps/web` | Next.js marketplace + seller storefronts (chosen by domain) | Next |
+| `apps/web` | Next.js marketplace (seller storefronts by domain come later) | Homepage, category listings, product and supplier pages, SEO |
 | `packages/*` | Shared UI, generated API client, config | Next |
 | `mockups/` | Approved HTML designs, storefront themes, Theme Studio | Reference for `apps/web` |
 
@@ -28,6 +28,8 @@ npm run db:migrate                         # apply migrations
 npm run db:seed                            # create the admin account
 npm run db:seed:demo -w @digimart/api      # optional: demo catalog from the mockups
 npm run dev:api                            # http://localhost:3000/api/v1 · docs at /api/docs
+cp apps/web/.env.example apps/web/.env.local   # set INTERNAL_API_KEY (same as the API's)
+npm run dev -w @digimart/web               # http://localhost:3001
 ```
 
 In development, sign-in codes are printed in the API log instead of being emailed (`MAIL_TRANSPORT=console`).
@@ -46,7 +48,7 @@ In development, sign-in codes are printed in the API log instead of being emaile
 
 1. ~~Repository, CI, local database~~ · ~~Sign-in: email OTP + Google~~
 2. ~~Catalog API: categories, companies (suppliers), products, search, moderation~~
-3. Website: Homepage v2, category listing, product page; SEO (metadata, sitemap, structured data)
+3. ~~Website: Homepage v2, category listing, product page; SEO (metadata, sitemap, structured data)~~
 4. Supplier dashboard: company profile, GST verification request, product management, image uploads
 5. RFQs: post requirement, matching, quotes, buyer comparison
 6. Storefront themes + custom domains (Caddy on-demand TLS, DNS verification, admin approval)
@@ -54,6 +56,8 @@ In development, sign-in codes are printed in the API log instead of being emaile
 8. Deployment: Docker images, Compose stack, backups, monitoring
 
 ## Known follow-ups
+
+- Upgrade Next.js to 15.5.29+ (or 16) once the release is two weeks old; postcss is pinned to 8.5.30 via `overrides` until then.
 
 - Upgrade NestJS to 12 before adding file uploads (security fix in its upload handler).
 - Migrate Prisma 6 → 7 (security fix in its config tooling).
