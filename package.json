@@ -1,0 +1,26 @@
+{
+  "name": "digimart360",
+  "private": true,
+  "description": "DIGI MART 360: B2B marketplace, supplier websites and shared API",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:api": "npm run start:dev -w @digimart/api",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:migrate": "npm run db:deploy -w @digimart/api",
+    "db:seed": "npm run db:seed -w @digimart/api"
+  },
+  "allowScripts": {
+    "prisma@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "@prisma/client@6.19.3": true,
+    "@scarf/scarf": false
+  }
+}

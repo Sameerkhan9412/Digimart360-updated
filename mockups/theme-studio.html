@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Storefront Studio - DIGI MART 360</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Barlow+Condensed:wght@700&family=Manrope:wght@800&family=Cormorant+Garamond:wght@600&family=Sora:wght@700&display=swap">
+<link rel="stylesheet" href="neumorphic.css">
+<style>
+/* Storefront Studio · supplier dashboard tool. Settings rail (left) + live preview (right). */
+:root {
+  --studio-line: #d6dee8;
+  --studio-panel: #f4f7fa;
+  --ok: #1B8C4E;
+  --ok-soft: #e3f4ea;
+  --warn: #c56a12;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg-main); color: var(--text-main); font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif; font-size: 14px; display: flex; flex-direction: column; }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+button { font: inherit; cursor: pointer; }
+.demo-switcher { flex-wrap: wrap; gap: 6px; }
+.demo-switcher .flex { flex-wrap: wrap; }
+
+/* Top bar */
+.studio-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding: 14px 20px; border-bottom: 1px solid var(--studio-line); background: var(--bg-main); }
+.studio-top .t { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.back { color: var(--text-muted); text-decoration: none; font-weight: 600; white-space: nowrap; }
+.back:hover { color: var(--color-secondary); }
+.studio-top h1 { font-size: 20px; font-weight: 800; color: var(--color-secondary); margin: 0; }
+.status { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text-muted); font-size: 13px; }
+.status i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.status.dirty i { background: var(--warn); }
+.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.b { border: 1px solid var(--studio-line); background: #fff; color: var(--color-secondary); border-radius: 10px; padding: 9px 14px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.b:hover { border-color: var(--color-secondary); }
+.b.primary { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+.b.primary:disabled { opacity: .5; cursor: not-allowed; }
+.b.small { padding: 6px 10px; font-size: 12px; }
+
+/* Layout */
+.studio { flex: 1; min-height: 0; display: grid; grid-template-columns: 380px minmax(0, 1fr); }
+.rail { overflow-y: auto; border-right: 1px solid var(--studio-line); background: var(--studio-panel); padding: 8px 18px 40px; }
+.stage { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+@media (max-width: 1000px) {
+  html, body { height: auto; }
+  .studio { grid-template-columns: minmax(0, 1fr); }
+  .rail { border-right: 0; border-bottom: 1px solid var(--studio-line); overflow: visible; }
+  .stage { height: 80vh; }
+}
+
+/* Rail sections */
+.sec { padding-block: 18px; border-bottom: 1px solid var(--studio-line); display: grid; gap: 12px; }
+.sec:last-child { border-bottom: 0; }
+.sec h2 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--color-secondary); margin: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sec h2 small { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--text-muted); }
+.hint { color: var(--text-muted); font-size: 12.5px; margin: 0; line-height: 1.5; }
+
+/* Theme cards */
+.themes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.theme { text-align: left; border: 2px solid transparent; background: #fff; border-radius: 14px; padding: 8px; display: grid; gap: 8px; box-shadow: 0 1px 2px rgba(26,60,94,.08); }
+.theme[aria-pressed="true"] { border-color: var(--color-primary); }
+.theme b { font-size: 14px; color: var(--color-secondary); display: flex; justify-content: space-between; align-items: center; }
+.theme b em { font-style: normal; font-size: 10px; font-weight: 800; color: var(--ok); background: var(--ok-soft); border-radius: 999px; padding: 2px 7px; }
+.theme span { font-size: 11.5px; color: var(--text-muted); line-height: 1.35; }
+.thumb { height: 74px; border-radius: 8px; position: relative; overflow: hidden; }
+.thumb.forge { background: #121518; }
+.thumb.forge::before { content: "VALVES"; position: absolute; left: 8px; top: 10px; font: 700 20px "Barlow Condensed", sans-serif; color: #e6ebf0; letter-spacing: .02em; }
+.thumb.forge::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: #f26b1d; }
+.thumb.meridian { background: #fff; border: 1px solid var(--studio-line); }
+.thumb.meridian::before { content: "Valves"; position: absolute; left: 8px; top: 12px; font: 800 15px Manrope, sans-serif; color: #183b63; }
+.thumb.meridian::after { content: ""; position: absolute; right: 8px; top: 8px; width: 42%; height: 56px; border-radius: 8px; background: #e8edf3; }
+.thumb.heritage { background: #f2f1ec; border: 1px solid #cfccc0; }
+.thumb.heritage::before { content: "Valves"; position: absolute; inset: 0; display: grid; place-items: center; font: italic 600 24px "Cormorant Garamond", serif; color: #232a5c; }
+.thumb.heritage::after { content: ""; position: absolute; left: 25%; right: 25%; bottom: 14px; height: 1px; background: #b7832b; }
+.thumb.bazaar { background: #f6f7f9; }
+.thumb.bazaar::before { content: ""; position: absolute; left: 6px; right: 6px; top: 6px; height: 30px; border-radius: 8px; background: linear-gradient(120deg, #0f5e34, #1B8C4E); }
+.thumb.bazaar::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 6px; height: 28px; background: radial-gradient(circle, #fff 0 9px, transparent 10px) 0 0 / 25% 100%; }
+
+/* Logo + colours */
+.logo-row { display: flex; gap: 12px; align-items: center; }
+.logo-box { width: 64px; height: 64px; border-radius: 14px; background: #fff; border: 1px dashed var(--studio-line); display: grid; place-items: center; overflow: hidden; flex: none; color: var(--text-light); font-size: 11px; text-align: center; }
+.logo-box img { width: 100%; height: 100%; object-fit: contain; }
+.logo-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.file-label { position: relative; overflow: hidden; }
+.file-label input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.colors { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.color { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid var(--studio-line); border-radius: 12px; padding: 8px; }
+.color input[type=color] { width: 36px; height: 36px; border: 0; padding: 0; background: none; border-radius: 8px; cursor: pointer; flex: none; }
+.color label { display: grid; font-weight: 700; font-size: 12px; color: var(--color-secondary); min-width: 0; }
+.color code { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatch { display: inline-flex; border-radius: 999px; overflow: hidden; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--studio-line); padding: 0; background: none; }
+.swatch i { width: 18px; height: 22px; display: block; }
+.swatch.from-logo { box-shadow: 0 0 0 2px var(--color-accent); }
+.extracted { display: none; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+.extracted.on { display: flex; }
+
+/* Fonts */
+.fonts { display: grid; gap: 6px; }
+.font-opt { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--studio-line); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+.font-opt:has(input:checked) { border-color: var(--color-primary); box-shadow: 0 0 0 1px var(--color-primary); }
+.font-opt input { accent-color: var(--color-primary); }
+.font-opt .s { font-size: 20px; color: var(--color-secondary); width: 40px; }
+.font-opt b { display: block; font-size: 13px; }
+.font-opt small { color: var(--text-muted); font-size: 11.5px; }
+
+/* Text fields */
+.field { display: grid; gap: 5px; }
+.field label { font-weight: 700; font-size: 12px; color: var(--color-secondary); display: flex; justify-content: space-between; }
+.field label span { color: var(--text-light); font-weight: 500; }
+.field input, .field textarea { font: 500 14px "Plus Jakarta Sans", sans-serif; color: var(--text-main); background: #fff; border: 1px solid var(--studio-line); border-radius: 10px; padding: 10px 12px; width: 100%; }
+.field textarea { min-height: 84px; resize: vertical; }
+
+/* Sections list */
+.sections { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.sections li { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--studio-line); border-radius: 10px; padding: 8px 10px; }
+.sections li.off { opacity: .55; }
+.sections label { flex: 1; display: flex; gap: 10px; align-items: center; font-weight: 600; cursor: pointer; }
+.sections input { accent-color: var(--color-primary); width: 16px; height: 16px; }
+.sections .mv { border: 1px solid var(--studio-line); background: var(--studio-panel); border-radius: 6px; width: 28px; height: 26px; color: var(--color-secondary); font-weight: 800; }
+.sections .mv:disabled { opacity: .35; cursor: default; }
+.sections .lock { font-size: 11px; color: var(--text-light); }
+
+/* Domains */
+.addr { background: #fff; border: 1px solid var(--studio-line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
+.addr .top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.addr b { color: var(--color-secondary); font-size: 14px; overflow-wrap: anywhere; }
+.pill { font-size: 11px; font-weight: 800; border-radius: 999px; padding: 3px 9px; white-space: nowrap; }
+.pill.live { background: var(--ok-soft); color: var(--ok); }
+.pill.free { background: #eaf0f7; color: var(--color-secondary); }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.steps li { font-size: 10.5px; font-weight: 700; color: var(--ok); border-top: 3px solid var(--ok); padding-top: 4px; line-height: 1.25; }
+.dns { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.dns th { text-align: left; color: var(--text-muted); font-weight: 600; padding: 4px 6px 4px 0; }
+.dns td { padding: 4px 6px 4px 0; font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; border-top: 1px solid var(--studio-line); }
+.add-domain { display: flex; gap: 6px; }
+.add-domain input { flex: 1; min-width: 0; font: 500 13px "Plus Jakarta Sans", sans-serif; border: 1px solid var(--studio-line); border-radius: 10px; padding: 8px 10px; }
+.added-note { font-size: 12px; color: var(--warn); font-weight: 600; margin: 0; }
+
+/* Preview stage */
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 16px; border-bottom: 1px solid var(--studio-line); }
+.url { display: flex; align-items: center; gap: 4px; background: #fff; border: 1px solid var(--studio-line); border-radius: 999px; padding: 3px; min-width: 0; flex-wrap: wrap; }
+.url button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 12.5px; color: var(--text-muted); white-space: nowrap; }
+.url button[aria-pressed="true"] { background: var(--color-secondary); color: #fff; }
+.url button::before { content: "🔒 "; font-size: 10px; }
+.devices { display: inline-flex; border: 1px solid var(--studio-line); border-radius: 10px; overflow: hidden; background: #fff; }
+.devices button { border: 0; background: transparent; padding: 7px 12px; font-weight: 700; font-size: 12.5px; color: var(--text-muted); }
+.devices button[aria-pressed="true"] { background: var(--color-secondary); color: #fff; }
+.viewport { flex: 1; min-height: 0; position: relative; overflow: hidden; padding: 16px; display: flex; justify-content: center; background: repeating-linear-gradient(45deg, transparent 0 10px, rgba(26,60,94,.025) 10px 20px); }
+.device { position: relative; flex: none; transform-origin: top center; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 50px rgba(18,35,54,.18), 0 0 0 1px var(--studio-line); background: #fff; }
+.device.phone { border-radius: 28px; box-shadow: 0 20px 50px rgba(18,35,54,.22), 0 0 0 10px #1c2733; }
+.device iframe { border: 0; width: 100%; height: 100%; display: block; background: #fff; }
+.sync { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; padding: 10px 16px; border-top: 1px solid var(--studio-line); font-size: 12.5px; color: var(--text-muted); }
+.sync b { color: var(--color-secondary); }
+.sync a { color: var(--color-primary); font-weight: 700; }
+
+/* Publish confirm */
+.confirm { position: fixed; inset: 0; z-index: 10000; background: rgba(18,35,54,.5); display: grid; place-items: center; padding: 16px; }
+.confirm[hidden] { display: none; }
+.confirm .box { background: #fff; border-radius: 18px; padding: 24px; max-width: 460px; width: 100%; display: grid; gap: 14px; box-shadow: 0 30px 60px rgba(0,0,0,.25); }
+.confirm h3 { margin: 0; font-size: 18px; color: var(--color-secondary); }
+.confirm ul { margin: 0; padding-left: 18px; color: var(--text-muted); display: grid; gap: 4px; }
+.confirm .row { display: flex; justify-content: flex-end; gap: 8px; }
+.toast { position: fixed; z-index: 10001; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--color-secondary); color: #fff; border-radius: 12px; padding: 12px 18px; font-weight: 700; box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+.toast[hidden] { display: none; }
+</style>
+</head>
+<body>
+
+<div class="demo-switcher">
+  <div><strong>DIGI MART 360</strong> — Interactive Prototype Switcher</div>
+  <div class="flex gap-2">
+    <a href="index.html">Homepage</a>
+    <a href="home-v2.html">Homepage v2</a>
+    <a href="category-listing.html">Category Listing</a>
+    <a href="product-detail.html">Product Detail</a>
+    <a href="storefront.html">Supplier Storefront (Theme)</a>
+    <a href="buyer-dashboard.html">Buyer RFQs</a>
+    <a href="supplier-dashboard.html">Supplier CRM</a>
+    <a href="theme-studio.html" class="active">Theme Studio</a>
+    <a href="admin-dashboard.html">Admin Portal</a>
+  </div>
+</div>
+
+<div class="studio-top">
+  <div class="t">
+    <a class="back" href="supplier-dashboard.html">← Command Center</a>
+    <div>
+      <h1>Storefront Studio</h1>
+      <span class="status" id="status"><i></i><span id="status-text">Live · Meridian · published 3 Nov 2026</span></span>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="b" type="button" id="discard" hidden>Discard changes</button>
+    <a class="b" id="open-live" href="themes/meridian.html" target="_blank" rel="noopener">Open full page ↗</a>
+    <button class="b primary" type="button" id="publish" disabled>Publish</button>
+  </div>
+</div>
+
+<div class="studio">
+  <aside class="rail" aria-label="Storefront settings">
+
+    <section class="sec">
+      <h2>Theme <small>4 available</small></h2>
+      <div class="themes" id="themes"></div>
+      <p class="hint">Switching theme keeps your products, logo, colours and text. Only the design changes.</p>
+    </section>
+
+    <section class="sec">
+      <h2>Logo & colours</h2>
+      <div class="logo-row">
+        <div class="logo-box" id="logo-box">No logo</div>
+        <div style="display:grid;gap:6px">
+          <div class="logo-actions">
+            <label class="b small file-label" for="logo-file">Upload logo<input type="file" id="logo-file" accept="image/png,image/jpeg,image/svg+xml,image/webp"></label>
+            <button class="b small" type="button" id="logo-sample">Use sample</button>
+            <button class="b small" type="button" id="logo-remove" hidden>Remove</button>
+          </div>
+          <p class="hint">PNG, JPG or SVG. Square works best.</p>
+        </div>
+      </div>
+      <div class="extracted" id="extracted">Colours found in your logo: <span class="swatches" id="logo-swatches"></span></div>
+      <div class="colors">
+        <div class="color"><input type="color" id="c-primary"><label for="c-primary">Brand colour<code id="c-primary-v"></code></label></div>
+        <div class="color"><input type="color" id="c-accent"><label for="c-accent">Button colour<code id="c-accent-v"></code></label></div>
+      </div>
+      <div class="swatches" id="presets" aria-label="Colour presets"></div>
+      <button class="b small" type="button" id="colors-reset" style="justify-self:start">Use theme's default colours</button>
+    </section>
+
+    <section class="sec">
+      <h2>Fonts</h2>
+      <div class="fonts" id="fonts"></div>
+    </section>
+
+    <section class="sec">
+      <h2>Homepage text</h2>
+      <div class="field"><label for="t-name">Company name <span id="t-name-n"></span></label><input id="t-name" maxlength="40"></div>
+      <div class="field"><label for="t-tag">Tagline <span id="t-tag-n"></span></label><input id="t-tag" maxlength="70"></div>
+      <div class="field"><label for="t-title">Headline <span id="t-title-n"></span></label><input id="t-title" maxlength="70"></div>
+      <div class="field"><label for="t-text">Intro paragraph <span id="t-text-n"></span></label><textarea id="t-text" maxlength="260"></textarea></div>
+    </section>
+
+    <section class="sec">
+      <h2>Homepage sections <small>show, hide, reorder</small></h2>
+      <ul class="sections" id="sections"></ul>
+    </section>
+
+    <section class="sec">
+      <h2>Web addresses</h2>
+      <p class="hint">Your store is live at both addresses. Products you edit in your catalogue update on both, and on the DIGI MART marketplace.</p>
+      <div class="addr">
+        <div class="top"><b>digimart360.com/store/acme-fluid</b><span class="pill free">Free address</span></div>
+        <span class="hint">Included with every supplier plan.</span>
+      </div>
+      <div class="addr">
+        <div class="top"><b>www.acmeflow.com</b><span class="pill live">Live · HTTPS</span></div>
+        <ol class="steps" aria-label="Domain setup progress">
+          <li>Domain added</li><li>DNS verified</li><li>Approved by DIGI MART</li><li>Secure (HTTPS)</li>
+        </ol>
+        <table class="dns">
+          <thead><tr><th>Type</th><th>Name</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>CNAME</td><td>www</td><td>stores.digimart360.com</td></tr>
+            <tr><td>TXT</td><td>_dm360</td><td>dm360-verify=af82c1e9</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <form class="add-domain" id="add-domain">
+        <label for="new-domain" style="position:absolute;left:-9999px">Add a domain</label>
+        <input id="new-domain" placeholder="Add another domain, e.g. acmevalves.in">
+        <button class="b small" type="submit">Add</button>
+      </form>
+      <p class="added-note" id="added-note" hidden></p>
+    </section>
+
+  </aside>
+
+  <div class="stage">
+    <div class="bar">
+      <div class="url" role="group" aria-label="Preview address">
+        <button type="button" data-url="www.acmeflow.com" aria-pressed="true">www.acmeflow.com</button>
+        <button type="button" data-url="digimart360.com/store/acme-fluid" aria-pressed="false">digimart360.com/store/acme-fluid</button>
+      </div>
+      <div class="devices" role="group" aria-label="Preview device">
+        <button type="button" data-w="1280" aria-pressed="true">Desktop</button>
+        <button type="button" data-w="820" aria-pressed="false">Tablet</button>
+        <button type="button" data-w="390" aria-pressed="false">Phone</button>
+      </div>
+    </div>
+    <div class="viewport" id="viewport">
+      <div class="device" id="device"><iframe id="frame" title="Storefront preview" src="themes/meridian.html"></iframe></div>
+    </div>
+    <div class="sync">
+      <span><b>6 products</b> in preview · synced from your Product Catalog (18 total)</span>
+      <span>Same listings on the marketplace: <a href="product-detail.html">view on DIGI MART 360</a></span>
+    </div>
+  </div>
+</div>
+
+<div class="confirm" id="confirm" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+  <div class="box">
+    <h3 id="confirm-title">Publish your storefront?</h3>
+    <p class="hint" id="confirm-summary"></p>
+    <ul><li>www.acmeflow.com</li><li>digimart360.com/store/acme-fluid</li></ul>
+    <p class="hint">Visitors see the new design straight away. You can switch back at any time.</p>
+    <div class="row"><button class="b" type="button" id="confirm-cancel">Cancel</button><button class="b primary" type="button" id="confirm-ok">Publish now</button></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+const THEMES = [
+  { id: 'meridian', name: 'Meridian', best: 'Corporate & engineering firms', primary: '#183b63', accent: '#0f8f7e' },
+  { id: 'forge', name: 'Forge', best: 'Heavy machinery & fabrication', primary: '#f26b1d', accent: '#ffc23d' },
+  { id: 'heritage', name: 'Heritage', best: 'Export houses & premium brands', primary: '#232a5c', accent: '#b7832b' },
+  { id: 'bazaar', name: 'Bazaar', best: 'Large catalogues & distributors', primary: '#1B8C4E', accent: '#f08a24' },
+];
+const PRESETS = [
+  ['#183b63', '#0f8f7e'], ['#1A3C5E', '#E8852D'], ['#1B8C4E', '#f08a24'], ['#7a1f2b', '#c9a227'],
+  ['#0e4d64', '#f2a541'], ['#2d2a6e', '#e0457b'], ['#222831', '#00adb5'],
+];
+const FONTS = [
+  { id: '', label: 'Theme default', note: 'Fonts designed for this theme', sample: 'Aa', css: 'inherit' },
+  { id: 'industrial', label: 'Industrial', note: 'Barlow Condensed + Barlow', sample: 'Aa', css: '"Barlow Condensed"' },
+  { id: 'corporate', label: 'Corporate', note: 'Manrope + Source Sans 3', sample: 'Aa', css: 'Manrope' },
+  { id: 'classic', label: 'Classic', note: 'Cormorant Garamond + Mulish', sample: 'Aa', css: '"Cormorant Garamond"' },
+  { id: 'modern', label: 'Modern', note: 'Sora + DM Sans', sample: 'Aa', css: 'Sora' },
+];
+const SECTIONS = {
+  hero: 'Banner & headline', stats: 'Plant figures', products: 'Products', about: 'About the company',
+  certifications: 'Certifications', industries: 'Industries & exports', contact: 'Inquiry form',
+};
+const DEFAULT_TEXT = {
+  companyName: 'Acme Fluid Systems',
+  tagline: 'Industrial valves, engineered in Pune since 2011',
+  heroTitle: 'High-pressure valves for critical flow lines',
+  heroText: 'Ball, gate, check and butterfly valves for refineries, chemical plants, fertilizer complexes and water projects. Hydro-tested to API 598, dispatched with mill test certificates.',
+};
+const PUBLISHED = {
+  theme: 'meridian', primary: '', accent: '', fontPair: '', logo: '',
+  ...DEFAULT_TEXT,
+  sections: Object.keys(SECTIONS).map((id) => ({ id, visible: true })),
+};
+
+const $ = (id) => document.getElementById(id);
+let published = structuredClone(PUBLISHED);
+let draft = structuredClone(PUBLISHED);
+try {
+  const saved = JSON.parse(localStorage.getItem('dm360-studio') || 'null');
+  if (saved && saved.published && saved.draft) { published = saved.published; draft = saved.draft; }
+} catch {}
+
+const themeOf = (id) => THEMES.find((t) => t.id === id);
+const isDirty = () => JSON.stringify(draft) !== JSON.stringify(published);
+
+function persist() {
+  try { localStorage.setItem('dm360-studio', JSON.stringify({ published, draft })); } catch {}
+}
+
+/* ---------- Rendering the rail ---------- */
+function renderThemes() {
+  $('themes').replaceChildren(...THEMES.map((t) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'theme';
+    b.setAttribute('aria-pressed', String(draft.theme === t.id));
+    b.innerHTML = `<div class="thumb ${t.id}"></div><b>${t.name}${published.theme === t.id ? '<em>LIVE</em>' : ''}</b><span>${t.best}</span>`;
+    b.addEventListener('click', () => { draft.theme = t.id; changed(true); });
+    return b;
+  }));
+}
+
+function renderColors() {
+  const t = themeOf(draft.theme);
+  const p = draft.primary || t.primary;
+  const a = draft.accent || t.accent;
+  $('c-primary').value = p; $('c-primary-v').textContent = p.toUpperCase() + (draft.primary ? '' : ' · theme');
+  $('c-accent').value = a; $('c-accent-v').textContent = a.toUpperCase() + (draft.accent ? '' : ' · theme');
+  $('colors-reset').hidden = !draft.primary && !draft.accent;
+}
+
+function swatchButton([p, a], cls = '') {
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'swatch ' + cls;
+  b.title = `Brand ${p} · Button ${a}`;
+  b.innerHTML = `<i style="background:${p}"></i><i style="background:${a}"></i>`;
+  b.addEventListener('click', () => { draft.primary = p; draft.accent = a; changed(); });
+  return b;
+}
+
+function renderLogo() {
+  const box = $('logo-box');
+  if (draft.logo) {
+    const img = document.createElement('img');
+    img.src = draft.logo; img.alt = 'Your logo';
+    box.replaceChildren(img);
+  } else box.textContent = 'No logo';
+  $('logo-remove').hidden = !draft.logo;
+}
+
+function renderFonts() {
+  $('fonts').replaceChildren(...FONTS.map((f) => {
+    const l = document.createElement('label');
+    l.className = 'font-opt';
+    l.innerHTML = `<input type="radio" name="font" value="${f.id}"><span class="s" style="font-family:${f.css}">${f.sample}</span><span><b>${f.label}</b><small>${f.note}</small></span>`;
+    const input = l.querySelector('input');
+    input.checked = (draft.fontPair || '') === f.id;
+    input.addEventListener('change', () => { draft.fontPair = f.id; changed(); });
+    return l;
+  }));
+}
+
+function renderText() {
+  [['t-name', 'companyName'], ['t-tag', 'tagline'], ['t-title', 'heroTitle'], ['t-text', 'heroText']].forEach(([id, key]) => {
+    const el = $(id);
+    if (document.activeElement !== el) el.value = draft[key];
+    $(id + '-n').textContent = `${el.value.length}/${el.maxLength}`;
+  });
+}
+
+function renderSections() {
+  const list = $('sections');
+  list.replaceChildren(...draft.sections.map((s, i) => {
+    const li = document.createElement('li');
+    li.className = s.visible ? '' : 'off';
+    const locked = s.id === 'products';
+    li.innerHTML = `<label><input type="checkbox" ${s.visible ? 'checked' : ''} ${locked ? 'disabled' : ''}>${SECTIONS[s.id]}</label>${locked ? '<span class="lock">Always shown</span>' : ''}<button class="mv" type="button" aria-label="Move ${SECTIONS[s.id]} up" ${i === 0 ? 'disabled' : ''}>↑</button><button class="mv" type="button" aria-label="Move ${SECTIONS[s.id]} down" ${i === draft.sections.length - 1 ? 'disabled' : ''}>↓</button>`;
+    li.querySelector('input').addEventListener('change', (e) => { s.visible = e.target.checked; changed(); });
+    const [up, down] = li.querySelectorAll('.mv');
+    up.addEventListener('click', () => move(i, -1));
+    down.addEventListener('click', () => move(i, 1));
+    return li;
+  }));
+}
+function move(i, d) {
+  const arr = draft.sections;
+  [arr[i], arr[i + d]] = [arr[i + d], arr[i]];
+  changed();
+  const btn = $('sections').children[i + d]?.querySelectorAll('.mv')[d < 0 ? 0 : 1];
+  if (btn && !btn.disabled) btn.focus();
+}
+
+function renderStatus() {
+  const dirty = isDirty();
+  $('status').classList.toggle('dirty', dirty);
+  $('status-text').textContent = dirty
+    ? 'Unpublished changes · visitors still see ' + themeOf(published.theme).name
+    : `Live · ${themeOf(published.theme).name} · ${published.at ? 'published ' + published.at : 'published 3 Nov 2026'}`;
+  $('publish').disabled = !dirty;
+  $('discard').hidden = !dirty;
+  $('open-live').href = `themes/${draft.theme}.html`;
+}
+
+/* ---------- Preview ---------- */
+const frame = $('frame');
+let loadedTheme = 'meridian';
+function brandPayload() {
+  const { theme, ...rest } = draft;
+  return rest;
+}
+function sendBrand() {
+  try { frame.contentWindow.postMessage({ type: 'dm360:brand', brand: brandPayload() }, '*'); } catch {}
+}
+window.addEventListener('message', (e) => { if (e.data && e.data.type === 'dm360:ready' && e.source === frame.contentWindow) sendBrand(); });
+frame.addEventListener('load', sendBrand);
+
+function syncFrame() {
+  if (loadedTheme !== draft.theme) { loadedTheme = draft.theme; frame.src = `themes/${draft.theme}.html`; }
+  else sendBrand();
+}
+
+let deviceW = 1280;
+function fit() {
+  const vp = $('viewport');
+  const dev = $('device');
+  const availW = vp.clientWidth - 32;
+  const availH = vp.clientHeight - 32;
+  const scale = Math.min(1, availW / deviceW);
+  dev.style.width = deviceW + 'px';
+  dev.style.height = Math.max(200, availH / scale) + 'px';
+  dev.style.transform = `scale(${scale})`;
+  dev.classList.toggle('phone', deviceW === 390);
+}
+document.querySelectorAll('.devices button').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('.devices button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  deviceW = Number(b.dataset.w);
+  fit();
+}));
+document.querySelectorAll('.url button').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('.url button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  toast(`Same store, same products at ${b.dataset.url}`);
+}));
+new ResizeObserver(fit).observe($('viewport'));
+
+/* ---------- Inputs ---------- */
+$('c-primary').addEventListener('input', (e) => { draft.primary = e.target.value; changed(); });
+$('c-accent').addEventListener('input', (e) => { draft.accent = e.target.value; changed(); });
+$('colors-reset').addEventListener('click', () => { draft.primary = ''; draft.accent = ''; changed(); });
+[['t-name', 'companyName'], ['t-tag', 'tagline'], ['t-title', 'heroTitle'], ['t-text', 'heroText']].forEach(([id, key]) => {
+  $(id).addEventListener('input', (e) => { draft[key] = e.target.value; changed(); });
+});
+
+$('logo-file').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { toast('That logo is over 2 MB. Please use a smaller file.'); return; }
+  const r = new FileReader();
+  r.onload = () => setLogo(r.result);
+  r.readAsDataURL(file);
+  e.target.value = '';
+});
+$('logo-sample').addEventListener('click', () => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="24" fill="#0e4d64"/><circle cx="60" cy="60" r="34" fill="none" stroke="#f2a541" stroke-width="10"/><path d="M60 26v68M26 60h68" stroke="#ffffff" stroke-width="8"/><circle cx="60" cy="60" r="10" fill="#f2a541"/></svg>`;
+  setLogo('data:image/svg+xml;base64,' + btoa(svg));
+});
+$('logo-remove').addEventListener('click', () => { draft.logo = ''; $('extracted').classList.remove('on'); changed(); });
+
+function setLogo(url) {
+  draft.logo = url;
+  changed();
+  extractColors(url).then((pairs) => {
+    if (!pairs.length) return;
+    $('logo-swatches').replaceChildren(...pairs.map((p) => swatchButton(p, 'from-logo')));
+    $('extracted').classList.add('on');
+    draft.primary = pairs[0][0]; draft.accent = pairs[0][1];
+    changed();
+    toast('Colours taken from your logo. Pick another pair or adjust them.');
+  });
+}
+
+/* Finds the two most common strong colours in the logo. */
+function extractColors(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 48;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, 48, 48);
+      let data;
+      try { data = ctx.getImageData(0, 0, 48, 48).data; } catch { return resolve([]); }
+      const buckets = new Map();
+      for (let i = 0; i < data.length; i += 4) {
+        const [r, g, b, a] = [data[i], data[i + 1], data[i + 2], data[i + 3]];
+        if (a < 200) continue;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        if (max > 235 && min > 225) continue;
+        if (max - min < 28 && max > 60) continue;
+        const key = ((r >> 4) << 8) | ((g >> 4) << 4) | (b >> 4);
+        buckets.set(key, (buckets.get(key) || 0) + 1);
+      }
+      const hex = (k) => '#' + [k >> 8, (k >> 4) & 15, k & 15].map((v) => (v * 16 + 8).toString(16).padStart(2, '0')).join('');
+      const lum = (h) => { const n = parseInt(h.slice(1), 16); return 0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255); };
+      const top = [...buckets.entries()].sort((x, y) => y[1] - x[1]).map(([k]) => hex(k));
+      const distinct = [];
+      top.forEach((h) => { if (distinct.every((d) => Math.abs(lum(d) - lum(h)) > 30 || d.slice(1, 3) !== h.slice(1, 3))) distinct.push(h); });
+      const picks = distinct.slice(0, 3);
+      if (picks.length < 2) return resolve([]);
+      const byDark = [...picks].sort((x, y) => lum(x) - lum(y));
+      const pairs = [[byDark[0], byDark[byDark.length - 1]]];
+      if (picks.length === 3) pairs.push([byDark[1], byDark[2]], [byDark[0], byDark[1]]);
+      resolve(pairs);
+    };
+    img.onerror = () => resolve([]);
+    img.src = url;
+  });
+}
+
+$('add-domain').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const v = $('new-domain').value.trim().toLowerCase();
+  const note = $('added-note');
+  if (!/^([a-z0-9-]+\.)+[a-z]{2,}$/.test(v)) { note.textContent = 'Enter a domain like acmevalves.in, without https://'; note.hidden = false; return; }
+  note.textContent = `${v} added. Create the two DNS records shown above at your domain registrar; we check every 10 minutes. After DNS is verified, our team approves it within one working day.`;
+  note.hidden = false;
+  $('new-domain').value = '';
+});
+
+/* ---------- Publish ---------- */
+$('publish').addEventListener('click', () => {
+  const parts = [];
+  if (draft.theme !== published.theme) parts.push(`theme changes to ${themeOf(draft.theme).name}`);
+  if (draft.primary !== published.primary || draft.accent !== published.accent || draft.logo !== published.logo) parts.push('new logo or colours');
+  if (draft.fontPair !== published.fontPair) parts.push('new fonts');
+  if (['companyName', 'tagline', 'heroTitle', 'heroText'].some((k) => draft[k] !== published[k])) parts.push('updated homepage text');
+  if (JSON.stringify(draft.sections) !== JSON.stringify(published.sections)) parts.push('section changes');
+  $('confirm-summary').textContent = 'Changes: ' + (parts.join(', ') || 'minor updates') + '. They go live on:';
+  $('confirm').hidden = false;
+  $('confirm-ok').focus();
+});
+$('confirm-cancel').addEventListener('click', () => { $('confirm').hidden = true; $('publish').focus(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') $('confirm').hidden = true; });
+$('confirm-ok').addEventListener('click', () => {
+  const at = new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  published = structuredClone({ ...draft, at });
+  draft.at = at;
+  $('confirm').hidden = true;
+  changed(true);
+  toast('Published. Your storefront is live on both addresses.');
+});
+$('discard').addEventListener('click', () => { draft = structuredClone(published); changed(true); toast('Changes discarded'); });
+
+let toastTimer;
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (t.hidden = true), 3200);
+}
+
+function changed(full = false) {
+  if (full) { renderThemes(); renderFonts(); }
+  renderColors(); renderLogo(); renderText(); renderSections(); renderStatus();
+  persist();
+  syncFrame();
+}
+
+// "at" (publish time) is copied to the draft so it never counts as a change.
+published.at = published.at || '';
+draft.at = published.at;
+
+$('presets').replaceChildren(...PRESETS.map((p) => swatchButton(p)));
+loadedTheme = draft.theme;
+frame.src = `themes/${draft.theme}.html`;
+changed(true);
+fit();
+</script>
+</body>
+</html>

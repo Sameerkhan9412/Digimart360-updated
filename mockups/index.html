@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DIGI MART 360 - B2B Marketplace (Neumorphism UI)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="neumorphic.css">
+  <style>
+    /* Header */
+    .header {
+      padding: 18px 0;
+      position: sticky;
+      top: 37px;
+      z-index: 100;
+      background: rgba(233, 239, 245, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    }
+    .header-logo {
+      height: 48px;
+      width: auto;
+      object-fit: contain;
+    }
+    .nav-links a {
+      color: var(--text-main);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--color-primary);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 60px 0 40px;
+    }
+    .hero-badge {
+      display: inline-block;
+      margin-bottom: 16px;
+      padding: 6px 16px;
+    }
+    .hero-title {
+      font-size: 44px;
+      font-weight: 800;
+      color: var(--color-secondary);
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .hero-title span {
+      background: linear-gradient(135deg, #1B8C4E, #14693A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    /* Neumorphic Search Bar Box */
+    .search-box {
+      background: var(--bg-card);
+      box-shadow: var(--shadow-floating);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-xl);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 860px;
+    }
+    .search-select {
+      background: transparent;
+      border: none;
+      font-weight: 600;
+      color: var(--color-secondary);
+      padding: 10px 12px;
+      outline: none;
+      cursor: pointer;
+      border-right: 2px solid #d4dae2;
+    }
+    .search-input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-box input {
+      border: none;
+      background: transparent;
+      outline: none;
+      width: 100%;
+      font-size: 15px;
+      color: var(--text-main);
+    }
+
+    /* Quick stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin: 50px 0 20px;
+    }
+    .stat-card {
+      text-align: center;
+      padding: 22px;
+    }
+    .stat-number {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--color-secondary);
+    }
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    /* Categories Grid */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin: 60px 0 24px;
+    }
+    .section-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--color-secondary);
+    }
+    .section-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 18px;
+    }
+    .category-card {
+      text-align: center;
+      padding: 20px 12px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    .cat-icon-box {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-lg);
+      font-size: 26px;
+      background: var(--bg-card);
+      box-shadow: var(--shadow-convex);
+      transition: all 0.3s;
+    }
+    .category-card:hover .cat-icon-box {
+      box-shadow: var(--shadow-pressed);
+      transform: scale(0.96);
+      color: var(--color-primary);
+    }
+    .cat-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-secondary);
+    }
+    .cat-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    .product-card {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .prod-img-box {
+      width: 100%;
+      height: 180px;
+      border-radius: var(--radius-md);
+      background: #dde5ed;
+      box-shadow: var(--shadow-pressed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 14px;
+      overflow: hidden;
+      font-size: 48px;
+      color: #9ab0c6;
+    }
+    .prod-price {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin-bottom: 4px;
+    }
+    .prod-moq {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .prod-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.4;
+      margin-bottom: 10px;
+      flex-grow: 1;
+    }
+    .prod-supplier {
+      font-size: 12px;
+      color: var(--color-secondary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    /* RFQ Banner */
+    .rfq-banner {
+      margin: 70px 0;
+      background: linear-gradient(135deg, #1A3C5E 0%, #102942 100%);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 44px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 40px;
+      align-items: center;
+      box-shadow: var(--shadow-floating);
+    }
+    .rfq-banner h2 {
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .rfq-banner p {
+      color: #b7cce1;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .rfq-card-inner {
+      background: #e9eff5;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      box-shadow: inset 4px 4px 10px rgba(0,0,0,0.25);
+      color: var(--text-main);
+    }
+
+    /* Footer */
+    .footer {
+      background: #dfe5ec;
+      padding: 60px 0 30px;
+      margin-top: 80px;
+      border-top: 1px solid rgba(255, 255, 255, 0.7);
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-col h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-secondary);
+      margin-bottom: 16px;
+    }
+    .footer-col ul {
+      list-style: none;
+    }
+    .footer-col ul li {
+      margin-bottom: 10px;
+    }
+    .footer-col ul li a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .footer-col ul li a:hover {
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Demo Switcher -->
+  <div class="demo-switcher">
+    <div><strong>DIGI MART 360</strong> — Interactive Prototype Switcher</div>
+    <div class="flex gap-2">
+      <a href="index.html" class="active">Homepage</a>
+      <a href="home-v2.html">Homepage v2</a>
+      <a href="category-listing.html">Category Listing</a>
+      <a href="product-detail.html">Product Detail</a>
+      <a href="storefront.html">Supplier Storefront (Theme)</a>
+      <a href="buyer-dashboard.html">Buyer RFQs</a>
+      <a href="supplier-dashboard.html">Supplier CRM</a>
+      <a href="theme-studio.html">Theme Studio</a>
+      <a href="admin-dashboard.html">Admin Portal</a>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <a href="index.html">
+          <img src="logo.png" alt="DIGI MART 360" class="header-logo">
+        </a>
+        <nav class="nav-links flex gap-3">
+          <a href="#categories">All Categories</a>
+          <a href="product-detail.html">Products</a>
+          <a href="storefront.html">Suppliers</a>
+          <a href="buyer-dashboard.html">Post RFQ</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="supplier-dashboard.html" class="neu-btn neu-btn-pill">
+          🏢 Supplier Hub
+        </a>
+        <a href="buyer-dashboard.html" class="neu-btn neu-btn-primary neu-btn-pill">
+          Sign In
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="neu-badge badge-featured hero-badge">
+        🚀 India's Most Advanced B2B Sourcing Platform
+      </div>
+      <h1 class="hero-title">
+        Discover Verified Manufacturers &<br>
+        <span>Wholesale Suppliers in India</span>
+      </h1>
+      <p class="hero-subtitle">
+        Connect directly with verified industrial suppliers, request wholesale quotations, and streamline bulk sourcing with DIGI MART 360.
+      </p>
+
+      <!-- Neumorphic Search Bar -->
+      <div class="search-box">
+        <select class="search-select">
+          <option>All India</option>
+          <option>Pune / Mumbai</option>
+          <option>Delhi NCR</option>
+          <option>Ahmedabad</option>
+          <option>Bengaluru</option>
+        </select>
+        <div class="search-input-wrapper">
+          <svg width="20" height="20" fill="none" stroke="#6a7c92" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Enter product name, industrial part, or supplier..." value="Industrial Ball Valve 2 Inch">
+        </div>
+        <a href="product-detail.html" class="neu-btn neu-btn-accent neu-btn-pill">
+          Search Marketplace
+        </a>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="neu-card stat-card">
+          <div class="stat-number">45,000+</div>
+          <div class="stat-label">Active B2B Products</div>
+        </div>
+        <div class="neu-card stat-card">
+          <div class="stat-number">3,800+</div>
+          <div class="stat-label">Verified Suppliers</div>
+        </div>
+        <div class="neu-card stat-card">
+          <div class="stat-number">₹120 Cr+</div>
+          <div class="stat-label">RFQs Processed</div>
+        </div>
+        <div class="neu-card stat-card">
+          <div class="stat-number">< 2 hrs</div>
+          <div class="stat-label">Avg Quotation Speed</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Categories -->
+  <section id="categories" class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Explore Industry Categories</h2>
+        <p class="section-desc">Over 250+ curated industrial taxonomies & wholesale sectors</p>
+      </div>
+      <a href="#" class="neu-btn neu-btn-pill">View All 120+ Sectors →</a>
+    </div>
+
+    <div class="category-grid">
+      <a href="product-detail.html" class="neu-card category-card">
+        <div class="cat-icon-box">⚙️</div>
+        <div class="cat-name">Industrial Valves</div>
+        <div class="cat-count">1,420 items</div>
+      </a>
+      <a href="product-detail.html" class="neu-card category-card">
+        <div class="cat-icon-box">⚡</div>
+        <div class="cat-name">Electrical & Switchgear</div>
+        <div class="cat-count">2,850 items</div>
+      </a>
+      <a href="product-detail.html" class="neu-card category-card">
+        <div class="cat-icon-box">🏗️</div>
+        <div class="cat-name">Pipes, Tubes & Fittings</div>
+        <div class="cat-count">3,120 items</div>
+      </a>
+      <a href="product-detail.html" class="neu-card category-card">
+        <div class="cat-icon-box">🧪</div>
+        <div class="cat-name">Chemicals & Dyes</div>
+        <div class="cat-count">940 items</div>
+      </a>
+      <a href="product-detail.html" class="neu-card category-card">
+        <div class="cat-icon-box">🧵</div>
+        <div class="cat-name">Textiles & Yarns</div>
+        <div class="cat-count">2,110 items</div>
+      </a>
+      <a href="product-detail.html" class="neu-card category-card">
+        <div class="cat-icon-box">🚜</div>
+        <div class="cat-name">Agriculture Tools</div>
+        <div class="cat-count">870 items</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Trending Wholesale Products</h2>
+        <p class="section-desc">Direct factory prices with transparent MOQ tiers</p>
+      </div>
+      <div class="flex gap-2">
+        <button class="neu-btn neu-btn-primary neu-btn-pill">Machinery</button>
+        <button class="neu-btn neu-btn-pill">Hardware</button>
+        <button class="neu-btn neu-btn-pill">Metals</button>
+      </div>
+    </div>
+
+    <div class="product-grid">
+      <!-- Item 1 -->
+      <div class="neu-card product-card">
+        <div class="prod-img-box">
+          <span style="font-size: 50px;">🔧</span>
+          <span class="neu-badge badge-featured" style="position: absolute; top: 10px; right: 10px;">Trending</span>
+        </div>
+        <div class="prod-price">₹2,500 <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">/ piece</span></div>
+        <div class="prod-moq">Min. Order: 50 pieces</div>
+        <div class="prod-title">Heavy Duty 2-Inch SS304 Stainless Steel Ball Valve (150 PSI)</div>
+        <div class="prod-supplier">
+          <span>🏢 Acme Fluid Systems</span>
+          <span class="neu-badge badge-verified" style="font-size: 9px; padding: 2px 6px;">Verified</span>
+        </div>
+        <div class="flex gap-2" style="margin-top: auto;">
+          <a href="product-detail.html" class="neu-btn neu-btn-accent" style="flex: 1; padding: 8px;">Inquire Now</a>
+          <a href="storefront.html" class="neu-btn" style="padding: 8px 12px;" title="View Supplier Storefront">Store ↗</a>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="neu-card product-card">
+        <div class="prod-img-box">
+          <span style="font-size: 50px;">⚡</span>
+        </div>
+        <div class="prod-price">₹18,400 <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">/ unit</span></div>
+        <div class="prod-moq">Min. Order: 5 units</div>
+        <div class="prod-title">Three-Phase 15HP Induction Motor (Copper Winding, IE3)</div>
+        <div class="prod-supplier">
+          <span>🏢 Bharat Electro Corp</span>
+          <span class="neu-badge badge-verified" style="font-size: 9px; padding: 2px 6px;">Verified</span>
+        </div>
+        <div class="flex gap-2" style="margin-top: auto;">
+          <a href="product-detail.html" class="neu-btn neu-btn-accent" style="flex: 1; padding: 8px;">Inquire Now</a>
+          <a href="storefront.html" class="neu-btn" style="padding: 8px 12px;">Store ↗</a>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="neu-card product-card">
+        <div class="prod-img-box">
+          <span style="font-size: 50px;">🔩</span>
+        </div>
+        <div class="prod-price">₹85 <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">/ kg</span></div>
+        <div class="prod-moq">Min. Order: 500 kg</div>
+        <div class="prod-title">Galvanized High-Tensile Hex Bolts M16 x 60mm Grade 8.8</div>
+        <div class="prod-supplier">
+          <span>🏢 Apex Fasteners Ltd</span>
+          <span class="neu-badge badge-verified" style="font-size: 9px; padding: 2px 6px;">Verified</span>
+        </div>
+        <div class="flex gap-2" style="margin-top: auto;">
+          <a href="product-detail.html" class="neu-btn neu-btn-accent" style="flex: 1; padding: 8px;">Inquire Now</a>
+          <a href="storefront.html" class="neu-btn" style="padding: 8px 12px;">Store ↗</a>
+        </div>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="neu-card product-card">
+        <div class="prod-img-box">
+          <span style="font-size: 50px;">📦</span>
+        </div>
+        <div class="prod-price">₹42 <span style="font-size: 13px; color: var(--text-muted); font-weight: normal;">/ box</span></div>
+        <div class="prod-moq">Min. Order: 1,000 boxes</div>
+        <div class="prod-title">5-Ply Corrugated Heavy Shipping Box (Custom Logo Print)</div>
+        <div class="prod-supplier">
+          <span>🏢 Horizon Packaging</span>
+          <span class="neu-badge badge-verified" style="font-size: 9px; padding: 2px 6px;">Verified</span>
+        </div>
+        <div class="flex gap-2" style="margin-top: auto;">
+          <a href="product-detail.html" class="neu-btn neu-btn-accent" style="flex: 1; padding: 8px;">Inquire Now</a>
+          <a href="storefront.html" class="neu-btn" style="padding: 8px 12px;">Store ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RFQ Quick Banner -->
+  <section class="container">
+    <div class="rfq-banner">
+      <div>
+        <h2>Cannot Find What You're Looking For?</h2>
+        <p>Post a quick Request for Quotation (RFQ). Let multiple verified manufacturers submit their best bids directly into your inbox within hours.</p>
+        <div class="flex gap-3">
+          <a href="buyer-dashboard.html" class="neu-btn neu-btn-accent neu-btn-pill">Create Bulk RFQ Now</a>
+          <a href="supplier-dashboard.html" class="neu-btn neu-btn-pill" style="color: white; border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1);">Register as Supplier</a>
+        </div>
+      </div>
+      <div class="rfq-card-inner">
+        <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 14px; color: var(--color-secondary);">Instant Requirement Express</h3>
+        <input type="text" class="neu-input" placeholder="Product name or requirement" style="margin-bottom: 12px;" value="Precision CNC Turned Aluminum Parts">
+        <div class="flex gap-2" style="margin-bottom: 12px;">
+          <input type="number" class="neu-input" placeholder="Quantity" value="5000">
+          <select class="neu-input" style="width: 140px;">
+            <option>Pieces</option>
+            <option>Kilograms</option>
+            <option>Meters</option>
+          </select>
+        </div>
+        <button class="neu-btn neu-btn-primary" style="width: 100%;">Broadcast to 15+ Verified Suppliers</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <img src="logo.png" alt="DIGI MART 360" style="height: 40px; margin-bottom: 16px;">
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; max-width: 320px;">
+            DIGI MART 360 is India's next-generation B2B marketplace platform empowering manufacturing MSMEs and global wholesale buyers.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>For Buyers</h4>
+          <ul>
+            <li><a href="product-detail.html">Browse Products</a></li>
+            <li><a href="buyer-dashboard.html">Post RFQ</a></li>
+            <li><a href="#">Category Directory</a></li>
+            <li><a href="#">Buyer Protection Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>For Suppliers</h4>
+          <ul>
+            <li><a href="supplier-dashboard.html">Supplier Dashboard</a></li>
+            <li><a href="storefront.html">Theme Storefront</a></li>
+            <li><a href="#">Lead Plans & Credits</a></li>
+            <li><a href="#">GST Verification Guide</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About DIGI MART 360</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Contact Support</a></li>
+            <li><a href="#">Privacy & Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div style="text-align: center; font-size: 12px; color: var(--text-muted); padding-top: 24px; border-top: 1px solid rgba(0,0,0,0.06);">
+        © 2026 DIGI MART 360 Technologies Pvt Ltd. All rights reserved. Built with Neumorphic Clean Architecture.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
+

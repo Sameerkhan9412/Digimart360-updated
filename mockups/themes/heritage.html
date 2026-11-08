@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme Fluid Systems · Heritage theme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Mulish:wght@400;600;700&display=swap">
+<style>
+/* HERITAGE · export house. Stone paper, indigo ink, gilt rules, editorial rows.
+   Seller-controlled: --primary (ink/brand) · --accent (gilt, buttons) · fonts */
+:root {
+  --primary: #232a5c;
+  --accent: #b7832b;
+  --paper: #f2f1ec;
+  --paper-2: #e9e7df;
+  --ink: #1e2233;
+  --muted: #5e6172;
+  --rule: #cfccc0;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Mulish", "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.7; }
+img { max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; margin: 0; line-height: 1.05; text-wrap: balance; color: var(--primary); }
+.wrap { max-width: 1160px; margin: 0 auto; padding-inline: max(20px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-right)); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.smallcaps { font: 700 12px var(--font-body); letter-spacing: .22em; text-transform: uppercase; color: var(--accent); }
+.ornament { display: flex; align-items: center; gap: 14px; color: var(--accent); justify-content: center; }
+.ornament::before, .ornament::after { content: ""; height: 1px; flex: 1; max-width: 120px; background: currentColor; opacity: .6; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 13px 26px; font: 700 13px var(--font-body); letter-spacing: .14em; text-transform: uppercase; text-decoration: none; background: var(--primary); color: var(--paper); border: 1px solid var(--primary); cursor: pointer; }
+.btn:hover { background: var(--ink); }
+.btn.gilt { background: transparent; color: var(--primary); border-color: var(--accent); }
+.btn.gilt:hover { background: var(--accent); color: #fff; }
+
+/* Masthead */
+.strip { background: var(--primary); color: color-mix(in srgb, var(--paper) 80%, transparent); font-size: 13px; }
+.strip .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 18px; padding-block: 8px; }
+header { border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: 0; z-index: 10; }
+header .wrap { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; padding-block: 16px; }
+header nav { display: flex; gap: 22px; }
+header nav a { text-decoration: none; font-weight: 600; font-size: 14px; color: var(--muted); }
+header nav a:hover { color: var(--primary); }
+header nav a.btn, header nav a.btn:hover { color: var(--paper); }
+header nav.right { justify-content: flex-end; }
+.brand { display: flex; flex-direction: column; align-items: center; text-decoration: none; text-align: center; }
+.logo { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--accent); display: grid; place-items: center; font: 600 22px var(--font-display); color: var(--primary); background: var(--paper); box-shadow: 0 0 0 4px var(--paper), 0 0 0 5px var(--rule); }
+.logo.has-image { padding: 6px; background: #fff; }
+.logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 50%; }
+.brand b { font: 600 24px var(--font-display); color: var(--primary); margin-top: 8px; line-height: 1; }
+@media (max-width: 860px) {
+  header .wrap { grid-template-columns: minmax(0, 1fr) auto; }
+  header nav.left { display: none; }
+  header nav.right a:not(.btn) { display: none; }
+  .brand { flex-direction: row; gap: 10px; text-align: left; }
+  .brand b { margin-top: 0; font-size: 20px; }
+  .logo { width: 40px; height: 40px; font-size: 17px; box-shadow: none; }
+}
+
+/* Hero */
+.hero { text-align: center; padding-block: 72px 64px; }
+.hero h1 { font-size: clamp(44px, 7vw, 92px); font-weight: 500; margin-block: 20px 22px; }
+.hero h1::first-line { font-style: italic; }
+.hero p { max-width: 60ch; margin: 0 auto 30px; color: var(--muted); font-size: 18px; }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+.plate { margin: 52px auto 0; max-width: 760px; border: 1px solid var(--rule); padding: 10px; background: var(--paper); }
+.plate > div { border: 1px solid var(--accent); aspect-ratio: 21 / 9; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; padding: 18px; color: var(--primary); background: var(--paper-2); }
+.plate svg { width: min(260px, 36vw); }
+.plate .note { font: italic 500 18px var(--font-display); color: var(--muted); line-height: 1.3; }
+.plate .note b { display: block; font: 700 11px var(--font-body); letter-spacing: .2em; text-transform: uppercase; color: var(--accent); font-style: normal; margin-bottom: 4px; }
+@media (max-width: 620px) { .plate > div { grid-template-columns: minmax(0, 1fr); aspect-ratio: auto; text-align: center; } }
+
+/* Stats */
+.stats { border-block: 1px solid var(--rule); }
+.stats .wrap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat { padding: 30px 18px; text-align: center; border-left: 1px solid var(--rule); }
+.stat:first-child { border-left: 0; }
+.stat b { font: 500 clamp(38px, 5vw, 56px) var(--font-display); color: var(--primary); display: block; line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+.stat em { font-style: normal; font: 700 11px var(--font-body); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.stat span { display: block; color: var(--muted); font-size: 14px; }
+@media (max-width: 760px) { .stats .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid var(--rule); } }
+
+section.block { padding-block: 88px; }
+.head { text-align: center; margin-bottom: 44px; }
+.head h2 { font-size: clamp(36px, 5vw, 58px); margin-block: 12px 10px; }
+.head p { color: var(--muted); max-width: 56ch; margin: 0 auto; }
+
+.filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px; margin-bottom: 40px; }
+.filters button { font: 600 14px var(--font-body); color: var(--muted); background: none; border: 0; border-bottom: 1px solid transparent; padding: 4px 0; cursor: pointer; }
+.filters button[aria-pressed="true"] { color: var(--primary); border-bottom-color: var(--accent); }
+
+/* Editorial product rows */
+.rows { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.prow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 48px; padding-block: 40px; border-bottom: 1px solid var(--rule); align-items: center; }
+.prow[hidden] { display: none; }
+.prow:nth-child(even) .pic { order: 2; }
+.prow .pic { background: var(--paper-2); border: 1px solid var(--rule); aspect-ratio: 4 / 3; display: grid; place-items: center; color: var(--primary); position: relative; }
+.prow .pic svg { width: 60%; }
+.prow .no { position: absolute; top: 12px; left: 16px; font: italic 500 18px var(--font-display); color: var(--accent); }
+.prow h3 { font-size: clamp(30px, 3.6vw, 42px); margin-block: 8px 12px; }
+.prow p { color: var(--muted); margin: 0 0 18px; max-width: 52ch; }
+.prow dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 22px; border-block: 1px solid var(--rule); }
+.prow dl div { padding: 10px 12px 10px 0; min-width: 0; }
+.prow dt { font: 700 10px var(--font-body); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.prow dd { margin: 0; font-weight: 600; font-size: 14px; }
+.prow .row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
+.price b { font: 600 32px var(--font-display); color: var(--primary); font-variant-numeric: lining-nums; }
+.price span, .price small { color: var(--muted); font-size: 14px; }
+.price small { display: block; }
+.prow .btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+@media (max-width: 820px) { .prow { grid-template-columns: minmax(0, 1fr); gap: 22px; } .prow:nth-child(even) .pic { order: 0; } .prow dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* About */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: start; }
+.about .lead { font: italic 500 clamp(24px, 3vw, 32px) var(--font-display); color: var(--primary); line-height: 1.3; margin: 16px 0 0; }
+.about p { color: var(--muted); }
+.timeline { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--accent); }
+.timeline li { padding: 0 0 26px 24px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: -5px; top: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
+.timeline b { font: 600 26px var(--font-display); color: var(--primary); display: block; line-height: 1.1; }
+.timeline span { color: var(--muted); }
+@media (max-width: 820px) { .about { grid-template-columns: minmax(0, 1fr); gap: 36px; } }
+
+/* Certifications as seals */
+.seals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.seal { text-align: center; display: grid; justify-items: center; gap: 10px; }
+.seal i { width: 112px; height: 112px; border-radius: 50%; border: 1px solid var(--accent); box-shadow: inset 0 0 0 6px var(--paper), inset 0 0 0 7px var(--rule); display: grid; place-items: center; font: 600 20px var(--font-display); font-style: normal; color: var(--primary); padding: 12px; line-height: 1.1; }
+.seal span { color: var(--muted); font-size: 14px; }
+@media (max-width: 760px) { .seals { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Industries + export register */
+.register { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; }
+.register h3 { font-size: 30px; margin-bottom: 14px; }
+.register ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.register li { padding: 12px 0; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; gap: 12px; }
+.register li::after { content: "◆"; color: var(--accent); font-size: 10px; align-self: center; }
+@media (max-width: 760px) { .register { grid-template-columns: minmax(0, 1fr); gap: 36px; } }
+
+/* Contact */
+.letter { max-width: 760px; margin: 0 auto; border: 1px solid var(--rule); padding: 10px; }
+.letter > div { border: 1px solid var(--accent); padding: clamp(22px, 5vw, 48px); background: var(--paper); }
+.letter dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 26px 0; text-align: center; }
+.letter dt { font: 700 10px var(--font-body); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.letter dd { margin: 0; font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+form { display: grid; gap: 16px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+label { display: grid; gap: 4px; font: 700 11px var(--font-body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+input, textarea { font: 400 16px var(--font-body); color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--rule); padding: 10px 0; width: 100%; }
+input:focus, textarea:focus { border-bottom-color: var(--primary); outline: none; }
+textarea { min-height: 90px; resize: vertical; }
+.sent { color: var(--primary); font: italic 500 20px var(--font-display); margin: 0; text-align: center; }
+@media (max-width: 620px) { .letter dl, .two { grid-template-columns: minmax(0, 1fr); } }
+
+footer { border-top: 1px solid var(--rule); padding-block: 30px; font-size: 14px; color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: space-between; align-items: center; }
+.dm-badge { display: inline-flex; gap: 8px; align-items: center; text-decoration: none; color: var(--ink); font-weight: 600; }
+.dm-badge i { font-style: normal; width: 18px; height: 18px; border-radius: 50%; background: #1B8C4E; color: #fff; display: grid; place-items: center; font-size: 11px; }
+
+.tray { position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom)); }
+.tray .btn { box-shadow: 0 10px 28px rgba(30,34,51,.25); }
+</style>
+</head>
+<body>
+
+<div class="strip"><div class="wrap">
+  <span>Manufacturers & exporters · Est. <span data-bind="since"></span></span>
+  <span><span data-bind="phone"></span> · <span data-bind="email"></span></span>
+</div></div>
+
+<header><div class="wrap">
+  <nav class="left" aria-label="Sections"><a href="#products">Collection</a><a href="#about">Our story</a></nav>
+  <a class="brand" href="#hero"><span class="logo" data-logo></span><b data-bind="companyName"></b></a>
+  <nav class="right" aria-label="More"><a href="#certifications">Approvals</a><a class="btn" href="#contact">Enquire</a></nav>
+</div></header>
+
+<main data-sections>
+
+  <section data-section="hero" class="hero" id="hero"><div class="wrap">
+    <div class="ornament smallcaps"><span data-bind="tagline"></span></div>
+    <h1 data-bind="heroTitle"></h1>
+    <p data-bind="heroText"></p>
+    <div class="cta">
+      <a class="btn" href="#products">View the collection</a>
+      <a class="btn gilt" href="#contact">Request export price list</a>
+    </div>
+    <div class="plate" aria-hidden="true"><div>
+      <div class="note"><b>Plate I</b>Flanged ball valve, CF8 investment casting</div>
+      <svg viewBox="0 0 160 120" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="44" width="14" height="40" rx="2"/><rect x="136" y="44" width="14" height="40" rx="2"/><path d="M24 54h22M24 74h22M114 54h22M114 74h22"/><circle cx="80" cy="64" r="34"/><circle cx="80" cy="64" r="26" stroke-dasharray="2 4"/><circle cx="80" cy="64" r="12"/><path d="M74 30V20h12v10"/><path d="M80 20l46-8" stroke-width="4"/></svg>
+      <div class="note"><b>Shipped to</b>18 countries across the Gulf, Africa and South-East Asia</div>
+    </div></div>
+  </div></section>
+
+  <section data-section="stats" class="stats" aria-label="House figures"><div class="wrap" data-list="stats">
+    <template><div class="stat"><b data-i="value"></b><em data-i="unit"></em><span data-i="label"></span></div></template>
+  </div></section>
+
+  <section data-section="products" class="block" id="products"><div class="wrap">
+    <div class="head">
+      <div class="ornament smallcaps">The collection</div>
+      <h2>Valves made to last a plant's lifetime</h2>
+      <p>Ex-works prices for the stated minimum order. FOB Nhava Sheva quotations on request.</p>
+    </div>
+    <div class="filters" data-filter-bar aria-label="Filter by type"></div>
+    <div class="rows" data-products></div>
+    <template id="product-card">
+      <article class="prow">
+        <div class="pic"><span class="no">No. <span data-f="index"></span></span><span data-f="icon" style="display:contents"></span></div>
+        <div>
+          <span class="smallcaps" data-f="category"></span>
+          <h3 data-f="name"></h3>
+          <p data-f="summary"></p>
+          <dl data-f="specs"></dl>
+          <div class="row">
+            <div class="price"><b data-f="price"></b> <span data-f="unit"></span><small data-f="moq"></small></div>
+            <button class="btn" type="button" data-action="rfq" aria-pressed="false" data-label-off="Add to enquiry" data-label-on="In your enquiry">Add to enquiry</button>
+          </div>
+        </div>
+      </article>
+    </template>
+  </div></section>
+
+  <section data-section="about" class="block" id="about" style="background:var(--paper-2);border-block:1px solid var(--rule)"><div class="wrap about">
+    <div>
+      <span class="smallcaps">Our story</span>
+      <p class="lead">“A valve is a promise that a line will hold. We have kept that promise for fourteen years.”</p>
+      <p>What began as a two-lathe workshop in Bhosari is now a 25,000 sq ft works supplying refineries, fertilizer complexes and water authorities at home and abroad.</p>
+      <p data-bind="address"></p>
+    </div>
+    <ol class="timeline">
+      <li><b>2011</b><span>Workshop founded in MIDC Bhosari, Pune.</span></li>
+      <li><b>2015</b><span>ISO 9001 certification and first Gulf export order.</span></li>
+      <li><b>2019</b><span>API 6D licence; new CNC hall and 100 bar test bench.</span></li>
+      <li><b>2024</b><span>18 export countries; CE marking under the EU Pressure Equipment Directive.</span></li>
+    </ol>
+  </div></section>
+
+  <section data-section="certifications" class="block" id="certifications"><div class="wrap">
+    <div class="head"><div class="ornament smallcaps">Approvals</div><h2>Certified and inspected</h2></div>
+    <div class="seals" data-list="certifications">
+      <template><div class="seal"><i data-i="code"></i><span data-i="label"></span></div></template>
+    </div>
+  </div></section>
+
+  <section data-section="industries" class="block" style="padding-top:0"><div class="wrap register">
+    <div><h3>Industries served</h3><ul data-list="industries"><template><li data-i></li></template></ul></div>
+    <div><h3>Export register</h3><ul data-list="exportTo"><template><li data-i></li></template></ul></div>
+  </div></section>
+
+  <section data-section="contact" class="block" id="contact" style="padding-top:0"><div class="wrap">
+    <div class="letter"><div>
+      <div class="head" style="margin-bottom:0"><div class="ornament smallcaps">Correspondence</div><h2>Write to our export desk</h2></div>
+      <dl>
+        <div><dt>Telephone</dt><dd data-bind="phone"></dd></div>
+        <div><dt>Email</dt><dd data-bind="email"></dd></div>
+        <div><dt>Works</dt><dd data-bind="city"></dd></div>
+      </dl>
+      <form data-inquiry>
+        <div class="two">
+          <label for="h-name">Name<input id="h-name" required autocomplete="name"></label>
+          <label for="h-co">Company & country<input id="h-co" autocomplete="organization"></label>
+        </div>
+        <div class="two">
+          <label for="h-em">Email<input id="h-em" type="email" required autocomplete="email"></label>
+          <label for="h-ph">Telephone<input id="h-ph" type="tel" autocomplete="tel"></label>
+        </div>
+        <label for="h-req">Your requirement<textarea id="h-req"></textarea></label>
+        <div style="text-align:center"><button class="btn" type="submit">Send enquiry</button></div>
+        <p class="sent" data-sent hidden>Thank you. Our export desk will write back within one working day.</p>
+      </form>
+    </div></div>
+  </div></section>
+
+</main>
+
+<footer><div class="wrap">
+  <span>© <span data-year></span> <span data-bind="legalName"></span> · <span data-bind="domain"></span></span>
+  <a class="dm-badge" href="../storefront.html"><i>✓</i> Verified exporter on DIGI MART 360</a>
+</div></footer>
+
+<div class="tray" data-rfq-tray hidden><a class="btn" href="#contact">Enquiry · <span data-rfq-count>0</span> items</a></div>
+
+<script src="store-data.js"></script>
+</body>
+</html>

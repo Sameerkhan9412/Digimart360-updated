@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acme Fluid Systems · Forge theme</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* FORGE · heavy industrial. Graphite plate, blueprint grid, spec-sheet cards.
+   Seller-controlled: --primary (brand, bands, icons) · --accent (buttons) · fonts */
+:root {
+  --primary: #f26b1d;
+  --accent: #ffc23d;
+  --plate: #121518;
+  --plate-2: #191d22;
+  --plate-3: #22282f;
+  --rule: #2f363f;
+  --steel: #e6ebf0;
+  --steel-dim: #9aa6b2;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Barlow", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--plate); color: var(--steel); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+img { max-width: 100%; }
+a { color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .01em; line-height: .95; margin: 0; text-wrap: balance; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: max(20px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-right)); }
+.mono { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 22px; font-family: var(--font-display); font-weight: 700; font-size: 18px; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; border: 2px solid var(--accent); background: var(--accent); color: #111; cursor: pointer; clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%); }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--steel); border-color: var(--rule); }
+.btn.ghost:hover { border-color: var(--steel); }
+
+/* Header */
+.top { border-bottom: 1px solid var(--rule); font-size: 13px; color: var(--steel-dim); }
+.top .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; padding-block: 8px; }
+header.bar { position: sticky; top: 0; z-index: 10; background: rgba(18,21,24,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--rule); }
+header.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; }
+.brand { display: flex; align-items: center; gap: 12px; text-decoration: none; min-width: 0; }
+.logo { width: 46px; height: 46px; flex: none; display: grid; place-items: center; background: var(--primary); color: #111; font-family: var(--font-display); font-weight: 800; font-size: 22px; clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); }
+.logo.has-image { background: #fff; clip-path: none; border-radius: 4px; }
+.logo img { width: 100%; height: 100%; object-fit: contain; }
+.brand b { font-family: var(--font-display); font-size: 24px; text-transform: uppercase; letter-spacing: .02em; display: block; line-height: 1; }
+.brand small { color: var(--steel-dim); font-size: 12px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+nav.links { display: flex; gap: 26px; align-items: center; }
+nav.links a { text-decoration: none; font-weight: 600; font-size: 15px; color: var(--steel-dim); }
+nav.links a:hover { color: var(--steel); }
+nav.links a.btn { color: #111; white-space: nowrap; }
+@media (max-width: 860px) { nav.links a:not(.btn) { display: none; } nav.links .btn { padding: 10px 14px; font-size: 15px; } .brand small { display: none; } }
+
+/* Hero */
+.hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--rule); background: var(--plate); }
+.hero::before { content: ""; position: absolute; inset: 0; background:
+    repeating-linear-gradient(0deg, transparent 0 39px, rgba(255,255,255,.04) 39px 40px),
+    repeating-linear-gradient(90deg, transparent 0 39px, rgba(255,255,255,.04) 39px 40px); pointer-events: none; }
+.hero .wrap { position: relative; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; align-items: center; padding-block: 72px 80px; }
+.hero .tag { display: inline-flex; gap: 10px; align-items: center; color: var(--accent); }
+.hero .tag::before { content: ""; width: 28px; height: 2px; background: var(--accent); }
+.hero h1 { font-size: clamp(48px, 8vw, 104px); font-weight: 800; margin-block: 18px 22px; }
+.hero p { color: var(--steel-dim); font-size: 18px; max-width: 54ch; margin: 0 0 30px; }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.drawing { position: relative; aspect-ratio: 4 / 3; max-width: 100%; border: 1px solid var(--rule); background: var(--plate-2); display: grid; place-items: center; color: var(--primary); }
+.drawing svg { width: 78%; }
+.drawing .mono { position: absolute; color: var(--steel-dim); }
+.drawing .tl { top: 12px; left: 14px; } .drawing .br { bottom: 12px; right: 14px; } .drawing .tr { top: 12px; right: 14px; color: var(--accent); }
+.dim { position: absolute; left: 11%; right: 11%; bottom: 18%; border-top: 1px dashed var(--steel-dim); opacity: .5; }
+@media (max-width: 860px) { .hero .wrap { grid-template-columns: minmax(0, 1fr); padding-block: 48px 56px; } }
+
+/* Stats band */
+.stats { background: var(--primary); color: #111; }
+.stats .wrap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat { padding: 26px 20px; border-left: 1px solid rgba(0,0,0,.18); }
+.stat:first-child { border-left: 0; }
+.stat b { font-family: var(--font-display); font-size: clamp(36px, 5vw, 54px); line-height: 1; display: block; font-variant-numeric: tabular-nums; }
+.stat span { font-weight: 600; font-size: 14px; }
+.stat em { font-style: normal; font-family: var(--font-mono); font-size: 12px; text-transform: uppercase; opacity: .75; display: block; }
+@media (max-width: 760px) { .stats .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stat:nth-child(3) { border-left: 0; } .stat:nth-child(n+3) { border-top: 1px solid rgba(0,0,0,.18); } }
+
+section.block { padding-block: 88px; border-bottom: 1px solid var(--rule); }
+.head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 18px; margin-bottom: 36px; }
+.head h2 { font-size: clamp(40px, 6vw, 72px); font-weight: 800; }
+.head p { color: var(--steel-dim); margin: 0; max-width: 46ch; }
+.kicker { color: var(--accent); margin-bottom: 10px; display: block; }
+
+/* Filter chips */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
+.filters button { font: 600 14px var(--font-body); color: var(--steel-dim); background: transparent; border: 1px solid var(--rule); padding: 8px 14px; cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--steel); color: var(--plate); border-color: var(--steel); }
+
+/* Product spec cards */
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+@media (max-width: 980px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--plate-2); display: flex; flex-direction: column; min-width: 0; }
+.card[hidden] { display: none; }
+.card .pic { position: relative; aspect-ratio: 16 / 10; display: grid; place-items: center; color: var(--steel); background: radial-gradient(circle at 50% 60%, var(--plate-3), var(--plate-2) 70%); border-bottom: 1px solid var(--rule); }
+.card .pic svg { width: 62%; }
+.card .pic .mono { position: absolute; top: 12px; left: 14px; color: var(--steel-dim); }
+.card .pic .idx { position: absolute; top: 8px; right: 14px; font: 800 34px var(--font-display); color: var(--plate-3); -webkit-text-stroke: 1px var(--rule); }
+.card .body { padding: 20px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.card h3 { font-size: 26px; }
+.card p { margin: 0; color: var(--steel-dim); font-size: 15px; }
+.card dl { margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+.card dl div { background: var(--plate); padding: 8px 10px; min-width: 0; }
+.card dt { font: 500 11px var(--font-mono); text-transform: uppercase; letter-spacing: .06em; color: var(--steel-dim); }
+.card dd { margin: 0; font-weight: 600; font-size: 14px; }
+.card .row { margin-top: auto; display: flex; align-items: end; justify-content: space-between; gap: 12px; padding-top: 6px; }
+.price b { font: 800 30px var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.price span { color: var(--steel-dim); font-size: 13px; }
+.price small { display: block; font: 500 11px var(--font-mono); text-transform: uppercase; color: var(--steel-dim); }
+.card .btn { font-size: 15px; padding: 10px 14px; }
+.card .btn[aria-pressed="true"] { background: var(--steel); border-color: var(--steel); }
+
+/* About */
+.about { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: start; }
+.about p { color: var(--steel-dim); font-size: 17px; }
+.process { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.process li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 14px; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+.process b { font: 800 30px var(--font-display); color: var(--primary); }
+.process strong { display: block; font-size: 17px; }
+.process span { color: var(--steel-dim); font-size: 15px; }
+@media (max-width: 860px) { .about { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+
+/* Certifications */
+.certs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.cert { border: 1px solid var(--rule); padding: 22px; display: flex; flex-direction: column; gap: 6px; background: var(--plate-2); }
+.cert b { font: 800 30px var(--font-display); color: var(--steel); }
+.cert span { color: var(--steel-dim); font-size: 14px; }
+@media (max-width: 860px) { .certs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Industries */
+.inds { display: flex; flex-wrap: wrap; gap: 0; border-top: 1px solid var(--rule); }
+.inds li { list-style: none; flex: 1 1 260px; padding: 22px 0; border-bottom: 1px solid var(--rule); font: 700 clamp(24px, 3vw, 34px) var(--font-display); text-transform: uppercase; display: flex; gap: 14px; align-items: baseline; }
+.inds li::before { content: "▸"; color: var(--primary); font-size: .7em; }
+.inds { padding: 0; margin: 0; column-gap: 32px; }
+
+/* Contact */
+.contact { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 48px; }
+.contact dl { margin: 24px 0 0; display: grid; gap: 14px; }
+.contact dt { color: var(--steel-dim); }
+.contact dd { margin: 0; font-size: 18px; font-weight: 600; }
+form { background: var(--plate-2); border: 1px solid var(--rule); padding: 26px; display: grid; gap: 14px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+label { display: grid; gap: 6px; font-size: 13px; color: var(--steel-dim); font-weight: 600; }
+input, textarea, select { font: 500 15px var(--font-body); color: var(--steel); background: var(--plate); border: 1px solid var(--rule); padding: 12px; width: 100%; }
+textarea { min-height: 110px; resize: vertical; }
+.sent { color: var(--accent); font-weight: 600; margin: 0; }
+@media (max-width: 860px) { .contact { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .two { grid-template-columns: minmax(0, 1fr); } }
+
+/* Footer */
+footer { padding-block: 40px; color: var(--steel-dim); font-size: 14px; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 16px 32px; justify-content: space-between; align-items: center; }
+.dm-badge { display: inline-flex; align-items: center; gap: 10px; border: 1px solid var(--rule); padding: 8px 12px; text-decoration: none; color: var(--steel); }
+.dm-badge i { font-style: normal; width: 18px; height: 18px; border-radius: 50%; background: #1B8C4E; display: grid; place-items: center; color: #fff; font-size: 11px; }
+
+/* RFQ tray */
+.tray { position: fixed; z-index: 20; right: max(16px, env(safe-area-inset-right)); bottom: calc(16px + env(safe-area-inset-bottom)); }
+.tray .btn { box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+  <span class="mono">GSTIN <span data-bind="gstin"></span> · <span data-bind="city"></span></span>
+  <span><span data-bind="phone"></span> · <span data-bind="email"></span></span>
+</div></div>
+
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#hero">
+    <span class="logo" data-logo></span>
+    <span style="min-width:0"><b data-bind="companyName"></b><small data-bind="tagline"></small></span>
+  </a>
+  <nav class="links" aria-label="Main">
+    <a href="#products">Products</a>
+    <a href="#about">Plant</a>
+    <a href="#certifications">Approvals</a>
+    <a class="btn" href="#contact">Get a quote</a>
+  </nav>
+</div></header>
+
+<main data-sections>
+
+  <section data-section="hero" class="hero" id="hero"><div class="wrap">
+    <div>
+      <span class="tag mono">Manufacturer · Since <span data-bind="since"></span></span>
+      <h1 data-bind="heroTitle"></h1>
+      <p data-bind="heroText"></p>
+      <div class="cta">
+        <a class="btn" href="#products">See <span data-bind="productCount"></span> products →</a>
+        <a class="btn ghost" href="#contact">Send drawing / BOM</a>
+      </div>
+    </div>
+    <div class="drawing" aria-hidden="true">
+      <span class="mono tl">DWG-BV-150 · REV C</span>
+      <span class="mono tr">API 598</span>
+      <span class="mono br">SCALE 1:4 · MM</span>
+      <span class="dim"></span>
+      <svg viewBox="0 0 160 120" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><rect x="10" y="44" width="14" height="40" rx="2"/><rect x="136" y="44" width="14" height="40" rx="2"/><path d="M24 54h22M24 74h22M114 54h22M114 74h22"/><circle cx="80" cy="64" r="34"/><circle cx="80" cy="64" r="12"/><path d="M74 30V20h12v10"/><path d="M80 20l46-8" stroke-width="5"/></svg>
+    </div>
+  </div></section>
+
+  <section data-section="stats" class="stats" aria-label="Plant figures"><div class="wrap" data-list="stats">
+    <template><div class="stat"><b data-i="value"></b><em data-i="unit"></em><span data-i="label"></span></div></template>
+  </div></section>
+
+  <section data-section="products" class="block" id="products"><div class="wrap">
+    <div class="head">
+      <div><span class="kicker mono">Catalogue</span><h2>Factory-direct valves</h2></div>
+      <p>Prices are ex-works Pune for the listed MOQ. Each lot ships with a mill test certificate and hydro-test report.</p>
+    </div>
+    <div class="filters" data-filter-bar aria-label="Filter by type"></div>
+    <div class="grid" data-products></div>
+    <template id="product-card">
+      <article class="card">
+        <div class="pic"><span class="mono" data-f="category"></span><span class="idx" data-f="index"></span><span data-f="icon" style="display:contents"></span></div>
+        <div class="body">
+          <h3 data-f="name"></h3>
+          <p data-f="summary"></p>
+          <dl data-f="specs"></dl>
+          <div class="row">
+            <div class="price"><b data-f="price"></b> <span data-f="unit"></span><small data-f="moq"></small></div>
+            <button class="btn" type="button" data-action="rfq" aria-pressed="false" data-label-off="+ Quote" data-label-on="✓ Added">+ Quote</button>
+          </div>
+        </div>
+      </article>
+    </template>
+  </div></section>
+
+  <section data-section="about" class="block" id="about"><div class="wrap about">
+    <div>
+      <span class="kicker mono">The plant</span>
+      <h2 style="font-size:clamp(40px,6vw,72px);font-weight:800;margin-bottom:22px">Cast, machined and tested under one roof</h2>
+      <p>Our Bhosari MIDC works runs 14 CNC turning centres, an in-house hydro and pneumatic test bench up to 100 bar, and a third-party inspection bay for TPI by Bureau Veritas, TÜV or the client's own engineer.</p>
+      <p><span data-bind="address"></span></p>
+    </div>
+    <ol class="process">
+      <li><b>01</b><div><strong>Casting & forging</strong><span>Approved foundries, heat numbers traced to every body.</span></div></li>
+      <li><b>02</b><div><strong>CNC machining</strong><span>Seats and bores held to ±0.02 mm.</span></div></li>
+      <li><b>03</b><div><strong>Assembly & testing</strong><span>Shell and seat tests on 100% of valves to API 598.</span></div></li>
+      <li><b>04</b><div><strong>Dispatch</strong><span>Seaworthy crating, MTC and test reports with every lot.</span></div></li>
+    </ol>
+  </div></section>
+
+  <section data-section="certifications" class="block" id="certifications"><div class="wrap">
+    <div class="head"><div><span class="kicker mono">Approvals</span><h2>Certified for critical service</h2></div></div>
+    <div class="certs" data-list="certifications">
+      <template><div class="cert"><b data-i="code"></b><span data-i="label"></span></div></template>
+    </div>
+  </div></section>
+
+  <section data-section="industries" class="block"><div class="wrap">
+    <div class="head"><div><span class="kicker mono">Where our valves run</span><h2>Industries served</h2></div></div>
+    <ul class="inds" data-list="industries"><template><li data-i></li></template></ul>
+  </div></section>
+
+  <section data-section="contact" class="block" id="contact"><div class="wrap contact">
+    <div>
+      <span class="kicker mono">Quotation desk</span>
+      <h2 style="font-size:clamp(40px,6vw,72px);font-weight:800">Send your requirement</h2>
+      <dl>
+        <div><dt>Sales</dt><dd data-bind="phone"></dd></div>
+        <div><dt>Tenders & RFQs</dt><dd data-bind="email"></dd></div>
+        <div><dt>Works</dt><dd data-bind="address"></dd></div>
+      </dl>
+    </div>
+    <form data-inquiry>
+      <div class="two">
+        <label for="f-name">Your name<input id="f-name" required autocomplete="name"></label>
+        <label for="f-co">Company<input id="f-co" autocomplete="organization"></label>
+      </div>
+      <div class="two">
+        <label for="f-ph">Phone / WhatsApp<input id="f-ph" type="tel" required autocomplete="tel"></label>
+        <label for="f-qty">Quantity<input id="f-qty" placeholder="e.g. 200 pcs"></label>
+      </div>
+      <label for="f-req">Requirement<textarea id="f-req" placeholder="Valve type, size, rating, material, end connection"></textarea></label>
+      <button class="btn" type="submit">Request quotation</button>
+      <p class="sent" data-sent hidden>Received. Our sales engineer will call you within one working day.</p>
+    </form>
+  </div></section>
+
+</main>
+
+<footer><div class="wrap">
+  <span>© <span data-year></span> <span data-bind="legalName"></span> · <span data-bind="domain"></span></span>
+  <a class="dm-badge" href="../storefront.html"><i>✓</i> Verified supplier on DIGI MART 360</a>
+</div></footer>
+
+<div class="tray" data-rfq-tray hidden><a class="btn" href="#contact">Quote list · <span data-rfq-count>0</span></a></div>
+
+<script src="store-data.js"></script>
+</body>
+</html>

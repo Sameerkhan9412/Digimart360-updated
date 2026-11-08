@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin & Marketplace Moderation Portal - DIGI MART 360</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="neumorphic.css">
+  <style>
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 37px);
+    }
+    .admin-sidebar {
+      background: #15273b;
+      color: #cbdbe9;
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-nav {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 24px;
+    }
+    .admin-nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      color: #9cbacf;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .admin-nav a.active, .admin-nav a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+    }
+    .admin-nav a.active {
+      border-left: 3px solid var(--color-accent);
+    }
+
+    .admin-main {
+      padding: 30px 40px;
+      overflow-y: auto;
+    }
+
+    /* Moderate Cards */
+    .mod-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 20px;
+    }
+    .mod-card {
+      padding: 20px;
+    }
+    .doc-preview-box {
+      background: #dde5ed;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      margin: 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Demo Switcher -->
+  <div class="demo-switcher">
+    <div><strong>DIGI MART 360</strong> — Interactive Prototype Switcher</div>
+    <div class="flex gap-2">
+      <a href="index.html">Homepage</a>
+      <a href="home-v2.html">Homepage v2</a>
+      <a href="category-listing.html">Category Listing</a>
+      <a href="product-detail.html">Product Detail</a>
+      <a href="storefront.html">Supplier Storefront (Theme)</a>
+      <a href="buyer-dashboard.html">Buyer RFQs</a>
+      <a href="supplier-dashboard.html">Supplier CRM</a>
+      <a href="theme-studio.html">Theme Studio</a>
+      <a href="admin-dashboard.html" class="active">Admin Portal</a>
+    </div>
+  </div>
+
+  <div class="admin-layout">
+    <!-- Dark Neumorphic Admin Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="flex items-center gap-2">
+        <span style="font-size: 24px;">🛡️</span>
+        <div>
+          <div style="font-weight: 800; color: #fff; font-size: 15px;">DIGI MART 360</div>
+          <div style="font-size: 11px; color: var(--color-accent);">Master Admin Console</div>
+        </div>
+      </div>
+
+      <ul class="admin-nav">
+        <li><a href="#" class="active">📊 Platform Analytics</a></li>
+        <li><a href="#">🏢 Supplier Verification (5 Pending)</a></li>
+        <li><a href="#">📦 Product Moderation (14)</a></li>
+        <li><a href="#">📑 Category Taxonomy Tree</a></li>
+        <li><a href="#">🌐 Custom Domain Approvals</a></li>
+        <li><a href="#">💳 Subscription Plans & Invoices</a></li>
+        <li><a href="#">📜 Audit & Compliance Logs</a></li>
+        <li><a href="#">⚙️ Feature Flags & Modes</a></li>
+      </ul>
+
+      <div style="margin-top: auto; padding: 12px; font-size: 11px; color: #7f9eb5; border-top: 1px solid rgba(255,255,255,0.1);">
+        Logged in as SuperAdmin (Security ID: ADM-01)
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <div class="flex justify-between items-center" style="margin-bottom: 28px;">
+        <div>
+          <h1 style="font-size: 24px; font-weight: 800; color: var(--color-secondary);">
+            Marketplace Operations & Verification Queue
+          </h1>
+          <p style="font-size: 13px; color: var(--text-muted);">
+            Moderate supplier business documents, review product listings, and configure system rules.
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <span class="neu-badge badge-verified">PostgreSQL: Healthy</span>
+          <span class="neu-badge badge-teal">Redis: Connected</span>
+        </div>
+      </div>
+
+      <!-- KPI Overview Cards -->
+      <div class="stats-row" style="margin-top: 0; margin-bottom: 30px;">
+        <div class="neu-card stat-card">
+          <div class="stat-number">3,842</div>
+          <div class="stat-label">Registered Suppliers</div>
+        </div>
+        <div class="neu-card stat-card">
+          <div class="stat-number" style="color: var(--color-accent);">5</div>
+          <div class="stat-label">GSTIN Pending Review</div>
+        </div>
+        <div class="neu-card stat-card">
+          <div class="stat-number">14</div>
+          <div class="stat-label">Products Awaiting Review</div>
+        </div>
+        <div class="neu-card stat-card">
+          <div class="stat-number text-primary">₹14.2 L</div>
+          <div class="stat-label">Monthly Sub Revenue</div>
+        </div>
+      </div>
+
+      <!-- Moderation Task Queues -->
+      <div class="mod-grid">
+        <!-- 1. Supplier Business Verification -->
+        <div class="neu-card mod-card">
+          <div class="flex justify-between items-center" style="margin-bottom: 14px;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--color-secondary);">
+              🏢 Supplier GSTIN Verification
+            </h3>
+            <span class="neu-badge badge-featured">Action Required</span>
+          </div>
+
+          <div class="neu-pressed" style="padding: 16px; border-radius: var(--radius-md); margin-bottom: 14px;">
+            <div style="font-weight: 700; color: var(--color-secondary); font-size: 14px;">
+              Shree Ganesh Metal Castings Pvt Ltd
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Submitted by: Vikram Patil • Kolhapur MIDC, Maharashtra
+            </div>
+
+            <div class="doc-preview-box">
+              <span>📄</span>
+              <div style="flex: 1;">
+                <div><strong>GST Certificate:</strong> 27AABCU9603R1ZM</div>
+                <div style="color: var(--text-muted); font-size: 11px;">Validated via Govt GST Portal API: Match 100%</div>
+              </div>
+              <a href="#" class="text-primary font-bold">View PDF</a>
+            </div>
+
+            <div class="doc-preview-box">
+              <span>📜</span>
+              <div style="flex: 1;">
+                <div><strong>Udyam MSME:</strong> UDYAM-MH-12-0049182</div>
+                <div style="color: var(--text-muted); font-size: 11px;">Category: Small Enterprise (Manufacturing)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button class="neu-btn neu-btn-primary" style="flex: 1;">✓ Approve & Issue Gold Badge</button>
+            <button class="neu-btn" style="color: #dc2626;">Reject with Reason</button>
+          </div>
+        </div>
+
+        <!-- 2. Product Moderation Queue -->
+        <div class="neu-card mod-card">
+          <div class="flex justify-between items-center" style="margin-bottom: 14px;">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--color-secondary);">
+              📦 New Product Moderation
+            </h3>
+            <span class="neu-badge badge-teal">Queue: 14 items</span>
+          </div>
+
+          <div class="neu-pressed" style="padding: 16px; border-radius: var(--radius-md); margin-bottom: 14px;">
+            <div style="font-weight: 700; color: var(--color-secondary); font-size: 14px;">
+              Industrial Ball Valve 2-Inch SS304
+            </div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              Supplier: Acme Fluid Systems • Category: Industrial Valves
+            </div>
+
+            <div style="margin: 12px 0; font-size: 12px; line-height: 1.6;">
+              <div><strong>MOQ:</strong> 50 Pieces • <strong>Base Price:</strong> ₹2,500/piece</div>
+              <div><strong>Image Quality Check:</strong> 4 High-Res Images Uploaded to Cloudinary</div>
+              <div><strong>HSN Code:</strong> 8481.80.30 (Compliant)</div>
+            </div>
+
+            <div class="flex gap-2">
+              <span class="neu-badge badge-verified">Specs Validated</span>
+              <span class="neu-badge badge-teal">Cloudinary Clean</span>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button class="neu-btn neu-btn-primary" style="flex: 1;">✓ Approve & Publish to Marketplace</button>
+            <button class="neu-btn" style="color: #dc2626;">Request Edits</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Flags & Mode Configuration Box -->
+      <div class="neu-card" style="margin-top: 30px; padding: 24px;">
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--color-secondary); margin-bottom: 14px;">
+          ⚙️ Dynamic Marketplace Configuration (Zero Code Deploy)
+        </h3>
+        <div class="grid" style="grid-template-columns: repeat(3, 1fr); gap: 20px;">
+          <div class="neu-pressed" style="padding: 14px; border-radius: var(--radius-md);">
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-secondary);">Signup Identifier Mode</div>
+            <div style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin: 4px 0;">email</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Options: email | phone | both</div>
+          </div>
+          <div class="neu-pressed" style="padding: 14px; border-radius: var(--radius-md);">
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-secondary);">WhatsApp Gateway API</div>
+            <div style="font-size: 13px; font-weight: 800; color: var(--text-muted); margin: 4px 0;">Disabled (Mock Mode)</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Email OTP active as primary</div>
+          </div>
+          <div class="neu-pressed" style="padding: 14px; border-radius: var(--radius-md);">
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-secondary);">Cloudinary CDN Storage</div>
+            <div style="font-size: 13px; font-weight: 800; color: var(--color-primary); margin: 4px 0;">Enabled (Auto-Transform)</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Folder: /digimart360/production</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>
+

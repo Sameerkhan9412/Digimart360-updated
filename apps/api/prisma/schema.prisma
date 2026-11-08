@@ -1,0 +1,85 @@
+// DIGI MART 360 data model.
+// Accounts and sign-in. Marketplace tables (companies, categories,
+// products, RFQs) are added as their modules are built.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BUYER
+  SUPPLIER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+/// How a one-time code reaches the person. WHATSAPP and SMS are planned.
+enum OtpChannel {
+  EMAIL
+  WHATSAPP
+  SMS
+}
+
+model User {
+  id              String     @id @default(uuid()) @db.Uuid
+  email           String     @unique
+  emailVerifiedAt DateTime?
+  phone           String?    @unique
+  name            String
+  avatarUrl       String?
+  /// Google account "sub". Set when the person signs in with Google.
+  googleId        String?    @unique
+  role            Role       @default(BUYER)
+  status          UserStatus @default(ACTIVE)
+  lastLoginAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  sessions RefreshToken[]
+
+  @@map("users")
+}
+
+/// One row per signed-in device (browser, Android app, iOS app).
+/// Only a SHA-256 hash of the token is stored.
+model RefreshToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique
+  deviceName String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+/// A one-time sign-in code sent to an email address (later WhatsApp / SMS).
+/// The code itself is never stored, only an HMAC of it.
+model OtpChallenge {
+  id          String     @id @default(uuid()) @db.Uuid
+  channel     OtpChannel
+  /// Normalised email address or E.164 phone number.
+  destination String
+  codeHash    String
+  attempts    Int        @default(0)
+  expiresAt   DateTime
+  consumedAt  DateTime?
+  ip          String?
+  createdAt   DateTime   @default(now())
+
+  @@index([destination, createdAt])
+  @@map("otp_challenges")
+}

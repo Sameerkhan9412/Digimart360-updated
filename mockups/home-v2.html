@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIGI MART 360 - India's Verified B2B Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="market.css">
+<style>
+section.band { margin-top: 22px; }
+
+/* Hero: category list · banner · quick RFQ */
+.hero { display: grid; grid-template-columns: 236px minmax(0, 1fr) 300px; gap: 14px; margin-top: 14px; align-items: stretch; }
+.catlist { padding: 6px 0; overflow: hidden; }
+.catlist a { display: flex; align-items: center; gap: 10px; padding: 7px 14px; font-weight: 600; font-size: 13px; }
+.catlist a:hover { background: var(--green-soft); color: var(--green-dark); }
+.catlist i { font-style: normal; width: 22px; text-align: center; }
+.catlist .all-link { color: var(--green); font-weight: 800; border-top: 1px solid var(--line); margin-top: 4px; padding-top: 10px; }
+.banner { border-radius: 14px; background: radial-gradient(circle at 85% 30%, rgba(232,133,45,.35), transparent 40%), linear-gradient(120deg, #102b46, var(--navy) 45%, #13603a); color: #fff; padding: clamp(22px, 3.5vw, 40px); display: flex; flex-direction: column; justify-content: space-between; gap: 22px; position: relative; overflow: hidden; }
+.banner .kick { display: inline-block; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 700; }
+.banner h1 { font-size: clamp(28px, 3.6vw, 44px); font-weight: 800; margin-block: 12px 10px; max-width: 18ch; }
+.banner p { margin: 0; color: #cfdeec; font-size: 15px; max-width: 46ch; }
+.banner .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.banner .btn-white { background: #fff; color: var(--navy); }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.stats div { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; padding: 10px 12px; }
+.stats b { display: block; font-size: 20px; font-weight: 800; }
+.stats span { font-size: 12px; color: #c3d4e5; }
+.quick { padding: 16px; display: grid; gap: 10px; align-content: start; }
+.quick h2 { font-size: 16px; color: var(--navy); }
+.quick .sub { margin: -4px 0 2px; color: var(--muted); font-size: 12.5px; }
+.quick .ok { color: var(--green-dark); font-weight: 700; font-size: 12.5px; margin: 0; }
+.quick .signin { border-top: 1px solid var(--line); padding-top: 10px; display: flex; gap: 8px; }
+.quick .signin .btn { flex: 1; }
+@media (max-width: 1150px) { .hero { grid-template-columns: minmax(0, 1fr) 300px; } .catlist { display: none; } }
+@media (max-width: 800px) { .hero { grid-template-columns: minmax(0, 1fr); } .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Value props */
+.values { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+.values div { padding: 16px 18px; display: flex; gap: 12px; align-items: start; border-left: 1px solid var(--line); }
+.values div:first-child { border-left: 0; }
+.values i { font-style: normal; width: 40px; height: 40px; border-radius: 10px; background: var(--green-soft); display: grid; place-items: center; font-size: 19px; flex: none; }
+.values b { display: block; font-size: 14px; color: var(--navy); }
+.values span { color: var(--muted); font-size: 12.5px; }
+@media (max-width: 900px) { .values { grid-template-columns: 1fr 1fr; } .values div:nth-child(3) { border-left: 0; } .values div:nth-child(n+3) { border-top: 1px solid var(--line); } }
+@media (max-width: 520px) { .values { grid-template-columns: minmax(0, 1fr); } .values div { border-left: 0 !important; border-top: 1px solid var(--line); } .values div:first-child { border-top: 0; } }
+
+/* Trending tiles */
+.scroller { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.tile { flex: 0 0 148px; scroll-snap-align: start; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: grid; gap: 6px; }
+.tile:hover { border-color: var(--green); }
+.tile i { font-style: normal; aspect-ratio: 1; border-radius: 8px; display: grid; place-items: center; font-size: 44px; }
+.tile b { font-size: 13px; line-height: 1.3; }
+.tile span { color: var(--green-dark); font-weight: 700; font-size: 12px; }
+
+/* Category showcase blocks */
+.showcase { display: grid; grid-template-columns: 260px minmax(0, 1fr); overflow: hidden; }
+.feature { padding: 20px; color: #fff; display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden; }
+.feature h3 { font-size: 19px; font-weight: 800; }
+.feature ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; position: relative; z-index: 1; }
+.feature li a { color: rgba(255,255,255,.88); font-size: 13px; }
+.feature li a:hover { color: #fff; text-decoration: underline; }
+.feature .big { position: absolute; right: -14px; bottom: -18px; font-size: 120px; opacity: .22; line-height: 1; }
+.feature .btn { align-self: start; margin-top: auto; background: #fff; color: var(--ink); position: relative; z-index: 1; }
+.subs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sub { padding: 14px 16px; border-left: 1px solid var(--line); border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 4px 10px; align-content: start; }
+.sub:nth-child(-n+3) { border-top: 0; }
+.sub h4 { font-size: 13.5px; color: var(--navy); grid-column: 1 / -1; }
+.sub h4 a:hover { color: var(--green); }
+.sub ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.sub li a { color: var(--muted); font-size: 12.5px; }
+.sub li a:hover { color: var(--green); }
+.sub i { font-style: normal; width: 64px; height: 64px; border-radius: 10px; display: grid; place-items: center; font-size: 30px; align-self: start; }
+@media (max-width: 1000px) { .showcase { grid-template-columns: minmax(0, 1fr); } .feature { min-height: 0; } .feature ul { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .subs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .sub:nth-child(3) { border-top: 1px solid var(--line); } .sub:nth-child(odd) { border-left: 0; } }
+@media (max-width: 480px) { .subs { grid-template-columns: minmax(0, 1fr); } .sub { border-left: 0 !important; border-top: 1px solid var(--line) !important; } .sub:first-child { border-top: 0 !important; } }
+
+/* Buy requirements */
+.leads-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; }
+.leads { overflow: hidden; }
+.lead { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; padding: 12px 16px; border-top: 1px solid var(--line); align-items: center; }
+.lead:first-child { border-top: 0; }
+.lead b { font-size: 14px; color: var(--ink); }
+.lead .meta { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); font-size: 12.5px; }
+.lead .meta .fresh { color: var(--orange-dark); font-weight: 700; }
+.lead .vb { color: var(--green-dark); font-weight: 700; }
+.lead .btn { grid-row: span 2; }
+.supcta { background: linear-gradient(160deg, var(--green), var(--green-dark)); color: #fff; padding: 20px; display: flex; flex-direction: column; gap: 10px; border: 0; }
+.supcta h3 { font-size: 18px; }
+.supcta p { margin: 0; color: #dff3e8; font-size: 13px; }
+.supcta .n { font-size: 32px; font-weight: 800; line-height: 1; }
+.supcta .btn { background: #fff; color: var(--green-dark); align-self: start; margin-top: auto; }
+@media (max-width: 900px) { .leads-wrap { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .lead { grid-template-columns: minmax(0, 1fr); } .lead .btn { grid-row: auto; justify-self: start; } }
+
+/* Suppliers */
+.sups { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.supc { padding: 14px; display: grid; gap: 8px; }
+.supc:hover { border-color: var(--green); }
+.supc .head { display: flex; gap: 10px; align-items: center; }
+.supc .mono { width: 42px; height: 42px; border-radius: 10px; color: #fff; display: grid; place-items: center; font-weight: 800; flex: none; }
+.supc b { font-size: 13.5px; line-height: 1.3; display: block; }
+.supc small { color: var(--muted); font-size: 12px; }
+.supc .cat { color: var(--muted); font-size: 12.5px; }
+
+/* Find by city / country */
+.finders { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.finders .panel { padding: 16px; }
+.places { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.places a { border: 1px solid var(--line); border-radius: 10px; padding: 10px 8px; text-align: center; font-weight: 700; font-size: 12.5px; display: grid; gap: 4px; }
+.places a:hover { border-color: var(--green); color: var(--green-dark); }
+.places i { font-style: normal; font-size: 22px; }
+.places i.cc { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--navy); background: var(--page); border: 1px solid var(--line); border-radius: 6px; width: 38px; height: 26px; display: grid; place-items: center; justify-self: center; }
+.places small { color: var(--faint); font-weight: 500; font-size: 11px; }
+@media (max-width: 900px) { .finders { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 420px) { .places { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Start selling */
+.sell { padding: clamp(18px, 3vw, 30px); display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr); gap: 24px; align-items: center; background: linear-gradient(90deg, #fff, var(--orange-soft)); }
+.sell h2 { font-size: clamp(20px, 2.4vw, 26px); color: var(--navy); font-weight: 800; }
+.sell p { margin: 6px 0 14px; color: var(--muted); }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
+.steps li { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px; counter-increment: s; display: grid; gap: 4px; }
+.steps li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; background: var(--orange); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.steps b { color: var(--navy); }
+.steps span { color: var(--muted); font-size: 12.5px; }
+@media (max-width: 900px) { .sell { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+
+/* Bottom search band */
+.findband { padding: clamp(18px, 3vw, 28px); text-align: center; display: grid; gap: 12px; justify-items: center; }
+.findband h2 { font-size: clamp(20px, 2.4vw, 26px); color: var(--navy); font-weight: 800; }
+.findband p { margin: 0; color: var(--muted); }
+.findband .search { max-width: 640px; }
+.findband .pop { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+</style>
+</head>
+<body>
+
+<div class="demo-switcher">
+  <div><strong>DIGI MART 360</strong> — Interactive Prototype Switcher</div>
+  <div>
+    <a href="index.html">Homepage</a>
+    <a href="home-v2.html" class="active">Homepage v2</a>
+    <a href="category-listing.html">Category Listing</a>
+    <a href="product-detail.html">Product Detail</a>
+    <a href="storefront.html">Supplier Storefront</a>
+    <a href="buyer-dashboard.html">Buyer RFQs</a>
+    <a href="supplier-dashboard.html">Supplier CRM</a>
+    <a href="theme-studio.html">Theme Studio</a>
+    <a href="admin-dashboard.html">Admin Portal</a>
+  </div>
+</div>
+
+<div class="util"><div class="wrap">
+  <span>India's verified B2B marketplace · <b>3,800+</b> GST-verified suppliers</span>
+  <nav aria-label="Utility"><a href="supplier-dashboard.html">Sell on DIGI MART</a><a href="buyer-dashboard.html">My RFQs</a><a href="#">Help</a><a href="#">Download app</a></nav>
+</div></div>
+
+<header class="mh"><div class="wrap">
+  <a class="logo" href="home-v2.html"><img src="logo.png" alt="DIGI MART 360"></a>
+  <form class="search" role="search" action="category-listing.html">
+    <label class="sr" for="s-cat">Category</label>
+    <select id="s-cat"><option>All categories</option><option>Industrial Machinery</option><option>Electrical</option><option>Building & Construction</option></select>
+    <label class="sr" for="s-q">Search products or suppliers</label>
+    <input id="s-q" name="q" placeholder="Search products, e.g. ball valve, TMT bar, cotton yarn">
+    <button type="submit">Search</button>
+  </form>
+  <div class="acts">
+    <a class="acct" href="buyer-dashboard.html">Hello, sign in<b>My account</b></a>
+    <button class="btn btn-orange" type="button" data-gbp="Post your buy requirement" data-icon="📝" data-title="Tell us what you need">Post Requirement</button>
+  </div>
+</div></header>
+
+<nav class="catbar" aria-label="Categories"><div class="wrap">
+  <button class="all" type="button" data-mega-toggle aria-expanded="false" aria-controls="mega">☰ All Categories</button>
+  <a href="category-listing.html">Valves</a><a href="#">Pumps</a><a href="#">Motors</a><a href="#">Pipes & Fittings</a><a href="#">Electrical</a><a href="#">Steel</a><a href="#">Packaging</a><a href="#">Chemicals</a><a href="#">Textiles</a><a href="#">Agri & Food</a>
+  </div>
+  <div class="mega" id="mega" hidden><div class="wrap"><div class="rail" role="tablist" aria-label="Category groups"></div><div class="pane"></div></div></div>
+</nav>
+
+<main class="wrap">
+
+  <div class="hero">
+    <nav class="catlist panel" aria-label="Top categories" id="catlist"></nav>
+
+    <div class="banner">
+      <div>
+        <span class="kick">✓ Every supplier GST-verified</span>
+        <h1>Buy direct from India's verified manufacturers</h1>
+        <p>Post one requirement and get quotes from up to 5 matched suppliers, usually within 2 hours. Compare them side by side in your RFQ portal.</p>
+        <div class="cta">
+          <button class="btn btn-orange btn-lg" type="button" data-gbp="Post your buy requirement" data-icon="📝" data-title="Tell us what you need">Post Requirement</button>
+          <a class="btn btn-white btn-lg" href="supplier-dashboard.html">Start Selling</a>
+        </div>
+      </div>
+      <div class="stats">
+        <div><b class="num">45,000+</b><span>Products listed</span></div>
+        <div><b class="num">3,800+</b><span>Verified suppliers</span></div>
+        <div><b class="num">₹120 Cr+</b><span>RFQs processed</span></div>
+        <div><b class="num">&lt; 2 hrs</b><span>Average first quote</span></div>
+      </div>
+    </div>
+
+    <form class="quick panel" id="quick">
+      <h2>Get quotes in minutes</h2>
+      <p class="sub">Tell us what you need</p>
+      <div class="f"><label for="q-prod">Product or service</label><input id="q-prod" placeholder="e.g. 2 inch SS ball valve" required></div>
+      <div class="row2">
+        <div class="f"><label for="q-qty">Quantity</label><input id="q-qty" inputmode="numeric" placeholder="500"></div>
+        <div class="f"><label for="q-unit">Unit</label><select id="q-unit"><option>Piece</option><option>Kg</option><option>Tonne</option><option>Metre</option></select></div>
+      </div>
+      <div class="f"><label for="q-mob">Mobile</label><div class="phone"><span>+91</span><input id="q-mob" type="tel" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="10-digit mobile" required></div></div>
+      <button class="btn btn-orange" type="submit">Get Quotes</button>
+      <p class="ok" id="quick-ok" hidden>Sent. Matched suppliers will call you shortly.</p>
+      <div class="signin"><a class="btn btn-line btn-sm" href="buyer-dashboard.html">Sign in</a><a class="btn btn-ghost-green btn-sm" href="buyer-dashboard.html">Join free</a></div>
+    </form>
+  </div>
+
+  <section class="band panel" aria-label="Why DIGI MART 360">
+    <div class="values">
+      <div><i aria-hidden="true">🛡️</i><span><b>GST-verified suppliers</b><span>Business documents checked before listing</span></span></div>
+      <div><i aria-hidden="true">⚖️</i><span><b>Compare quotes</b><span>Price, MOQ and lead time side by side</span></span></div>
+      <div><i aria-hidden="true">🌍</i><span><b>Export ready</b><span>Suppliers shipping to 60+ countries</span></span></div>
+      <div><i aria-hidden="true">🤝</i><span><b>Sourcing help</b><span>Our team shortlists suppliers for you</span></span></div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="trend-h">
+    <div class="sec-head"><div><h2 id="trend-h">Trending this week</h2><p>Most requested products by Indian buyers</p></div><a class="link-more" href="category-listing.html">View all →</a></div>
+    <div class="scroller" id="trending"></div>
+  </section>
+
+  <div id="showcases"></div>
+
+  <section class="band" aria-labelledby="leads-h">
+    <div class="sec-head"><div><h2 id="leads-h">Latest buy requirements</h2><p>Live RFQs from verified buyers. Suppliers can respond with a quote.</p></div><a class="link-more" href="supplier-dashboard.html">See all buy leads →</a></div>
+    <div class="leads-wrap">
+      <div class="leads panel" id="leads"></div>
+      <div class="supcta panel">
+        <span class="n num">1,240</span>
+        <h3>new buy requirements this week</h3>
+        <p>List your products free and get requirements that match your category straight to WhatsApp and your Supplier CRM.</p>
+        <a class="btn" href="supplier-dashboard.html">Start getting leads</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="sup-h">
+    <div class="sec-head"><div><h2 id="sup-h">DM Trusted suppliers</h2><p>Inspected, GST-verified and rated 4.5+ by buyers</p></div><a class="link-more" href="#">View all →</a></div>
+    <div class="sups" id="sups"></div>
+  </section>
+
+  <section class="band finders" aria-label="Find suppliers by place">
+    <div class="panel">
+      <div class="sec-head"><h2>Find suppliers by city</h2><a class="link-more" href="#">More cities →</a></div>
+      <div class="places">
+        <a href="category-listing.html"><i aria-hidden="true">🏙️</i>Mumbai<small>1,920 suppliers</small></a><a href="category-listing.html"><i aria-hidden="true">🏛️</i>Delhi NCR<small>2,310</small></a><a href="category-listing.html"><i aria-hidden="true">🏭</i>Ahmedabad<small>1,480</small></a><a href="category-listing.html"><i aria-hidden="true">⚙️</i>Pune<small>1,105</small></a>
+        <a href="category-listing.html"><i aria-hidden="true">🧵</i>Surat<small>990</small></a><a href="category-listing.html"><i aria-hidden="true">🔩</i>Rajkot<small>760</small></a><a href="category-listing.html"><i aria-hidden="true">🌴</i>Chennai<small>870</small></a><a href="category-listing.html"><i aria-hidden="true">🧶</i>Coimbatore<small>640</small></a>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="sec-head"><h2>Exporters by destination</h2><a class="link-more" href="#">More countries →</a></div>
+      <div class="places">
+        <a href="#"><i class="cc" aria-hidden="true">AE</i>UAE<small>1,140 exporters</small></a><a href="#"><i class="cc" aria-hidden="true">US</i>USA<small>860</small></a><a href="#"><i class="cc" aria-hidden="true">SA</i>Saudi Arabia<small>720</small></a><a href="#"><i class="cc" aria-hidden="true">GB</i>UK<small>530</small></a>
+        <a href="#"><i class="cc" aria-hidden="true">KE</i>Kenya<small>410</small></a><a href="#"><i class="cc" aria-hidden="true">BD</i>Bangladesh<small>390</small></a><a href="#"><i class="cc" aria-hidden="true">NG</i>Nigeria<small>360</small></a><a href="#"><i class="cc" aria-hidden="true">DE</i>Germany<small>290</small></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="band sell panel" aria-labelledby="sell-h">
+    <div>
+      <h2 id="sell-h">Sell on DIGI MART 360</h2>
+      <p>Your free listing starts here. Get your own branded website on your domain too.</p>
+      <a class="btn btn-orange btn-lg" href="supplier-dashboard.html">Start Selling Free</a>
+    </div>
+    <ol class="steps">
+      <li><b>Create your account</b><span>Mobile number and OTP. Takes a minute.</span></li>
+      <li><b>Verify your business</b><span>Add GSTIN; we fetch your company details.</span></li>
+      <li><b>Add products</b><span>Prices, MOQ and photos. Live on the marketplace and your own site.</span></li>
+    </ol>
+  </section>
+
+  <section class="band findband panel" aria-labelledby="find-h">
+    <h2 id="find-h">Find verified suppliers</h2>
+    <p>Search 45,000+ products from manufacturers, exporters and wholesalers</p>
+    <form class="search" role="search" action="category-listing.html">
+      <label class="sr" for="s2">Search products</label>
+      <input id="s2" name="q" placeholder="What are you looking for?">
+      <button type="submit">Search</button>
+    </form>
+    <div class="pop"><a class="chip" href="category-listing.html">Ball valves</a><a class="chip" href="#">TMT bars</a><a class="chip" href="#">Corrugated boxes</a><a class="chip" href="#">Solar panels</a><a class="chip" href="#">Basmati rice</a><a class="chip" href="#">Cotton yarn</a></div>
+  </section>
+</main>
+
+<footer class="mf">
+  <div class="wrap cols">
+    <div class="brandcol"><img src="logo.png" alt="DIGI MART 360"><p>India's verified B2B marketplace connecting manufacturers, exporters and bulk buyers.</p></div>
+    <div><h4>For buyers</h4><ul><li><a href="#">Post requirement</a></li><li><a href="buyer-dashboard.html">Compare quotes</a></li><li><a href="#">Browse categories</a></li><li><a href="#">Buyer protection</a></li></ul></div>
+    <div><h4>For suppliers</h4><ul><li><a href="supplier-dashboard.html">Start selling</a></li><li><a href="theme-studio.html">Your own website</a></li><li><a href="#">Buy leads</a></li><li><a href="#">Membership plans</a></li></ul></div>
+    <div><h4>Company</h4><ul><li><a href="#">About us</a></li><li><a href="#">Careers</a></li><li><a href="#">Contact</a></li></ul></div>
+    <div><h4>Help</h4><ul><li><a href="#">Help centre</a></li><li><a href="#">Report a supplier</a></li><li><a href="#">Privacy & terms</a></li></ul></div>
+  </div>
+  <div class="wrap legal"><span>© 2026 DIGI MART 360 Technologies Pvt Ltd</span><span>Made for Indian manufacturers and exporters</span></div>
+</footer>
+
+<script src="market.js"></script>
+<script>
+const el = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+
+// Left category list (same data as the mega menu)
+const catlist = document.getElementById('catlist');
+MKT.CATEGORIES.forEach((c) => catlist.append(el(`<a href="category-listing.html"><i aria-hidden="true">${c.icon}</i>${c.name}</a>`)));
+catlist.append(el('<a class="all-link" href="#">View all 120+ categories →</a>'));
+
+// Trending tiles
+const TRENDING = [
+  ['🔩', 'SS Ball Valve 2"', '₹2,500', '#e7eef6'], ['🧱', 'AAC Blocks', '₹3,900 / m³', '#f3ece4'], ['☀️', 'Solar Panel 540W', '₹14,200', '#fff4dc'],
+  ['📦', '5-Ply Corrugated Box', '₹42', '#f1ebe1'], ['🌾', 'Basmati Rice 1121', '₹92 / kg', '#eef4e4'], ['🧶', 'Cotton Yarn 30s', '₹265 / kg', '#f2eef7'],
+  ['⚡', 'Induction Motor 15HP', '₹18,400', '#e8f1f9'], ['🧤', 'Nitrile Gloves', '₹6 / pc', '#e4f3f1'], ['🛢️', 'Caustic Soda Flakes', '₹48 / kg', '#eceff3'],
+  ['🪑', 'Ergonomic Office Chair', '₹4,950', '#f6ece9'], ['🚿', 'CP Bath Fittings Set', '₹3,100', '#e6f1f6'], ['🌶️', 'Guntur Red Chilli', '₹210 / kg', '#f8e9e6'],
+];
+document.getElementById('trending').replaceChildren(...TRENDING.map(([i, n, p, bg]) =>
+  el(`<a class="tile" href="category-listing.html"><i style="background:${bg}" aria-hidden="true">${i}</i><b>${n}</b><span>from ${p}</span></a>`)));
+
+// Category showcase blocks
+const SHOWCASES = [
+  { name: 'Industrial Machinery & Valves', icon: '⚙️', bg: 'linear-gradient(160deg,#1A3C5E,#24527f)',
+    links: ['Valves & Fittings', 'Pumps & Motors', 'CNC Machines', 'Compressors'],
+    subs: [['🔩', '#e7eef6', 'Valves', ['Ball valves', 'Gate valves', 'Butterfly valves', 'Check valves']], ['💧', '#e4f1f8', 'Pumps', ['Centrifugal pumps', 'Submersible pumps', 'Dosing pumps', 'Pump spares']],
+      ['⚡', '#eef2f8', 'Motors & Drives', ['Induction motors', 'Gear motors', 'VFD drives', 'Servo motors']], ['🛠️', '#f2eee6', 'Machine Tools', ['CNC lathes', 'VMC machines', 'Drill machines', 'Grinders']],
+      ['📦', '#f1ebe1', 'Packaging Machines', ['Pouch packing', 'Carton sealers', 'Shrink wrap', 'Labellers']], ['🌀', '#e8f0ef', 'Compressors', ['Screw compressors', 'Air dryers', 'Air receivers', 'Spares']]] },
+  { name: 'Building & Construction', icon: '🏗️', bg: 'linear-gradient(160deg,#9a4f12,#E8852D)',
+    links: ['TMT & Steel', 'Cement & Blocks', 'Sanitaryware', 'Roofing'],
+    subs: [['🏗️', '#f3ece4', 'Steel', ['TMT bars', 'MS pipes', 'Structural steel', 'GI sheets']], ['🧱', '#f2e9e3', 'Cement & Blocks', ['OPC cement', 'AAC blocks', 'Fly ash bricks', 'Paver blocks']],
+      ['🚿', '#e6f1f6', 'Sanitaryware', ['Wash basins', 'Faucets', 'Water closets', 'Shower panels']], ['🏠', '#efeee9', 'Roofing', ['Polycarbonate sheets', 'Roof tiles', 'Puff panels', 'Gutters']],
+      ['🚪', '#e9eef3', 'Doors & Windows', ['uPVC windows', 'Steel doors', 'Glass partitions', 'Hardware']], ['🎨', '#f4ecf2', 'Paints & Coatings', ['Wall putty', 'Epoxy flooring', 'Waterproofing', 'Primers']]] },
+  { name: 'Agriculture & Food', icon: '🌾', bg: 'linear-gradient(160deg,#14693A,#1B8C4E)',
+    links: ['Rice & Grains', 'Spices', 'Pulses', 'Farm Equipment'],
+    subs: [['🌾', '#eef4e4', 'Rice & Grains', ['Basmati rice', 'Non-basmati rice', 'Wheat', 'Maize']], ['🌶️', '#f8e9e6', 'Spices', ['Red chilli', 'Turmeric', 'Cumin seeds', 'Cardamom']],
+      ['🥣', '#f2eee6', 'Pulses', ['Toor dal', 'Chana', 'Moong dal', 'Urad dal']], ['🚜', '#eaf1e6', 'Farm Equipment', ['Tractors', 'Rotavators', 'Sprayers', 'Drip irrigation']],
+      ['🥜', '#f5eee2', 'Dry Fruits & Nuts', ['Cashew', 'Almonds', 'Raisins', 'Makhana']], ['🍯', '#fbf1dc', 'Processed Food', ['Jaggery', 'Honey', 'Pickles', 'Ready mixes']]] },
+];
+document.getElementById('showcases').replaceChildren(...SHOWCASES.map((s) => el(`
+  <section class="band" aria-label="${s.name}">
+    <div class="sec-head"><h2>${s.name}</h2><a class="link-more" href="category-listing.html">View all →</a></div>
+    <div class="showcase panel">
+      <div class="feature" style="background:${s.bg}">
+        <h3>${s.name}</h3>
+        <ul>${s.links.map((l) => `<li><a href="category-listing.html">${l}</a></li>`).join('')}</ul>
+        <a class="btn btn-sm" href="category-listing.html">Explore category</a>
+        <span class="big" aria-hidden="true">${s.icon}</span>
+      </div>
+      <div class="subs">${s.subs.map(([ic, bg, t, items]) => `
+        <div class="sub"><h4><a href="category-listing.html">${t}</a></h4>
+          <ul>${items.map((i) => `<li><a href="category-listing.html">${i}</a></li>`).join('')}</ul>
+          <i style="background:${bg}" aria-hidden="true">${ic}</i></div>`).join('')}
+      </div>
+    </div>
+  </section>`)));
+
+// Latest buy requirements
+const LEADS = [
+  ['SS304 flanged ball valve, 2 inch, Class 150', '500 pieces', 'Jamnagar, Gujarat', '12 min ago'],
+  ['TMT bars Fe 550D, 12 mm and 16 mm', '40 tonnes', 'Nagpur, Maharashtra', '26 min ago'],
+  ['5-ply corrugated boxes with logo print, 18×12×10 in', '20,000 pieces', 'Bhiwandi, Maharashtra', '41 min ago'],
+  ['Solar panels 540W mono PERC, for rooftop project', '220 pieces', 'Jaipur, Rajasthan', '1 hr ago'],
+  ['Basmati rice 1121 sella, export quality', '2 containers (50 t)', 'Dubai, UAE', '2 hrs ago'],
+];
+document.getElementById('leads').replaceChildren(...LEADS.map(([p, q, loc, t]) => el(`
+  <div class="lead">
+    <b>${p}</b>
+    <button class="btn btn-line btn-sm" type="button" data-gbp="${p}" data-icon="📨" data-title="Send your quote to this buyer">Send Quote</button>
+    <div class="meta"><span>Qty: <b>${q}</b></span><span>📍 ${loc}</span><span class="vb">✓ Verified buyer</span><span class="fresh">${t}</span></div>
+  </div>`)));
+
+// DM Trusted suppliers
+const SUPS = [
+  ['AF', '#1A3C5E', 'Acme Fluid Systems', 'Pune', 'Industrial valves', 14, 4.7], ['SG', '#14693A', 'Shree Ganesh Valve Industries', 'Ahmedabad', 'SS ball valves', 11, 4.6],
+  ['BE', '#9a4f12', 'Bharat Electro Corp', 'Coimbatore', 'Induction motors', 19, 4.8], ['HP', '#5b3d8a', 'Horizon Packaging', 'Bhiwandi', 'Corrugated boxes', 9, 4.5],
+  ['SR', '#0e6b6b', 'Sarthak Rice Exports', 'Karnal', 'Basmati rice', 23, 4.7], ['KT', '#7a1f2b', 'Kaveri Textiles', 'Tiruppur', 'Cotton yarn', 16, 4.6],
+];
+document.getElementById('sups').replaceChildren(...SUPS.map(([m, c, n, city, cat, y, r]) => el(`
+  <a class="supc panel" href="storefront.html">
+    <div class="head"><span class="mono" style="background:${c}">${m}</span><div><b>${n}</b><small>📍 ${city}</small></div></div>
+    <span class="cat">${cat}</span>
+    <div class="badges"><span class="bdg gst">✓ GST</span><span class="bdg trust">◆ DM Trusted</span><span class="bdg yrs">${y} yrs</span></div>
+    <span class="rating">${r}<span>/5</span></span>
+  </a>`)));
+
+document.getElementById('quick').addEventListener('submit', (e) => { e.preventDefault(); document.getElementById('quick-ok').hidden = false; });
+</script>
+</body>
+</html>

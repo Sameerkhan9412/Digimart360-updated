@@ -1,0 +1,22 @@
+# Dependencies & builds
+node_modules/
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Secrets: never commit. Use .env.example as the template.
+.env
+.env.*
+!.env.example
+
+# Generated review screenshots (recreate with the capture script)
+mockups/screenshots/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heavy Duty 2-Inch SS304 Stainless Steel Ball Valve - DIGI MART 360</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="neumorphic.css">
+  <style>
+    .header {
+      padding: 16px 0;
+      position: sticky;
+      top: 37px;
+      z-index: 100;
+      background: rgba(233, 239, 245, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+    }
+    .breadcrumb {
+      padding: 20px 0 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .breadcrumb a {
+      color: var(--color-secondary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Product Grid Layout */
+    .pdp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr 0.85fr;
+      gap: 28px;
+      margin: 20px 0 40px;
+    }
+
+    /* Gallery */
+    .main-image-frame {
+      height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 90px;
+      color: #92a8bf;
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .thumb-strip {
+      display: flex;
+      gap: 12px;
+    }
+    .thumb-btn {
+      width: 72px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .thumb-btn.active {
+      box-shadow: var(--shadow-pressed);
+      border-color: var(--color-primary);
+    }
+
+    /* Product Details */
+    .pdp-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--color-secondary);
+      line-height: 1.3;
+      margin-bottom: 10px;
+    }
+    .pdp-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    /* Tiered Pricing Table */
+    .tiers-box {
+      margin: 20px 0;
+      padding: 16px;
+      border-radius: var(--radius-md);
+    }
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .tier-card {
+      text-align: center;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+    }
+    .tier-qty {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .tier-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--color-primary);
+      margin-top: 4px;
+    }
+
+    /* Specs Table */
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+    .specs-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    .specs-table td:first-child {
+      font-weight: 700;
+      color: var(--color-secondary);
+      width: 40%;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    /* Supplier Sidebar Card */
+    .supplier-card {
+      position: sticky;
+      top: 110px;
+    }
+    .supplier-logo-box {
+      width: 60px;
+      height: 60px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 14px;
+    }
+    .trust-stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed rgba(0,0,0,0.08);
+    }
+
+    /* Tabs */
+    .pdp-tabs {
+      display: flex;
+      gap: 12px;
+      margin: 30px 0 20px;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: var(--radius-md);
+    }
+    .tab-btn.active {
+      box-shadow: var(--shadow-pressed);
+      color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Demo Switcher -->
+  <div class="demo-switcher">
+    <div><strong>DIGI MART 360</strong> — Interactive Prototype Switcher</div>
+    <div class="flex gap-2">
+      <a href="index.html">Homepage</a>
+      <a href="home-v2.html">Homepage v2</a>
+      <a href="category-listing.html">Category Listing</a>
+      <a href="product-detail.html" class="active">Product Detail</a>
+      <a href="storefront.html">Supplier Storefront (Theme)</a>
+      <a href="buyer-dashboard.html">Buyer RFQs</a>
+      <a href="supplier-dashboard.html">Supplier CRM</a>
+      <a href="theme-studio.html">Theme Studio</a>
+      <a href="admin-dashboard.html">Admin Portal</a>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container flex items-center justify-between">
+      <a href="index.html">
+        <img src="logo.png" alt="DIGI MART 360" style="height: 42px;">
+      </a>
+      <div class="flex gap-3">
+        <a href="index.html" class="neu-btn neu-btn-pill">← Back to Marketplace</a>
+        <a href="buyer-dashboard.html" class="neu-btn neu-btn-accent neu-btn-pill">My RFQ Baskets</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <a href="#">Industrial Supplies</a> / <a href="#">Valves & Actuators</a> / <span>Ball Valves</span>
+    </div>
+
+    <div class="pdp-grid">
+      <!-- 1. Left: Product Gallery -->
+      <div>
+        <div class="neu-card main-image-frame">
+          <span style="font-size: 96px;">🔧</span>
+          <div style="position: absolute; top: 16px; left: 16px;">
+            <span class="neu-badge badge-featured">Best Seller</span>
+          </div>
+          <div style="position: absolute; bottom: 14px; right: 14px; font-size: 12px; background: rgba(255,255,255,0.7); padding: 4px 10px; border-radius: 20px;">
+            🔍 Click for 360° Zoom
+          </div>
+        </div>
+
+        <div class="thumb-strip">
+          <div class="thumb-btn neu-flat active">🔧</div>
+          <div class="thumb-btn neu-flat">📐</div>
+          <div class="thumb-btn neu-flat">🔩</div>
+          <div class="thumb-btn neu-flat">📋</div>
+        </div>
+      </div>
+
+      <!-- 2. Center: Product Specifications & Pricing -->
+      <div class="neu-card">
+        <div class="neu-badge badge-teal" style="margin-bottom: 8px;">HSN Code: 8481.80.30</div>
+        <h1 class="pdp-title">Heavy Duty 2-Inch SS304 Stainless Steel Flanged Ball Valve</h1>
+        
+        <div class="pdp-meta-row">
+          <div class="flex items-center gap-1" style="color: #e59714; font-weight: 700;">
+            ★★★★☆ <span>4.8 (34 Buyer Reviews)</span>
+          </div>
+          <span style="color: var(--text-light);">•</span>
+          <span class="text-muted">SKU: DM-VLV-204</span>
+          <span style="color: var(--text-light);">•</span>
+          <span class="text-primary font-bold">✓ In Stock (5,000 Pcs)</span>
+        </div>
+
+        <!-- Tiered Pricing Block -->
+        <div class="neu-pressed tiers-box">
+          <div class="flex justify-between items-center">
+            <span style="font-size: 13px; font-weight: 700; color: var(--color-secondary);">Wholesale Volume Tiers:</span>
+            <span style="font-size: 11px; color: var(--color-primary); font-weight: 700;">GST 18% Extra as Applicable</span>
+          </div>
+          <div class="tier-grid">
+            <div class="tier-card neu-flat">
+              <div class="tier-qty">50 - 99 pcs (MOQ)</div>
+              <div class="tier-price">₹2,500</div>
+            </div>
+            <div class="tier-card neu-flat" style="border: 2px solid var(--color-primary);">
+              <div class="tier-qty">100 - 499 pcs</div>
+              <div class="tier-price">₹2,200</div>
+              <div style="font-size: 10px; color: var(--color-primary); font-weight: 700;">Recommended</div>
+            </div>
+            <div class="tier-card neu-flat">
+              <div class="tier-qty">500+ pcs</div>
+              <div class="tier-price">₹1,900</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Specs -->
+        <h3 style="font-size: 15px; font-weight: 700; color: var(--color-secondary); margin-top: 20px;">Technical Attributes</h3>
+        <table class="specs-table neu-flat" style="overflow: hidden; border-radius: var(--radius-md);">
+          <tr>
+            <td>Valve Size / Diameter</td>
+            <td>2 Inch (DN50) / 50 mm</td>
+          </tr>
+          <tr>
+            <td>Body Material</td>
+            <td>Stainless Steel ASTM A351 Grade CF8 (SS304)</td>
+          </tr>
+          <tr>
+            <td>Pressure Rating</td>
+            <td>Class 150 / PN16 / 150 PSI</td>
+          </tr>
+          <tr>
+            <td>End Connection</td>
+            <td>Flanged Ends ANSI B16.5 RF</td>
+          </tr>
+          <tr>
+            <td>Operating Media</td>
+            <td>Water, Chemical, Oil, Gas (WOG)</td>
+          </tr>
+          <tr>
+            <td>Lead Time</td>
+            <td>5 to 7 Days Dispatch (Ex-Factory)</td>
+          </tr>
+        </table>
+
+        <!-- Sample Order Callout -->
+        <div class="flex items-center justify-between neu-flat" style="padding: 14px; border-radius: var(--radius-md); margin-top: 20px; background: #f0f7f3;">
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--color-primary-dark);">Request a Single Paid Sample</div>
+            <div style="font-size: 12px; color: var(--text-muted);">Inspect quality before issuing bulk purchase orders. ₹600/sample</div>
+          </div>
+          <button class="neu-btn neu-btn-primary" style="padding: 6px 14px; font-size: 12px;">Order Sample</button>
+        </div>
+      </div>
+
+      <!-- 3. Right: Verified Supplier Profile & Instant Inquiry -->
+      <div>
+        <div class="neu-card supplier-card">
+          <div class="flex items-center gap-3">
+            <div class="supplier-logo-box neu-convex">
+              🏭
+            </div>
+            <div>
+              <div style="font-size: 15px; font-weight: 800; color: var(--color-secondary);">Acme Fluid Systems</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Bhosari MIDC, Pune, MH</div>
+            </div>
+          </div>
+
+          <div style="margin: 14px 0;">
+            <span class="neu-badge badge-verified">✓ GSTIN Verified</span>
+            <span class="neu-badge badge-teal" style="margin-left: 4px;">Udyam MSME</span>
+          </div>
+
+          <div style="margin: 16px 0; padding: 10px 0; border-top: 1px solid rgba(0,0,0,0.06); border-bottom: 1px solid rgba(0,0,0,0.06);">
+            <div class="trust-stat">
+              <span class="text-muted">Business Type</span>
+              <span class="font-bold">OEM Manufacturer</span>
+            </div>
+            <div class="trust-stat">
+              <span class="text-muted">Established</span>
+              <span class="font-bold">2012 (14 yrs)</span>
+            </div>
+            <div class="trust-stat">
+              <span class="text-muted">Response Rate</span>
+              <span class="font-bold text-primary">96% (< 1 hour)</span>
+            </div>
+            <div class="trust-stat">
+              <span class="text-muted">Custom Domain</span>
+              <span class="font-bold"><a href="storefront.html" style="color: var(--color-primary); text-decoration: none;">acmeflow.com ↗</a></span>
+            </div>
+          </div>
+
+          <!-- Instant Lead / Inquiry Form Box -->
+          <div class="neu-pressed" style="padding: 16px; border-radius: var(--radius-md); margin-bottom: 16px;">
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--color-secondary);">
+              Send Instant Sourcing Inquiry
+            </div>
+            <input type="number" class="neu-input" placeholder="Quantity needed (Min: 50)" style="margin-bottom: 10px;" value="150">
+            <textarea class="neu-input" rows="3" placeholder="Tell supplier your specs, target price & delivery city..." style="resize: none; margin-bottom: 12px;">Need 150 pieces delivered to Chennai port by end of month. Please attach material test certificate.</textarea>
+            
+            <a href="buyer-dashboard.html" class="neu-btn neu-btn-accent" style="width: 100%; text-align: center;">
+              Send Inquiry to Supplier
+            </a>
+          </div>
+
+          <a href="storefront.html" class="neu-btn" style="width: 100%; text-align: center;">
+            Visit Company Storefront 🌐
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Tabs: Overview, Drawings, Reviews -->
+    <div class="pdp-tabs">
+      <div class="tab-btn neu-flat active">Detailed Overview</div>
+      <div class="tab-btn neu-flat">Engineering Drawings & Specs</div>
+      <div class="tab-btn neu-flat">Verified Buyer Reviews (34)</div>
+    </div>
+
+    <div class="neu-card" style="margin-bottom: 60px; line-height: 1.7; font-size: 14px; color: var(--text-main);">
+      <h3 style="font-size: 17px; font-weight: 800; color: var(--color-secondary); margin-bottom: 12px;">Product Summary</h3>
+      <p style="margin-bottom: 14px;">
+        Acme Fluid Systems SS304 Series Ball Valves are engineered for critical industrial isolation applications across chemical plants, oil & gas lines, processing facilities, and high-pressure liquid transfer systems. Precision-machined investment cast body with blowout-proof stem ensures maximum operator safety under pressurized cycles.
+      </p>
+      <ul style="margin-left: 20px; color: var(--text-muted);">
+        <li>100% hydrostatically and pneumatically pressure tested to API 598 standards.</li>
+        <li>Reinforced PTFE seats for zero seat leakage and low operating torque.</li>
+        <li>Standard ISO 5211 top mounting pad ready for electrical/pneumatic actuator retrofitting.</li>
+      </ul>
+    </div>
+  </div>
+
+</body>
+</html>
+
