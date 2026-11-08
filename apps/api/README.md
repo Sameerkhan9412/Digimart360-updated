@@ -21,7 +21,11 @@ The one backend for DIGI MART 360. The web app and the future Android and iOS ap
 | API docs | Interactive docs at `/api/docs`, raw OpenAPI JSON at `/api/docs-json` |
 | Safety | Input validation, rate limiting (10/min per IP on auth routes; 1 code/min and 5 codes/hour per address), Helmet headers, CORS allow-list |
 
-Marketplace modules (categories, products, suppliers, RFQs, quotes, admin moderation) are not built yet. See **Adding a module** below.
+| Catalog | Category tree with live counts, product search and listing (filters, sorting, facets), product pages, supplier profiles, search suggestions |
+| Supplier self-service | Company profile (GSTIN, business types, exports), products with drafts, review, archive and restore |
+| Moderation | Admin review queue, approve / reject with reason, company approval, GST verification, "DM Trusted" seal, category management |
+
+RFQs, quotes, storefront themes and custom domains are next.
 
 ## Run it locally
 
@@ -35,11 +39,11 @@ npm run db:seed               # creates the admin account (SEED_ADMIN_EMAIL)
 npm run start:dev             # http://localhost:3000/api/v1 · docs at /api/docs
 ```
 
-Other scripts: `npm test` (unit tests), `npm run lint` (type check), `npm run build`, `npm run db:migrate` (create a new migration after editing `prisma/schema.prisma`), `npm run db:studio` (browse data).
+Other scripts: `npm run db:seed:demo` (demo catalog from the mockups; never in production), `npm run test:e2e` (end-to-end tests against `TEST_DATABASE_URL`, which they wipe), `npm test` (unit tests), `npm run lint` (type check), `npm run build`, `npm run db:migrate` (create a new migration after editing `prisma/schema.prisma`), `npm run db:studio` (browse data).
 
 > On this Windows Server machine PostgreSQL 17 runs natively as the `postgresql-17` service. `npm run db:up` (Docker) is for machines with Docker.
 
-> **Creating a migration** (non-interactive shells): edit `prisma/schema.prisma`, then `npx prisma migrate diff --from-migrations prisma/migrations --to-schema-datamodel prisma/schema.prisma --shadow-database-url <a scratch DB URL> --script > prisma/migrations/<timestamp>_<name>/migration.sql` and `npm run db:deploy`. In an interactive terminal `npm run db:migrate -- --name <name>` does both.
+> **Creating a migration:** edit `prisma/schema.prisma`, run `npm run db:new -- <name>` (needs `SHADOW_DATABASE_URL`), review the SQL, then `npm run db:deploy`. Use this instead of `prisma migrate dev`: it works in non-interactive shells and keeps the hand-written search column and indexes that Prisma can't model.
 
 ## API at a glance
 
@@ -57,8 +61,31 @@ All routes are under `/api/v1`. Every route needs `Authorization: Bearer <access
 | POST | `/auth/logout-all` | signed in | Sign out every device |
 | GET | `/users/me` | signed in | Current user's profile |
 | PATCH | `/users/me` | signed in | Update name or phone (onboarding) |
+| GET | `/categories` | public | Category tree with live product counts |
+| GET | `/categories/:slug` | public | Breadcrumb, sub-categories, count, SEO title and description |
+| GET | `/products` | public | Search and listing. `q, category, city, businessType, minPrice, maxPrice, trusted, gstVerified, exporter, company, sort, page, pageSize`. Returns items, total and city / business-type facets |
+| GET | `/products/:slug` | public | Full product, breadcrumb, more from the supplier, related products |
+| GET | `/search/suggest?q=` | public | Type-ahead: categories, product names, suppliers |
+| GET | `/companies/:slug` | public | Supplier profile (approved suppliers only) |
+| POST · GET · PATCH | `/me/company` | signed in | Create (buyer becomes supplier), read, edit your company |
+| GET · POST | `/me/products` | supplier | Your products in any status; add one (`submit: false` = draft) |
+| GET · PATCH · DELETE | `/me/products/:id` | supplier | Read, edit, archive |
+| POST | `/me/products/:id/restore` | supplier | Archived → draft |
+| GET | `/admin/catalog/products` · `/companies` | admin | Moderation queues (oldest first) |
+| POST | `/admin/catalog/products/:id/approve` · `/reject` | admin | Publish, or reject with a reason the supplier sees |
+| PATCH | `/admin/catalog/companies/:id` | admin | Approve or suspend, verify GSTIN, grant "DM Trusted" |
+| POST · PATCH | `/admin/catalog/categories` | admin | Manage the category tree |
 
 Errors use NestJS's standard shape: `{ "statusCode": 400, "message": [...], "error": "Bad Request" }`.
+
+## Catalog rules
+
+- **Public = live product + approved supplier.** Products show only when `ACTIVE` and their company is `ACTIVE`.
+- **Product life cycle:** `DRAFT → PENDING_REVIEW → ACTIVE` or `REJECTED` (with a reason); any → `ARCHIVED` → (restore) `DRAFT`.
+- **Edits:** changing name, summary, description, specs, images or category sends a live product back to review; price and MOQ changes stay live. **DM Trusted** suppliers skip review.
+- **URLs never change.** A product's slug is fixed at creation, so renames don't break links or search rankings.
+- **Search:** PostgreSQL full-text (English stemming; name > summary > specs > description) plus partial-word matching, in one query with filters, facets and sorting.
+- **Server-side callers** (the Next.js website) send `X-Internal-Key: <INTERNAL_API_KEY>` so per-IP rate limits apply to visitors, not to our own server.
 
 ## How web and mobile clients should sign in
 
@@ -89,9 +116,10 @@ Installed mobile apps can't be updated instantly; old versions stay in use for m
 ```
 backend/
 ├─ prisma/
-│  ├─ schema.prisma          data model (users, sessions, OTP challenges)
+│  ├─ schema.prisma          data model (users, sessions, OTP, categories, companies, products)
 │  ├─ migrations/            SQL migrations, applied in order
-│  └─ seed.ts                creates the first admin (signs in by email code)
+│  ├─ seed.ts                creates the first admin (signs in by email code)
+│  └─ seed-demo.ts           demo catalog: 163 categories, 13 suppliers, 26 products
 ├─ src/
 │  ├─ main.ts                bootstrap: /api/v1 prefix, CORS, validation, Swagger
 │  ├─ app.module.ts          wires modules and global guards
@@ -101,7 +129,10 @@ backend/
 │  ├─ auth/                  email OTP, Google, refresh, logout (+ unit tests)
 │  ├─ notifications/         email sending, pluggable OTP senders (WhatsApp later)
 │  ├─ users/                 user profile
+│  ├─ catalog/               categories, products, search, companies, supplier & admin routes
 │  └─ health/                health check
+├─ scripts/new-migration.mjs  generate migrations without prompts
+├─ test/                      end-to-end tests (real PostgreSQL)
 ├─ docker-compose.yml        local PostgreSQL
 └─ .env.example              every setting, documented
 ```

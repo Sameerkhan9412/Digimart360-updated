@@ -12,7 +12,7 @@ India's verified B2B marketplace: buyers find manufacturers and post requirement
 
 | Path | What it is | Status |
 |---|---|---|
-| `apps/api` | NestJS + Prisma + PostgreSQL. One API for web and mobile. | Sign-in done (email OTP, Google, sessions per device) |
+| `apps/api` | NestJS + Prisma + PostgreSQL. One API for web and mobile. | Sign-in, catalog, search, supplier self-service, moderation |
 | `apps/web` | Next.js marketplace + seller storefronts (chosen by domain) | Next |
 | `packages/*` | Shared UI, generated API client, config | Next |
 | `mockups/` | Approved HTML designs, storefront themes, Theme Studio | Reference for `apps/web` |
@@ -26,12 +26,13 @@ npm install
 cp apps/api/.env.example apps/api/.env   # then set DATABASE_URL and JWT_ACCESS_SECRET
 npm run db:migrate                         # apply migrations
 npm run db:seed                            # create the admin account
+npm run db:seed:demo -w @digimart/api      # optional: demo catalog from the mockups
 npm run dev:api                            # http://localhost:3000/api/v1 · docs at /api/docs
 ```
 
 In development, sign-in codes are printed in the API log instead of being emailed (`MAIL_TRANSPORT=console`).
 
-`npm run lint`, `npm test` and `npm run build` run across all apps. GitHub Actions runs the same on every push, against a real PostgreSQL.
+`npm run lint`, `npm test` and `npm run build` run across all apps; `npm run test:e2e -w @digimart/api` runs the end-to-end tests against a separate test database. GitHub Actions runs all of them on every push, against a real PostgreSQL.
 
 ## Decisions so far
 
@@ -44,7 +45,7 @@ In development, sign-in codes are printed in the API log instead of being emaile
 ## Roadmap (phase 1)
 
 1. ~~Repository, CI, local database~~ · ~~Sign-in: email OTP + Google~~
-2. Catalog API: categories, companies (suppliers), products, search
+2. ~~Catalog API: categories, companies (suppliers), products, search, moderation~~
 3. Website: Homepage v2, category listing, product page; SEO (metadata, sitemap, structured data)
 4. Supplier dashboard: company profile, GST verification request, product management, image uploads
 5. RFQs: post requirement, matching, quotes, buyer comparison

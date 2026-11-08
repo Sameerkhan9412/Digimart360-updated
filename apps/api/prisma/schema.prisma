@@ -1,6 +1,6 @@
 // DIGI MART 360 data model.
-// Accounts and sign-in. Marketplace tables (companies, categories,
-// products, RFQs) are added as their modules are built.
+// Accounts and sign-in, then the catalog: categories, companies (suppliers)
+// and products. RFQs and storefront settings come next.
 
 generator client {
   provider = "prisma-client-js"
@@ -45,6 +45,7 @@ model User {
   updatedAt       DateTime   @updatedAt
 
   sessions RefreshToken[]
+  company  Company?
 
   @@map("users")
 }
@@ -82,4 +83,138 @@ model OtpChallenge {
 
   @@index([destination, createdAt])
   @@map("otp_challenges")
+}
+
+// ───────────────────────────── Catalog ─────────────────────────────
+
+enum CompanyStatus {
+  /// Created by the supplier; not visible until an admin approves it.
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum BusinessType {
+  MANUFACTURER
+  EXPORTER
+  WHOLESALER
+  TRADER
+  RETAILER
+  SERVICE_PROVIDER
+}
+
+enum ProductStatus {
+  DRAFT
+  /// Waiting for moderation.
+  PENDING_REVIEW
+  ACTIVE
+  REJECTED
+  /// Hidden by the supplier. Kept so old links and RFQs still resolve.
+  ARCHIVED
+}
+
+/// Three levels: group (Industrial Machinery) > category (Valves & Fittings) > leaf (Ball Valves).
+/// Products attach to any level, normally a leaf.
+model Category {
+  id             String   @id @default(uuid()) @db.Uuid
+  parentId       String?  @db.Uuid
+  name           String
+  /// Unique across the tree, used in URLs: /c/ball-valves
+  slug           String   @unique
+  description    String?
+  icon           String?
+  sortOrder      Int      @default(0)
+  isActive       Boolean  @default(true)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId, sortOrder])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "categories_name_trgm_idx")
+  @@map("categories")
+}
+
+/// A supplier business. One per supplier account for now (team members later).
+model Company {
+  id              String         @id @default(uuid()) @db.Uuid
+  ownerId         String         @unique @db.Uuid
+  name            String
+  /// Storefront path: digimart360.com/store/<slug>
+  slug            String         @unique
+  legalName       String?
+  gstin           String?        @unique
+  gstVerifiedAt   DateTime?
+  businessTypes   BusinessType[]
+  yearEstablished Int?
+  description     String?
+  logoUrl         String?
+  phone           String?
+  email           String?
+  website         String?
+  addressLine     String?
+  city            String
+  state           String
+  pincode         String?
+  /// "DM Trusted": inspected by DIGI MART staff.
+  trustSeal       Boolean        @default(false)
+  exportsTo       String[]
+  status          CompanyStatus  @default(PENDING)
+  /// Typical first-reply time, shown on listings. Computed from inquiries later.
+  responseHours   Int?
+  ratingAvg       Decimal?       @db.Decimal(2, 1)
+  ratingCount     Int            @default(0)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  products Product[]
+
+  @@index([status, city])
+  @@index([businessTypes], type: Gin, map: "companies_business_types_idx")
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "companies_name_trgm_idx")
+  @@map("companies")
+}
+
+model Product {
+  id              String        @id @default(uuid()) @db.Uuid
+  companyId       String        @db.Uuid
+  categoryId      String        @db.Uuid
+  name            String
+  /// Globally unique, used in URLs: /p/ss304-flanged-ball-valve-k3x9
+  slug            String        @unique
+  summary         String?
+  description     String?
+  /// Price range in rupees. Both null = "Ask for price".
+  priceMin        Decimal?      @db.Decimal(12, 2)
+  priceMax        Decimal?      @db.Decimal(12, 2)
+  /// What one price buys: Piece, Kg, Tonne, Box, Metre…
+  priceUnit       String        @default("Piece")
+  moq             Int?
+  /// [{ "label": "Material", "value": "SS304 / CF8" }, …]
+  specs           Json          @default("[]")
+  images          String[]
+  status          ProductStatus @default(PENDING_REVIEW)
+  rejectionReason String?
+  publishedAt     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  /// Full-text search document, maintained by PostgreSQL (generated column).
+  searchVector    Unsupported("tsvector")?
+
+  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([status, categoryId])
+  @@index([companyId, status])
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "products_name_trgm_idx")
+  // Also in SQL only (Prisma can't express them; scripts/new-migration.mjs keeps them):
+  //   products_searchVector_idx (GIN on the generated searchVector column)
+  //   products_active_price_idx (partial index, status = 'ACTIVE')
+  //   products_price_range_chk, products_moq_chk (CHECK constraints)
+  @@map("products")
 }
