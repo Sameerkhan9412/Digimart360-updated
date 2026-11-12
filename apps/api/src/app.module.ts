@@ -9,6 +9,7 @@ import { RolesGuard } from './common/guards/roles.guard';
 import { AppThrottlerGuard } from './common/guards/throttle.guard';
 import { validateEnv } from './config/env.validation';
 import { HealthModule } from './health/health.module';
+import { MediaModule } from './media/media.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
@@ -23,6 +24,7 @@ import { UsersModule } from './users/users.module';
     HealthModule,
     AuthModule,
     UsersModule,
+    MediaModule,
     CatalogModule,
   ],
   providers: [

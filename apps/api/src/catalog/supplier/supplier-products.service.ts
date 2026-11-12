@@ -1,5 +1,6 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Company, Prisma, ProductStatus } from '@prisma/client';
+import { MediaService } from '../../media/media.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CategoriesService } from '../categories/categories.service';
 import { CompaniesService } from '../companies/companies.service';
@@ -22,6 +23,7 @@ export class SupplierProductsService {
     private readonly prisma: PrismaService,
     private readonly companies: CompaniesService,
     private readonly categories: CategoriesService,
+    private readonly media: MediaService,
   ) {}
 
   async list(userId: string, status?: ProductStatus): Promise<OwnProduct[]> {
@@ -43,6 +45,7 @@ export class SupplierProductsService {
   async create(userId: string, dto: CreateProductDto): Promise<OwnProduct> {
     const company = await this.companies.requireMine(userId);
     await this.assertCategory(dto.categoryId);
+    this.media.assertOwnImages(company.id, dto.images);
     const { submit = true, specs, ...fields } = dto;
     const prices = this.prices(dto.priceMin, dto.priceMax);
     const status = !submit ? ProductStatus.DRAFT : company.trustSeal ? ProductStatus.ACTIVE : ProductStatus.PENDING_REVIEW;
@@ -69,6 +72,7 @@ export class SupplierProductsService {
     const current = await this.find(company, id);
     if (current.status === ProductStatus.ARCHIVED) throw new ConflictException('Restore this product before editing it');
     if (dto.categoryId) await this.assertCategory(dto.categoryId);
+    this.media.assertOwnImages(company.id, dto.images);
 
     const { submit, specs, ...fields } = dto;
     const prices = this.prices(

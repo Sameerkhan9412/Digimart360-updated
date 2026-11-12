@@ -1,4 +1,5 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
+import request from 'supertest';
 import { api, createApp, signIn } from './app';
 
 /**
@@ -233,6 +234,32 @@ describe('Catalog API (e2e)', () => {
       await http.get(`/me/products/${productId}`, other).expect(404);
       await http.patch(`/me/products/${productId}`, { priceMin: 1 }, other).expect(404);
       await http.delete(`/me/products/${productId}`, other).expect(404);
+    });
+
+    it('uploads product photos, checks their real type, and only accepts your own', async () => {
+      const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+      const key = process.env.INTERNAL_API_KEY as string;
+      const upload = (file: Buffer, name: string, token = supplier) =>
+        request(app.getHttpServer()).post('/api/v1/me/uploads/images').set('X-Internal-Key', key).set('Authorization', `Bearer ${token}`).attach('file', file, name);
+
+      await request(app.getHttpServer()).post('/api/v1/me/uploads/images').attach('file', png, 'a.png').expect(401);
+      const disguised = await upload(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><script>1</script></svg>'), 'logo.png').expect(400);
+      expect(disguised.body.message).toMatch(/JPEG, PNG or WebP/);
+      await upload(Buffer.alloc(5 * 1024 * 1024 + 10, 1), 'big.jpg').expect(413);
+
+      const ok = await upload(png, 'photo.exe').expect(201);
+      expect(ok.body).toMatchObject({ contentType: 'image/png', size: png.length });
+      expect(ok.body.url).toContain(`/media/companies/${companyId}/`);
+      expect(ok.body.url).toMatch(/\.png$/);
+
+      const served = await request(app.getHttpServer()).get(new URL(ok.body.url).pathname).expect(200);
+      expect(served.headers['x-content-type-options']).toBe('nosniff');
+      expect(served.headers['cross-origin-resource-policy']).toBe('cross-origin');
+
+      const product = await http.patch(`/me/products/${productId}`, { images: [ok.body.url] }, supplier).expect(200);
+      expect(product.body.images).toEqual([ok.body.url]);
+      await http.patch(`/me/products/${productId}`, { images: ['https://evil.example/x.png'] }, supplier).expect(400);
+      await http.patch(`/me/products/${productId}`, { images: [ok.body.url.replace(companyId, 'other-company')] }, supplier).expect(400);
     });
 
     it('archiving hides a product; restoring brings it back as a draft', async () => {

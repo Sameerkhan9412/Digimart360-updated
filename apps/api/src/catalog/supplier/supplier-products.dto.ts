@@ -97,11 +97,11 @@ export class CreateProductDto {
   @Type(() => SpecInput)
   specs?: SpecInput[];
 
-  @ApiPropertyOptional({ type: [String], description: 'Image URLs (uploads come later). First one is the cover.' })
+  @ApiPropertyOptional({ type: [String], description: 'URLs returned by POST /me/uploads/images. First one is the cover.' })
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(10)
-  @IsUrl({ protocols: ['https'], require_protocol: true }, { each: true })
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true, require_tld: false }, { each: true })
   images?: string[];
 
   @ApiPropertyOptional({ default: true, description: 'true = send for review now; false = save as draft' })

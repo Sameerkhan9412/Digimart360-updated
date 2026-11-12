@@ -88,6 +88,15 @@ export class Env {
   @Max(30)
   OTP_TTL_MINUTES = 10;
 
+  /** Folder for uploaded product photos. In Docker this is a mounted volume. */
+  @IsString()
+  UPLOAD_DIR = './uploads';
+
+  /** Public URL prefix of uploaded files, as browsers and apps will see it (no trailing slash needed). */
+  @IsString()
+  @Matches(/^https?:\/\//, { message: 'MEDIA_BASE_URL must start with http:// or https://' })
+  MEDIA_BASE_URL = 'http://localhost:3000/media';
+
   @IsOptional()
   @IsEmail()
   SEED_ADMIN_EMAIL?: string;
