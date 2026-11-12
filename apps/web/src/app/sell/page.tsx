@@ -15,7 +15,7 @@ export default function SellPage() {
         <div>
           <h1 id="h" style={{ fontSize: 'clamp(24px,3vw,32px)', color: 'var(--navy)' }}>Sell on DIGI MART 360</h1>
           <p>Your free listing reaches buyers across India and abroad. Every product also appears on your own branded website, on your own domain.</p>
-          <p className="notice" role="note">Supplier sign-up opens with the supplier dashboard, the next release.</p>
+          <p><Link className="btn btn-orange btn-lg" href="/signin">Sign in and start selling</Link></p>
         </div>
         <ol className="steps">
           <li><b>Sign in</b><span>With your email (one-time code) or Google account.</span></li>

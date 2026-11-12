@@ -80,7 +80,13 @@ export class SupplierProductsService {
       dto.priceMax !== undefined ? dto.priceMax : current.priceMax == null ? undefined : Number(current.priceMax),
     );
 
-    const contentChanged = REVIEWED_FIELDS.some((f) => dto[f] !== undefined);
+    // Forms send every field every time, so only a real change counts as one.
+    const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+    const contentChanged = REVIEWED_FIELDS.some((f) => {
+      if (dto[f] === undefined) return false;
+      const before = f === 'specs' ? toOwnProduct(current).specs : current[f];
+      return !same(dto[f], f === 'summary' || f === 'description' ? (before ?? '') : before);
+    });
     let status = current.status;
     if (submit && (status === ProductStatus.DRAFT || status === ProductStatus.REJECTED)) {
       status = company.trustSeal ? ProductStatus.ACTIVE : ProductStatus.PENDING_REVIEW;

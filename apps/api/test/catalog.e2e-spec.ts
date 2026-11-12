@@ -212,6 +212,17 @@ describe('Catalog API (e2e)', () => {
       expect((await http.get('/products?q=knife').expect(200)).body.total).toBe(0);
     });
 
+    it('a full-form save with only a price change does not trigger a new review', async () => {
+      const cur = (await http.get(`/me/products/${productId}`, supplier).expect(200)).body;
+      const res = await http
+        .patch(`/me/products/${productId}`, {
+          name: cur.name, categoryId: cur.category.id, summary: cur.summary ?? '', description: cur.description ?? '',
+          specs: cur.specs, images: cur.images, priceMin: 7300, priceMax: 7300,
+        }, supplier)
+        .expect(200);
+      expect(res.body.status).toBe(cur.status);
+    });
+
     it('rejection reaches the supplier with a reason; resubmitting works', async () => {
       await http.post(`/admin/catalog/products/${productId}/reject`, { reason: 'Add a photo of the actual valve.' }, admin).expect(200);
       const mine = (await http.get(`/me/products/${productId}`, supplier).expect(200)).body;

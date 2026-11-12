@@ -6,6 +6,7 @@ import { LeadButton } from '@/components/LeadButton';
 import { MegaMenu } from '@/components/MegaMenu';
 import { SearchBox } from '@/components/SearchBox';
 import { api } from '@/lib/api';
+import { isSignedIn } from '@/lib/dash';
 import { SITE_NAME, SITE_URL } from '@/lib/seo';
 import type { CategoryNode } from '@/lib/types';
 import './globals.css';
@@ -41,7 +42,7 @@ async function categoryTree(): Promise<CategoryNode[]> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const tree = await categoryTree();
+  const [tree, signedIn] = await Promise.all([categoryTree(), isSignedIn()]);
   const quick = tree.flatMap((g) => g.children).sort((a, b) => b.productCount - a.productCount).slice(0, 9);
 
   return (
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <span>India&apos;s verified B2B marketplace · every supplier GST-checked</span>
             <nav aria-label="Utility">
               <Link href="/sell">Sell on DIGI MART</Link>
+              {signedIn ? <Link href="/dashboard">My dashboard</Link> : <Link href="/signin">Supplier sign in</Link>}
             </nav>
           </div>
         </div>

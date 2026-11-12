@@ -117,3 +117,30 @@ export interface ListingParams {
   page?: number;
   pageSize?: number;
 }
+
+/* Supplier dashboard */
+
+export type ProductStatus = 'DRAFT' | 'PENDING_REVIEW' | 'ACTIVE' | 'REJECTED' | 'ARCHIVED';
+export type CompanyStatus = 'PENDING' | 'ACTIVE' | 'SUSPENDED';
+
+export interface OwnProduct extends ProductCard {
+  status: ProductStatus;
+  rejectionReason: string | null;
+  description: string | null;
+  updatedAt: string;
+}
+
+export interface OwnCompany extends CompanySummary {
+  status: CompanyStatus;
+  legalName: string | null;
+  description: string | null;
+  yearEstablished: number | null;
+  website: string | null;
+  addressLine: string | null;
+  pincode: string | null;
+  exportsTo: string[];
+  gstin: string | null;
+  phone: string | null;
+  email: string | null;
+  productCount: number;
+}
