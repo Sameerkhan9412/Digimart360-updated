@@ -13,7 +13,7 @@ India's verified B2B marketplace: buyers find manufacturers and post requirement
 | Path | What it is | Status |
 |---|---|---|
 | `apps/api` | NestJS + Prisma + PostgreSQL. One API for web and mobile. | Sign-in, catalog, search, supplier self-service, moderation |
-| `apps/web` | Next.js marketplace (seller storefronts by domain come later) | Homepage, category listings, product and supplier pages, SEO |
+| `apps/web` | Next.js marketplace (seller storefronts by domain come later) | Homepage, category listings, product and supplier pages, SEO, supplier sign-in and dashboard |
 | `packages/*` | Shared UI, generated API client, config | Next |
 | `mockups/` | Approved HTML designs, storefront themes, Theme Studio | Reference for `apps/web` |
 
@@ -49,13 +49,16 @@ In development, sign-in codes are printed in the API log instead of being emaile
 1. ~~Repository, CI, local database~~ · ~~Sign-in: email OTP + Google~~
 2. ~~Catalog API: categories, companies (suppliers), products, search, moderation~~
 3. ~~Website: Homepage v2, category listing, product page; SEO (metadata, sitemap, structured data)~~
-4. Supplier dashboard: company profile, GST verification request, product management, image uploads
+4. ~~Supplier dashboard: company profile, GST verification request, product management, image uploads~~ (browser walkthrough pending)
 5. RFQs: post requirement, matching, quotes, buyer comparison
 6. Storefront themes + custom domains (Caddy on-demand TLS, DNS verification, admin approval)
 7. Admin: verification queue, moderation, domain approvals
 8. Deployment: Docker images, Compose stack, backups, monitoring
 
 ## Known follow-ups
+
+- Uploaded photos live in `UPLOAD_DIR` (default `apps/api/uploads`). In Docker, mount it as a volume and back it up; swap `LocalDiskStorage` for S3/R2 if the VPS fills up.
+- The dashboard can't clear an optional field once it is set (the API treats a missing field as unchanged).
 
 - Upgrade Next.js to 15.5.29+ (or 16) once the release is two weeks old; postcss is pinned to 8.5.30 via `overrides` until then.
 
