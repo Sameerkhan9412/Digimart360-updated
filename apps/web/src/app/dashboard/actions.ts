@@ -126,3 +126,56 @@ export async function withdrawQuote(rfqId: string) {
   await authedJson(`/me/rfq-inbox/${rfqId}/quote/withdraw`, { method: 'POST', json: {} });
   revalidatePath('/dashboard', 'layout');
 }
+
+export async function saveSite(_: FormState, f: FormData): Promise<FormState> {
+  const on = (k: string) => f.get(k) === 'on';
+  try {
+    await authedJson('/me/storefront', {
+      method: 'PATCH',
+      json: {
+        theme: text(f, 'theme'),
+        // null = go back to the theme's own colour / remove the banner.
+        accent: f.get('useThemeColour') === 'on' ? null : text(f, 'accent') || null,
+        tagline: text(f, 'tagline') || null,
+        bannerUrl: text(f, 'banner') || null,
+        showAbout: on('showAbout'),
+        showProducts: on('showProducts'),
+        showCertificates: on('showCertificates'),
+        showContact: on('showContact'),
+        certificates: text(f, 'certificates')
+          .split(/\r?\n/)
+          .map((l) => l.trim())
+          .filter(Boolean),
+      },
+    });
+  } catch (e) {
+    return { error: messageOf(e) };
+  }
+  revalidatePath('/dashboard', 'layout');
+  return { saved: true };
+}
+
+export async function saveDomain(_: FormState, f: FormData): Promise<FormState> {
+  try {
+    await authedJson('/me/domain', { method: 'PUT', json: { host: text(f, 'host') } });
+  } catch (e) {
+    return { error: messageOf(e) };
+  }
+  revalidatePath('/dashboard/website');
+  return { saved: true };
+}
+
+export async function checkDomain(): Promise<FormState> {
+  try {
+    await authedJson('/me/domain/check', { method: 'POST', json: {} });
+  } catch (e) {
+    return { error: messageOf(e) };
+  }
+  revalidatePath('/dashboard/website');
+  return { saved: true };
+}
+
+export async function removeDomain() {
+  await authedJson('/me/domain', { method: 'DELETE' });
+  revalidatePath('/dashboard/website');
+}

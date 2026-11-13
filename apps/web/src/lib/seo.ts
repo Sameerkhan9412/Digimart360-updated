@@ -3,6 +3,14 @@ import type { CompanyProfile, ProductCard, ProductDetail, Ref } from './types';
 export const SITE_URL = (process.env.SITE_URL ?? 'http://localhost:3001').replace(/\/$/, '');
 export const SITE_NAME = 'DIGI MART 360';
 
+/** Full address of a supplier website host. In development (*.localhost) it keeps the dev server's port. */
+export function siteUrl(host: string): string {
+  const site = new URL(SITE_URL);
+  const port = host.endsWith('localhost') && site.port ? `:${site.port}` : '';
+  return `${site.protocol}//${host}${port}`;
+}
+export const ROOT_DOMAIN = process.env.ROOT_DOMAIN ?? 'localhost';
+
 export const url = (path: string) => SITE_URL + path;
 export const productPath = (slug: string) => `/p/${slug}`;
 export const categoryPath = (slug: string) => `/c/${slug}`;

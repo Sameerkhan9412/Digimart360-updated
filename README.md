@@ -47,6 +47,8 @@ docker compose up -d --build               # builds, migrates, starts, gets HTTP
 docker compose run --rm api npx prisma db seed   # once: creates the admin account (SEED_ADMIN_EMAIL)
 ```
 
+DNS for supplier websites: an `A` record for `@` and `*` (wildcard) and `sites` pointing at the VPS. Suppliers connect their own domain by adding a TXT record (proof) and a CNAME to `sites.<your domain>` from the dashboard; staff approve it under Admin > Domains, and Caddy then issues its certificate on the first visit.
+
 One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and the rest to the website. Run `backup.sh` nightly from cron and copy `backups/` off the server. Not yet verified: the image builds (no Docker daemon was available when these were written), so expect to fix small things on the first build.
 
 ## Decisions so far
@@ -64,7 +66,7 @@ One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and
 3. ~~Website: Homepage v2, category listing, product page; SEO (metadata, sitemap, structured data)~~
 4. ~~Supplier dashboard: company profile, GST verification request, product management, image uploads~~ (browser walkthrough pending)
 5. ~~RFQs: post requirement, matching, quotes, buyer comparison~~ (email notifications only, no chat/POs; browser walkthrough pending)
-6. Storefront themes + custom domains (Caddy on-demand TLS, DNS verification, admin approval)
+6. ~~Storefront themes + custom domains~~ (themes, subdomains, domain verification and admin approval built; Caddy on-demand TLS written but untested on a server; browser walkthrough pending)
 7. ~~Admin: verification queue, moderation~~ (web at /admin; domain approvals come with item 6)
 8. Deployment: Docker images, Compose stack, Caddy HTTPS, backups: files in `deploy/` (written, not yet built or run on a server; monitoring still to do)
 

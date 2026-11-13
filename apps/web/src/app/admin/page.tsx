@@ -2,12 +2,13 @@ import Link from 'next/link';
 import { ProductVisual } from '@/components/ProductVisual';
 import { admin } from '@/lib/dash';
 import { dateLabel, priceRange } from '@/lib/format';
-import type { CompanyStatus, ProductStatus } from '@/lib/types';
-import { approveProduct, moderateCompany, rejectProduct } from './actions';
+import type { CompanyStatus, DomainStatus, ProductStatus } from '@/lib/types';
+import { approveDomain, approveProduct, moderateCompany, rejectDomain, rejectProduct } from './actions';
 
 const COMPANY_TABS: CompanyStatus[] = ['PENDING', 'ACTIVE', 'SUSPENDED'];
 const PRODUCT_TABS: ProductStatus[] = ['PENDING_REVIEW', 'ACTIVE', 'REJECTED'];
-const LABEL: Record<string, string> = { PENDING: 'Waiting', PENDING_REVIEW: 'In review', ACTIVE: 'Live', SUSPENDED: 'Suspended', REJECTED: 'Rejected' };
+const DOMAIN_TABS: DomainStatus[] = ['PENDING_APPROVAL', 'ACTIVE', 'PENDING_DNS', 'REJECTED'];
+const LABEL: Record<string, string> = { PENDING_APPROVAL: 'Waiting', PENDING_DNS: 'Awaiting DNS', PENDING: 'Waiting', PENDING_REVIEW: 'In review', ACTIVE: 'Live', SUSPENDED: 'Suspended', REJECTED: 'Rejected' };
 
 interface Search { tab?: string; status?: string; error?: string }
 
@@ -20,21 +21,22 @@ const NO_ACCESS = (
 
 export default async function Admin({ searchParams }: { searchParams: Promise<Search> }) {
   const sp = await searchParams;
-  const tab = sp.tab === 'products' ? 'products' : 'companies';
-  const tabs: string[] = tab === 'products' ? PRODUCT_TABS : COMPANY_TABS;
+  const tab = sp.tab === 'products' ? 'products' : sp.tab === 'domains' ? 'domains' : 'companies';
+  const tabs: string[] = tab === 'products' ? PRODUCT_TABS : tab === 'domains' ? DOMAIN_TABS : COMPANY_TABS;
   const status = tabs.includes(sp.status ?? '') ? sp.status! : tabs[0];
   const back = `/admin?tab=${tab}&status=${status}`;
 
   const companies = tab === 'companies' ? await admin.companies(status as CompanyStatus) : null;
   const products = tab === 'products' ? await admin.products(status as ProductStatus) : null;
-  if (companies === 'forbidden' || products === 'forbidden') return NO_ACCESS;
-  const page = companies ?? products!;
+  const domains = tab === 'domains' ? await admin.domains(status as DomainStatus) : null;
+  if (companies === 'forbidden' || products === 'forbidden' || domains === 'forbidden') return NO_ACCESS;
+  const page = (companies ?? products ?? domains)!;
 
   return (
     <>
       <div className="sec-head">
         <div>
-          <h1 style={{ fontSize: 24, color: 'var(--navy)' }}>{tab === 'products' ? 'Products' : 'Companies'}</h1>
+          <h1 style={{ fontSize: 24, color: 'var(--navy)' }}>{tab === 'products' ? 'Products' : tab === 'domains' ? 'Custom domains' : 'Companies'}</h1>
           <p>
             {page.total} {LABEL[status].toLowerCase()}
             {page.items.length < page.total && `, showing the first ${page.items.length}`}
@@ -67,6 +69,30 @@ export default async function Admin({ searchParams }: { searchParams: Promise<Se
                 {c.gstin && <form action={moderateCompany.bind(null, c.id, { gstVerified: !c.gstVerified }, back)}><button className="btn btn-line">{c.gstVerified ? 'Unverify GST' : 'Verify GST'}</button></form>}
                 <form action={moderateCompany.bind(null, c.id, { trustSeal: !c.trustSeal }, back)}><button className="btn btn-line">{c.trustSeal ? 'Remove DM Trusted' : 'Grant DM Trusted'}</button></form>
                 {c.status === 'ACTIVE' && <Link className="btn btn-line" href={`/store/${c.slug}`}>View page</Link>}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {domains && (
+        <ul className="plist">
+          {domains.items.map((d) => (
+            <li key={d.id} className="panel dcard">
+              <div className="pmain">
+                <b>{d.host}</b>
+                <span className="muted">{d.companyName} ({d.companySlug}) · {d.ownerEmail} · requested {dateLabel(d.createdAt)}</span>
+                {d.rejectionReason && <span className="muted">Rejected: {d.rejectionReason}</span>}
+                {d.status === 'PENDING_DNS' && <span className="muted">Ownership not proven yet</span>}
+              </div>
+              <div className="pact">
+                {d.status !== 'ACTIVE' && d.status !== 'PENDING_DNS' && <form action={approveDomain.bind(null, d.id, back)}><button className="btn btn-orange">Approve</button></form>}
+                {d.status !== 'REJECTED' && (
+                  <form action={rejectDomain.bind(null, d.id, back)} className="pact">
+                    <input name="reason" required minLength={10} maxLength={500} placeholder="Reason the supplier will see" aria-label="Rejection reason" style={{ minWidth: 260 }} />
+                    <button className="btn btn-line">{d.status === 'ACTIVE' ? 'Revoke' : 'Reject'}</button>
+                  </form>
+                )}
               </div>
             </li>
           ))}

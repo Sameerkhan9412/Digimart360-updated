@@ -10,6 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <nav className="dnav panel" aria-label="Admin">
         <Link href="/admin?tab=companies">Companies</Link>
         <Link href="/admin?tab=products">Products</Link>
+        <Link href="/admin?tab=domains">Domains</Link>
         <form action={signOut}><button type="submit">Sign out</button></form>
       </nav>
       <div className="dbody">{children}</div>

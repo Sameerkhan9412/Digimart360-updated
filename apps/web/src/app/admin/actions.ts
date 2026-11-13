@@ -30,3 +30,12 @@ export async function rejectProduct(id: string, back: string, f: FormData) {
   const reason = String(f.get('reason') ?? '').trim();
   await run(back, () => authedJson(`/admin/catalog/products/${id}/reject`, { method: 'POST', json: { reason } }));
 }
+
+export async function approveDomain(id: string, back: string) {
+  await run(back, () => authedJson(`/admin/domains/${id}/approve`, { method: 'POST', json: {} }));
+}
+
+export async function rejectDomain(id: string, back: string, f: FormData) {
+  const reason = String(f.get('reason') ?? '').trim();
+  await run(back, () => authedJson(`/admin/domains/${id}/reject`, { method: 'POST', json: { reason } }));
+}

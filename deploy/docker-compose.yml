@@ -38,6 +38,8 @@ services:
       CORS_ORIGINS: https://${DOMAIN}
       WEB_URL: https://${DOMAIN}
       MEDIA_BASE_URL: https://${DOMAIN}/media
+      ROOT_DOMAIN: ${DOMAIN}
+      SITES_TARGET: sites.${DOMAIN}
       UPLOAD_DIR: /data/uploads
       MAIL_TRANSPORT: ${MAIL_TRANSPORT:-smtp}
       SMTP_URL: ${SMTP_URL:-}
@@ -58,6 +60,7 @@ services:
     restart: unless-stopped
     environment:
       SITE_URL: https://${DOMAIN}
+      ROOT_DOMAIN: ${DOMAIN}
       API_URL: http://api:3000/api/v1
       INTERNAL_API_KEY: ${INTERNAL_API_KEY}
       ALLOW_INDEXING: ${ALLOW_INDEXING:-false}

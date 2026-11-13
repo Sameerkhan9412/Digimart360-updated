@@ -6,6 +6,7 @@ import type {
   ListingParams,
   ProductDetail,
   ProductPage,
+  PublicStorefront,
   SitemapData,
 } from './types';
 
@@ -66,5 +67,6 @@ export const api = {
   products: (params: ListingParams) => get<ProductPage>('/products' + toQuery(params), 60),
   product: (slug: string) => getOrNull<ProductDetail>(`/products/${encodeURIComponent(slug)}`, 300),
   company: (slug: string) => getOrNull<CompanyProfile>(`/companies/${encodeURIComponent(slug)}`, 300),
+  storefront: (slug: string) => getOrNull<PublicStorefront>(`/storefronts/${encodeURIComponent(slug)}`, 60),
   sitemap: () => get<SitemapData>('/sitemap', 3600),
 };

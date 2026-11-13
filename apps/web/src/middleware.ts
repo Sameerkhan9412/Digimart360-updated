@@ -2,13 +2,80 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from '@/lib/session-shared';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
+const GUARDED = ['/dashboard', '/account', '/rfq', '/admin'];
+
+/** Hosts that serve the marketplace itself. Every other host may be a supplier's website. */
+const MARKET_HOSTS = (() => {
+  const site = new URL(process.env.SITE_URL ?? 'http://localhost:3001').hostname;
+  const root = process.env.ROOT_DOMAIN ?? 'localhost';
+  return new Set([site, `www.${site}`, root, `www.${root}`, 'localhost', '127.0.0.1']);
+})();
+
+interface HostMatch { slug: string; canonicalHost: string }
+const hostCache = new Map<string, { value: HostMatch | null; until: number }>();
+
+/** Which supplier website lives at this host? Cached briefly so most requests skip the API call. */
+async function siteFor(host: string): Promise<HostMatch | null> {
+  const hit = hostCache.get(host);
+  if (hit && hit.until > Date.now()) return hit.value;
+  let value: HostMatch | null = null;
+  let ttl = 30_000;
+  try {
+    const r = await fetch(`${API_URL}/storefronts/by-host?host=${encodeURIComponent(host)}`, {
+      headers: { 'X-Internal-Key': process.env.INTERNAL_API_KEY ?? '' },
+      cache: 'no-store',
+    });
+    if (r.ok) {
+      value = await r.json();
+      ttl = 60_000;
+    } else if (r.status !== 404) {
+      ttl = 0; // API trouble: ask again next time instead of remembering "no".
+    }
+  } catch {
+    ttl = 0;
+  }
+  if (ttl > 0) {
+    if (hostCache.size > 2000) hostCache.clear();
+    hostCache.set(host, { value, until: Date.now() + ttl });
+  }
+  return value;
+}
+
+/** A supplier's own website: send the visitor to its canonical address, or serve /sites/<slug>/... */
+async function storefront(req: NextRequest, host: string): Promise<NextResponse | null> {
+  const match = await siteFor(host);
+  if (!match) return null;
+
+  if (match.canonicalHost !== host) {
+    const local = host.endsWith('localhost');
+    const proto = req.headers.get('x-forwarded-proto') ?? (local ? 'http' : 'https');
+    const port = local && req.nextUrl.port ? `:${req.nextUrl.port}` : '';
+    return NextResponse.redirect(`${proto}://${match.canonicalHost}${port}${req.nextUrl.pathname}${req.nextUrl.search}`, 308);
+  }
+
+  const url = req.nextUrl.clone();
+  url.pathname = `/sites/${match.slug}${req.nextUrl.pathname === '/' ? '' : req.nextUrl.pathname}`;
+  const headers = new Headers(req.headers);
+  headers.set('x-site-slug', match.slug);
+  return NextResponse.rewrite(url, { request: { headers } });
+}
 
 /**
- * Guards /dashboard (suppliers) and /account and /rfq (buyers). Access tokens last minutes; when one has expired we swap the
- * refresh token for a new pair here (the only place that can set cookies before
- * the page renders), then let the request through with the fresh token.
+ * 1. A supplier's host (acme.digimart360.com or their own domain) is rewritten to their website.
+ * 2. /dashboard, /account, /rfq and /admin need a session. Access tokens last minutes; when one has
+ *    expired we swap the refresh token for a new pair here (the only place that can set cookies
+ *    before the page renders), then let the request through with the fresh token.
  */
 export async function middleware(req: NextRequest) {
+  const host = (req.headers.get('host') ?? '').toLowerCase().replace(/:\d+$/, '');
+  if (host && !MARKET_HOSTS.has(host)) {
+    const res = await storefront(req, host);
+    if (res) return res;
+  }
+
+  const path = req.nextUrl.pathname;
+  if (!GUARDED.some((p) => path === p || path.startsWith(p + '/'))) return NextResponse.next();
+
   const login = () => {
     const url = new URL('/signin', req.url);
     url.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search);
@@ -47,4 +114,7 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-export const config = { matcher: ['/dashboard/:path*', '/account/:path*', '/rfq/:path*', '/admin/:path*'] };
+export const config = {
+  // Everything except Next's own files and static assets.
+  matcher: ['/((?!_next/|favicon.ico|logo.png|.*\\.(?:png|jpg|jpeg|svg|webp|ico|css|js|woff2?)$).*)'],
+};

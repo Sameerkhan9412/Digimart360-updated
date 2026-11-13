@@ -217,3 +217,39 @@ export interface ModerationCompany extends CompanySummary {
 }
 
 export interface Page<T> { items: T[]; total: number; page: number }
+
+/* Storefronts */
+
+export type StorefrontTheme = 'BAZAAR' | 'FORGE' | 'HERITAGE' | 'MERIDIAN';
+export type DomainStatus = 'PENDING_DNS' | 'PENDING_APPROVAL' | 'ACTIVE' | 'REJECTED';
+
+export interface StorefrontSettings {
+  theme: StorefrontTheme;
+  accent: string | null;
+  tagline: string | null;
+  bannerUrl: string | null;
+  showAbout: boolean;
+  showProducts: boolean;
+  showCertificates: boolean;
+  showContact: boolean;
+  certificates: string[];
+}
+
+export interface PublicStorefront extends StorefrontSettings { slug: string; canonicalHost: string }
+
+export interface DomainInfo {
+  id: string;
+  host: string;
+  status: DomainStatus;
+  txtName: string;
+  txtValue: string;
+  cnameTarget: string | null;
+  rejectionReason: string | null;
+}
+
+export interface ModerationDomain extends DomainInfo {
+  companyName: string;
+  companySlug: string;
+  ownerEmail: string;
+  createdAt: string;
+}

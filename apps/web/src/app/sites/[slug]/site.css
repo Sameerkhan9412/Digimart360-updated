@@ -1,0 +1,86 @@
+/* Supplier websites. Four themes = four sets of design tokens on .sf[data-theme]; layout is shared.
+   A supplier's accent colour only replaces --brand / --brand-ink. */
+
+.sf { --radius: 10px; --heading-case: none; --heading-weight: 700; --heading-tracking: -.02em; --hero-min: 380px;
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+.sf *, .sf *::before, .sf *::after { box-sizing: border-box; }
+.sf a { color: inherit; }
+.sf h1, .sf h2, .sf h3 { font-family: var(--font-display); font-weight: var(--heading-weight); letter-spacing: var(--heading-tracking); text-transform: var(--heading-case); line-height: 1.12; margin: 0; text-wrap: balance; }
+.sf :focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.sf-wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
+
+/* themes */
+.sf[data-theme='MERIDIAN'] { --bg: #fff; --surface: #f5f8fb; --ink: #142233; --muted: #5b6b7d; --line: #e2e8ef; --brand: #183b63; --brand-ink: #fff; --accent: #0f8f7e;
+  --hero-bg: linear-gradient(135deg, #183b63, #0f8f7e); --hero-ink: #fff; --font-display: 'Manrope', 'Segoe UI', sans-serif; --font-body: 'Source Sans 3', 'Segoe UI', sans-serif; --heading-weight: 800; }
+.sf[data-theme='BAZAAR'] { --bg: #f6f7f9; --surface: #fff; --ink: #17212b; --muted: #64707d; --line: #e6eaee; --brand: #1b8c4e; --brand-ink: #fff; --accent: #f08a24; --radius: 16px;
+  --hero-bg: linear-gradient(120deg, #1b8c4e, #0f6a38); --hero-ink: #fff; --font-display: 'Sora', 'Segoe UI', sans-serif; --font-body: 'DM Sans', 'Segoe UI', sans-serif; }
+.sf[data-theme='FORGE'] { --bg: #121518; --surface: #191d22; --ink: #e6ebf0; --muted: #9aa6b2; --line: #2f363f; --brand: #f26b1d; --brand-ink: #121518; --accent: #ffc23d; --radius: 2px;
+  --hero-bg: linear-gradient(135deg, #22282f, #121518); --hero-ink: #e6ebf0; --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif; --font-body: 'Barlow', 'Segoe UI', sans-serif;
+  --heading-case: uppercase; --heading-tracking: .01em; color-scheme: dark; }
+.sf[data-theme='HERITAGE'] { --bg: #f2f1ec; --surface: #e9e7df; --ink: #1e2233; --muted: #5e6172; --line: #cfccc0; --brand: #232a5c; --brand-ink: #fff; --accent: #b7832b; --radius: 4px;
+  --hero-bg: linear-gradient(135deg, #232a5c, #151a3d); --hero-ink: #f2f1ec; --font-display: 'Cormorant Garamond', Georgia, serif; --font-body: 'Mulish', 'Segoe UI', sans-serif; --heading-weight: 600; --heading-tracking: 0; }
+
+/* header */
+.sf-head { border-bottom: 1px solid var(--line); background: var(--bg); position: sticky; top: 0; z-index: 5; }
+.sf-head .sf-wrap { display: flex; align-items: center; gap: 18px; min-height: 64px; flex-wrap: wrap; padding-block: 8px; }
+.sf-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--font-display); font-weight: var(--heading-weight); font-size: 20px; text-transform: var(--heading-case); }
+.sf-brand img, .sf-mono { width: 40px; height: 40px; border-radius: var(--radius); object-fit: contain; background: var(--brand); color: var(--brand-ink); display: grid; place-items: center; font-weight: 800; font-size: 16px; }
+.sf-nav { display: flex; gap: 18px; margin-left: auto; align-items: center; flex-wrap: wrap; }
+.sf-nav a { text-decoration: none; color: var(--muted); font-weight: 600; font-size: 15px; }
+.sf-nav a:hover { color: var(--ink); }
+
+/* buttons */
+.sf-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 20px; border-radius: var(--radius); background: var(--brand); color: var(--brand-ink);
+  font-weight: 700; text-decoration: none; border: 2px solid var(--brand); font-size: 15px; }
+.sf-btn:hover { filter: brightness(1.08); }
+.sf-btn.ghost { background: transparent; color: inherit; border-color: currentColor; }
+.sf-nav .sf-btn { color: var(--brand-ink); }
+
+/* hero */
+.sf-hero { background: var(--hero-bg); color: var(--hero-ink); position: relative; min-height: var(--hero-min); display: flex; align-items: center; }
+.sf-hero.banner { background-size: cover; background-position: center; }
+.sf-hero.banner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(0 0 0 / .7), rgb(0 0 0 / .25)); }
+.sf-hero .sf-wrap { position: relative; padding-block: 56px; display: grid; gap: 16px; max-width: 1180px; }
+.sf-hero h1 { font-size: clamp(32px, 5vw, 54px); max-width: 18ch; }
+.sf-hero p { font-size: 19px; max-width: 56ch; margin: 0; opacity: .92; }
+.sf-hero .sf-btn { background: #fff; color: #111; border-color: #fff; }
+.sf[data-theme='FORGE'] .sf-hero .sf-btn { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.sf-hero.banner { color: #fff; }
+.sf-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.sf-badge { padding: 4px 12px; border: 1px solid currentColor; border-radius: 999px; font-size: 13px; font-weight: 700; opacity: .9; }
+
+/* sections */
+.sf-sec { padding-block: 54px; }
+.sf-sec.alt { background: var(--surface); }
+.sf-sec h2 { font-size: clamp(26px, 3.4vw, 36px); margin-bottom: 18px; }
+.sf[data-theme='HERITAGE'] .sf-sec h2 { color: var(--brand); }
+.sf-prose { max-width: 70ch; white-space: pre-wrap; margin: 0 0 18px; }
+.sf-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 0; }
+.sf-facts div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+.sf-sec.alt .sf-facts div { background: var(--bg); }
+.sf-facts dt { font-size: 13px; color: var(--muted); font-weight: 600; }
+.sf-facts dd { margin: 2px 0 0; font-weight: 700; }
+
+.sf-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+.sf-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; display: flex; flex-direction: column; }
+.sf-sec.alt .sf-card { background: var(--bg); }
+.sf-card .pic { aspect-ratio: 4 / 3; display: grid; place-items: center; background: color-mix(in srgb, var(--brand) 8%, var(--bg)); color: var(--brand); overflow: hidden; }
+.sf-card .pic img { width: 100%; height: 100%; object-fit: contain; }
+.sf-card .pic svg { width: 62%; height: auto; }
+.sf-card .body { padding: 14px 16px 16px; display: grid; gap: 6px; flex: 1; align-content: start; }
+.sf-card h3 { font-size: 18px; }
+.sf-card h3 a { text-decoration: none; }
+.sf-card h3 a:hover { text-decoration: underline; }
+.sf-price { font-weight: 800; font-size: 18px; color: var(--brand); }
+.sf[data-theme='FORGE'] .sf-price { color: var(--accent); }
+.sf-muted { color: var(--muted); font-size: 14px; }
+.sf-chips { display: flex; gap: 10px; flex-wrap: wrap; padding: 0; margin: 0; list-style: none; }
+.sf-chips li { padding: 9px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-weight: 700; }
+.sf-sec.alt .sf-chips li { background: var(--bg); }
+
+.sf-contact { display: grid; gap: 8px; }
+.sf-foot { margin-top: auto; border-top: 1px solid var(--line); padding-block: 22px; color: var(--muted); font-size: 14px; background: var(--bg); }
+.sf-foot .sf-wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sf-foot a { color: inherit; }
+
+@media (max-width: 640px) { .sf-nav { margin-left: 0; width: 100%; } .sf-sec { padding-block: 38px; } }

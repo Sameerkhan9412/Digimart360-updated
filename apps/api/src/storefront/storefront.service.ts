@@ -83,7 +83,8 @@ export class StorefrontService {
       const base = this.config.get('MEDIA_BASE_URL', { infer: true }).replace(/\/$/, '') + '/';
       if (dto.bannerUrl && !dto.bannerUrl.startsWith(base)) throw new BadRequestException('Use a photo uploaded to DIGI MART 360');
     }
-    const data: Prisma.StorefrontUpdateInput = { ...dto, accent: dto.accent?.toLowerCase() };
+    const data: Prisma.StorefrontUpdateInput = { ...dto, accent: dto.accent == null ? dto.accent : dto.accent.toLowerCase() };
+    // Sending null clears accent, tagline and banner; leaving a field out keeps it.
     const saved = await this.prisma.storefront.upsert({
       where: { companyId: c.id },
       update: data,

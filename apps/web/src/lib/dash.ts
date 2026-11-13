@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ApiError } from './api';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from './session-shared';
-import type { BuyerRfq, CompanyStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
+import type { BuyerRfq, DomainInfo, ModerationDomain, StorefrontSettings, CompanyStatus, DomainStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
 
@@ -111,7 +111,24 @@ export const rfqs = {
   inboxItem: (id: string) => orNull<SupplierRfq>(`/me/rfq-inbox/${encodeURIComponent(id)}`),
 };
 
+export const site = {
+  settings: () => authedJson<StorefrontSettings>('/me/storefront'),
+  /** null = no custom domain yet. The API sends an empty body in that case. */
+  async domain(): Promise<DomainInfo | null> {
+    const res = await authed('/me/domain');
+    if (!res.ok) throw await errorFrom(res);
+    const text = await res.text();
+    return text ? (JSON.parse(text) as DomainInfo) : null;
+  },
+};
+
 export const admin = {
+  async domains(status: DomainStatus): Promise<Page<ModerationDomain> | 'forbidden'> {
+    const res = await authed(`/admin/domains?status=${status}`);
+    if (res.status === 403) return 'forbidden';
+    if (!res.ok) throw await errorFrom(res);
+    return res.json();
+  },
   /** 'forbidden' when the signed-in person is not an admin. */
   async companies(status: CompanyStatus): Promise<Page<ModerationCompany> | 'forbidden'> {
     const res = await authed(`/admin/catalog/companies?status=${status}`);

@@ -2,10 +2,9 @@
 
 import { useId, useState } from 'react';
 
-const MAX = 10;
 
 /** Uploads photos as they are chosen. The form submits the resulting URLs as repeated "images" fields. */
-export function ImageUploader({ initial }: { initial: string[] }) {
+export function ImageUploader({ initial, name = 'images', max = 10, label = 'Photos', hint = 'JPEG, PNG or WebP, up to 5 MB each · the first is the cover' }: { initial: string[]; name?: string; max?: number; label?: string; hint?: string }) {
   const [urls, setUrls] = useState<string[]>(initial);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -15,7 +14,7 @@ export function ImageUploader({ initial }: { initial: string[] }) {
     if (!files?.length) return;
     setBusy(true);
     setError('');
-    for (const file of Array.from(files).slice(0, MAX - urls.length)) {
+    for (const file of Array.from(files).slice(0, max - urls.length)) {
       const body = new FormData();
       body.set('file', file);
       try {
@@ -32,13 +31,13 @@ export function ImageUploader({ initial }: { initial: string[] }) {
 
   return (
     <div className="f">
-      <label htmlFor={id}>Photos <small>JPEG, PNG or WebP, up to 5 MB each · the first is the cover</small></label>
+      <label htmlFor={id}>{label} <small>{hint}</small></label>
       <ul className="thumbs">
         {urls.map((u, i) => (
           <li key={u}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={u} alt={`Photo ${i + 1}`} />
-            <input type="hidden" name="images" value={u} />
+            <input type="hidden" name={name} value={u} />
             <span>
               {i > 0 && (
                 <button type="button" onClick={() => setUrls((l) => [u, ...l.filter((x) => x !== u)])}>Make cover</button>
@@ -48,7 +47,7 @@ export function ImageUploader({ initial }: { initial: string[] }) {
           </li>
         ))}
       </ul>
-      {urls.length < MAX && (
+      {urls.length < max && (
         <input id={id} type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={busy} onChange={(e) => { void add(e.target.files); e.target.value = ''; }} />
       )}
       {busy && <p className="hint" role="status">Uploading…</p>}

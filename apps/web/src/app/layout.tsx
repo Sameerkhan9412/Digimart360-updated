@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { headers } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import { LeadButton } from '@/components/LeadButton';
@@ -42,6 +43,14 @@ async function categoryTree(): Promise<CategoryNode[]> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // A supplier's own website (set by middleware) brings its own header, footer and theme.
+  if ((await headers()).get('x-site-slug')) {
+    return (
+      <html lang="en-IN">
+        <body>{children}</body>
+      </html>
+    );
+  }
   const [tree, signedIn] = await Promise.all([categoryTree(), isSignedIn()]);
   const quick = tree.flatMap((g) => g.children).sort((a, b) => b.productCount - a.productCount).slice(0, 9);
 

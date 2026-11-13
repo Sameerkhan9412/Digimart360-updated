@@ -463,3 +463,17 @@ p { margin: 0; }
 .qrows div { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; border-top: 1px solid var(--line); padding-top: 6px; }
 .qrows dt { color: var(--muted); }
 .qrows dd { margin: 0; font-weight: 600; text-align: right; }
+
+/* Website editor */
+.themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.theme { position: relative; display: grid; gap: 6px; padding: 12px; border: 2px solid var(--line, #e2e8ef); border-radius: 12px; cursor: pointer; background: #fff; }
+.theme input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.theme:has(input:checked) { border-color: var(--green, #1b8c4e); box-shadow: 0 0 0 3px rgb(27 140 78 / .15); }
+.theme:has(input:focus-visible) { outline: 2px solid var(--navy, #1a3c5e); outline-offset: 2px; }
+.theme .sw { display: flex; height: 26px; border-radius: 6px; overflow: hidden; border: 1px solid rgb(0 0 0 / .1); }
+.theme .sw i { flex: 1; }
+.theme small { color: var(--muted, #64707d); }
+.check { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
+.dns { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0; }
+.dns th, .dns td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line, #e2e8ef); vertical-align: top; }
+.dns code { word-break: break-all; }
