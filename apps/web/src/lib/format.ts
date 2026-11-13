@@ -51,3 +51,14 @@ export function monogramColor(seed: string): string {
   for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return palette[h % palette.length];
 }
+
+const DATE = new Intl.DateTimeFormat("en-IN", { day: "numeric", month: "short", year: "numeric" });
+export const dateLabel = (iso: string | Date) => DATE.format(new Date(iso));
+
+/** "3 days left", "closes today", or "closed". */
+export function timeLeft(iso: string): string {
+  const ms = new Date(iso).getTime() - Date.now();
+  if (ms <= 0) return "closed";
+  const days = Math.floor(ms / 86_400_000);
+  return days >= 1 ? `${plural(days, "day")} left` : "closes today";
+}

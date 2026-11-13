@@ -98,3 +98,31 @@ export async function restoreProduct(id: string) {
   await authedJson(`/me/products/${id}/restore`, { method: 'POST', json: {} });
   revalidatePath('/dashboard', 'layout');
 }
+
+export async function saveQuote(_: FormState, f: FormData): Promise<FormState> {
+  const rfqId = text(f, 'rfqId');
+  try {
+    await authedJson(`/me/rfq-inbox/${rfqId}/quote`, {
+      method: 'PUT',
+      json: {
+        unitPrice: num(f, 'unitPrice'),
+        deliveryDays: num(f, 'deliveryDays'),
+        material: opt(f, 'material'),
+        warranty: opt(f, 'warranty'),
+        paymentTerms: opt(f, 'paymentTerms'),
+        certificates: opt(f, 'certificates'),
+        note: opt(f, 'note'),
+        validForDays: num(f, 'validForDays'),
+      },
+    });
+  } catch (e) {
+    return { error: messageOf(e) };
+  }
+  revalidatePath('/dashboard', 'layout');
+  return { saved: true };
+}
+
+export async function withdrawQuote(rfqId: string) {
+  await authedJson(`/me/rfq-inbox/${rfqId}/quote/withdraw`, { method: 'POST', json: {} });
+  revalidatePath('/dashboard', 'layout');
+}

@@ -14,6 +14,6 @@ import { SupplierProductsService } from './supplier/supplier-products.service';
 @Module({
   controllers: [CategoriesController, ProductsController, CompaniesController, SupplierController, CatalogAdminController],
   providers: [CategoriesService, ProductsService, CompaniesService, SupplierProductsService, CatalogAdminService],
-  exports: [CategoriesService, ProductsService],
+  exports: [CategoriesService, ProductsService, CompaniesService],
 })
 export class CatalogModule {}

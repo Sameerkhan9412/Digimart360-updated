@@ -9,6 +9,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="dash">
       <nav className="dnav panel" aria-label="Supplier dashboard">
         <Link href="/dashboard">Overview</Link>
+        <Link href="/dashboard/rfqs">Requirements</Link>
         <Link href="/dashboard/products/new">Add product</Link>
         <Link href="/dashboard/company">Company profile</Link>
         <form action={signOut}><button type="submit">Sign out</button></form>

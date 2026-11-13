@@ -3,7 +3,7 @@
 import { useActionState } from 'react';
 import { requestCode, verifyCode, type SignInState } from '@/app/signin/actions';
 
-export function SignInForm({ next }: { next: string }) {
+export function SignInForm({ next, role }: { next: string; role: 'BUYER' | 'SUPPLIER' }) {
   const [asked, ask, asking] = useActionState<SignInState, FormData>(requestCode, { step: 'email' });
   const [verified, verify, verifying] = useActionState<SignInState, FormData>(verifyCode, { step: 'code' });
   // After a code is requested, show its form; errors from checking the code come from the second action.
@@ -25,6 +25,7 @@ export function SignInForm({ next }: { next: string }) {
   return (
     <form action={verify} className="dform">
       <input type="hidden" name="next" value={next} />
+      <input type="hidden" name="role" value={role} />
       <input type="hidden" name="challengeId" value={state.challengeId} />
       <p>We sent a 6-digit code to <b>{state.email}</b>. It is valid for a few minutes.</p>
       <div className="f">

@@ -54,7 +54,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             {cat.description ? ` · ${cat.description}` : ''}
           </p>
         </div>
-        <LeadButton label="Get quotes from 5 suppliers" product={cat.name} className="btn btn-soft" title={`Get quotes from 5 ${cat.name.toLowerCase()} suppliers`} />
+        <LeadButton label="Get quotes from 5 suppliers" product={cat.name} categoryId={cat.id} className="btn btn-soft" title={`Get quotes from 5 ${cat.name.toLowerCase()} suppliers`} />
       </div>
 
       {cat.children.length > 0 && (

@@ -11,6 +11,7 @@ import { validateEnv } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { MediaModule } from './media/media.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { RfqModule } from './rfq/rfq.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     MediaModule,
     CatalogModule,
+    RfqModule,
   ],
   providers: [
     // Order matters: rate limit, then authenticate, then check role.

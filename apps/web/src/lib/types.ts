@@ -144,3 +144,64 @@ export interface OwnCompany extends CompanySummary {
   email: string | null;
   productCount: number;
 }
+
+/* Requirements (RFQs) */
+
+export type RfqStatus = 'OPEN' | 'AWARDED' | 'CLOSED' | 'EXPIRED';
+export type QuoteStatus = 'SUBMITTED' | 'WITHDRAWN' | 'AWARDED' | 'NOT_SELECTED';
+
+export interface Contact { name: string; email: string | null; phone: string | null }
+
+export interface RfqSummary {
+  id: string;
+  number: string;
+  title: string;
+  category: CategoryRef;
+  quantity: number;
+  unit: string;
+  city: string;
+  state: string;
+  budget: number | null;
+  status: RfqStatus;
+  closesAt: string;
+  createdAt: string;
+  quoteCount: number;
+}
+
+export interface QuoteView {
+  id: string;
+  unitPrice: number;
+  total: number;
+  deliveryDays: number;
+  material: string | null;
+  warranty: string | null;
+  paymentTerms: string | null;
+  certificates: string | null;
+  note: string | null;
+  validUntil: string | null;
+  revision: number;
+  status: QuoteStatus;
+  updatedAt: string;
+}
+
+export interface BuyerQuote extends QuoteView {
+  company: CompanySummary;
+  isLowestPrice: boolean;
+  isFastest: boolean;
+  withinBudget: boolean | null;
+}
+
+export interface BuyerRfq extends RfqSummary {
+  description: string | null;
+  invitedCount: number;
+  quotes: BuyerQuote[];
+  awardedContact: Contact | null;
+}
+
+export interface SupplierRfq extends RfqSummary {
+  description: string | null;
+  invited: boolean;
+  buyerLocation: string;
+  myQuote: QuoteView | null;
+  buyerContact: Contact | null;
+}

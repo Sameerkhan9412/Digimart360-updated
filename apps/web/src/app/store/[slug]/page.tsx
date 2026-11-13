@@ -53,7 +53,7 @@ export default async function StorePage({ params, searchParams }: Props) {
           <TrustBadges c={c} />
           <RatingLine c={c} />
         </div>
-        <LeadButton label="Contact supplier" supplier={c.name} title={`Send your requirement to ${c.name}`} />
+        <LeadButton label="Contact supplier" companyId={c.id} supplier={c.name} title={`Send your requirement to ${c.name}`} />
       </section>
 
       <div className="below" style={{ marginTop: 14 }}>

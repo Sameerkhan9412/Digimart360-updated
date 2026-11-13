@@ -88,6 +88,11 @@ export class Env {
   @Max(30)
   OTP_TTL_MINUTES = 10;
 
+  /** Public address of the website, used in links inside emails. */
+  @IsString()
+  @Matches(/^https?:\/\//, { message: 'WEB_URL must start with http:// or https://' })
+  WEB_URL = 'http://localhost:3001';
+
   /** Folder for uploaded product photos. In Docker this is a mounted volume. */
   @IsString()
   UPLOAD_DIR = './uploads';

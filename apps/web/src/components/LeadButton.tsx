@@ -1,76 +1,39 @@
-'use client';
-
-import { useEffect, useId, useRef, useState } from 'react';
+import Link from 'next/link';
 
 /**
- * "Get Best Price" / "Send Inquiry" / "Post Requirement". Opens the requirement form.
- * Sending is switched on in the RFQ step (it needs the RFQ API); until then the
- * form says so instead of pretending to send.
+ * "Get Best Price" / "Send Inquiry" / "Post Requirement": opens the requirement form,
+ * pre-filled with whatever the page knows (product, category, supplier).
  */
 export function LeadButton({
   label,
   product,
+  productId,
+  categoryId,
+  companyId,
   supplier,
   className = 'btn btn-orange',
-  title = 'Get the best price from verified suppliers',
+  title,
 }: {
   label: string;
+  /** Product or topic name, used as the requirement's title. */
   product?: string;
+  productId?: string;
+  categoryId?: string;
+  companyId?: string;
   supplier?: string;
   className?: string;
   title?: string;
 }) {
-  const [open, setOpen] = useState(false);
-  const btn = useRef<HTMLButtonElement>(null);
-  const first = useRef<HTMLInputElement>(null);
-  const titleId = useId();
-
-  useEffect(() => {
-    if (!open) return;
-    first.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open]);
-
-  function close() {
-    setOpen(false);
-    btn.current?.focus();
-  }
-
+  const qs = new URLSearchParams();
+  if (product) qs.set('title', product);
+  if (productId) qs.set('product', productId);
+  if (categoryId) qs.set('category', categoryId);
+  if (companyId) qs.set('company', companyId);
+  if (supplier) qs.set('supplier', supplier);
+  const q = qs.toString();
   return (
-    <>
-      <button ref={btn} type="button" className={className} onClick={() => setOpen(true)}>
-        {label}
-      </button>
-      {open && (
-        <div className="modal" role="dialog" aria-modal="true" aria-labelledby={titleId} onMouseDown={(e) => e.target === e.currentTarget && close()}>
-          <div className="box">
-            <div className="top">
-              <div>
-                <b>{product ?? 'Your requirement'}</b>
-                <small>{supplier ? `Supplier: ${supplier}` : 'We match you with verified suppliers'}</small>
-              </div>
-              <button className="close" type="button" aria-label="Close" onClick={close}>×</button>
-            </div>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <h3 id={titleId} style={{ fontSize: 17 }}>{title}</h3>
-              <div className="row2">
-                <div className="f"><label htmlFor={`${titleId}-q`}>Quantity</label><input ref={first} id={`${titleId}-q`} inputMode="numeric" placeholder="e.g. 200" /></div>
-                <div className="f">
-                  <label htmlFor={`${titleId}-u`}>Unit</label>
-                  <select id={`${titleId}-u`}><option>Piece</option><option>Set</option><option>Kg</option><option>Tonne</option><option>Box</option></select>
-                </div>
-              </div>
-              <div className="f"><label htmlFor={`${titleId}-r`}>Requirement details</label><textarea id={`${titleId}-r`} placeholder="Size, material, grade, delivery city" /></div>
-              <p className="notice" role="note">
-                Sending requirements to suppliers opens in the next release (RFQs). Nothing is sent from this form yet.
-              </p>
-              <button className="btn btn-orange btn-lg" type="submit" disabled>Get Best Price</button>
-            </form>
-          </div>
-        </div>
-      )}
-    </>
+    <Link href={`/rfq/new${q ? `?${q}` : ''}`} className={className} title={title}>
+      {label}
+    </Link>
   );
 }

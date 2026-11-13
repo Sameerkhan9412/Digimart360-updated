@@ -4,14 +4,14 @@ import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
 
 /**
- * Guards /dashboard. Access tokens last minutes; when one has expired we swap the
+ * Guards /dashboard (suppliers) and /account and /rfq (buyers). Access tokens last minutes; when one has expired we swap the
  * refresh token for a new pair here (the only place that can set cookies before
  * the page renders), then let the request through with the fresh token.
  */
 export async function middleware(req: NextRequest) {
   const login = () => {
     const url = new URL('/signin', req.url);
-    url.searchParams.set('next', req.nextUrl.pathname);
+    url.searchParams.set('next', req.nextUrl.pathname + req.nextUrl.search);
     const res = NextResponse.redirect(url);
     res.cookies.delete(ACCESS_COOKIE);
     res.cookies.delete(REFRESH_COOKIE);
@@ -47,4 +47,4 @@ export async function middleware(req: NextRequest) {
   return res;
 }
 
-export const config = { matcher: ['/dashboard/:path*'] };
+export const config = { matcher: ['/dashboard/:path*', '/account/:path*', '/rfq/:path*'] };

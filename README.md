@@ -50,7 +50,7 @@ In development, sign-in codes are printed in the API log instead of being emaile
 2. ~~Catalog API: categories, companies (suppliers), products, search, moderation~~
 3. ~~Website: Homepage v2, category listing, product page; SEO (metadata, sitemap, structured data)~~
 4. ~~Supplier dashboard: company profile, GST verification request, product management, image uploads~~ (browser walkthrough pending)
-5. RFQs: post requirement, matching, quotes, buyer comparison
+5. ~~RFQs: post requirement, matching, quotes, buyer comparison~~ (email notifications only, no chat/POs; API e2e and browser walkthrough pending)
 6. Storefront themes + custom domains (Caddy on-demand TLS, DNS verification, admin approval)
 7. Admin: verification queue, moderation, domain approvals
 8. Deployment: Docker images, Compose stack, backups, monitoring

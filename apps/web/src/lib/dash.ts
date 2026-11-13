@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ApiError } from './api';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from './session-shared';
-import type { OwnCompany, OwnProduct } from './types';
+import type { BuyerRfq, OwnCompany, OwnProduct, RfqSummary, SupplierRfq } from './types';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
 
@@ -88,6 +88,27 @@ export const dash = {
     if (!res.ok) throw await errorFrom(res);
     return res.json();
   },
+};
+
+async function orNull<T>(path: string): Promise<T | null> {
+  const res = await authed(path);
+  if (res.status === 404 || res.status === 400) return null;
+  if (!res.ok) throw await errorFrom(res);
+  return res.json();
+}
+
+export const rfqs = {
+  /** The signed-in person's own requirements. */
+  mine: () => authedJson<RfqSummary[]>('/me/rfqs'),
+  get: (id: string) => orNull<BuyerRfq>(`/me/rfqs/${encodeURIComponent(id)}`),
+  /** Requirements sent to this supplier or open in their categories. [] if the company is not approved yet. */
+  async inbox(): Promise<SupplierRfq[] | 'not-approved'> {
+    const res = await authed('/me/rfq-inbox');
+    if (res.status === 403) return 'not-approved';
+    if (!res.ok) throw await errorFrom(res);
+    return res.json();
+  },
+  inboxItem: (id: string) => orNull<SupplierRfq>(`/me/rfq-inbox/${encodeURIComponent(id)}`),
 };
 
 /** Readable message from any thrown error, for forms. */

@@ -66,8 +66,8 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
           <div className="ctas">
-            <LeadButton label="Get Best Price" product={p.name} supplier={c.name} className="btn btn-orange btn-lg" />
-            <LeadButton label="Send Inquiry" product={p.name} supplier={c.name} className="btn btn-line btn-lg" title={`Send an inquiry to ${c.name}`} />
+            <LeadButton label="Get Best Price" product={p.name} productId={p.id} categoryId={p.category.id} companyId={c.id} supplier={c.name} className="btn btn-orange btn-lg" />
+            <LeadButton label="Send Inquiry" product={p.name} productId={p.id} categoryId={p.category.id} companyId={c.id} supplier={c.name} className="btn btn-line btn-lg" title={`Send an inquiry to ${c.name}`} />
           </div>
         </section>
 

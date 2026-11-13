@@ -164,8 +164,8 @@ export function ListingCard({ p, tag }: { p: ProductCard; tag?: string }) {
           <RatingLine c={p.company} />
         </div>
         <div className="ctas">
-          <LeadButton label="Get Best Price" product={p.name} supplier={p.company.name} />
-          <LeadButton label="Send Inquiry" product={p.name} supplier={p.company.name} className="btn btn-line btn-sm" title={`Send an inquiry to ${p.company.name}`} />
+          <LeadButton label="Get Best Price" product={p.name} productId={p.id} categoryId={p.category.id} companyId={p.company.id} supplier={p.company.name} />
+          <LeadButton label="Send Inquiry" product={p.name} productId={p.id} categoryId={p.category.id} companyId={p.company.id} supplier={p.company.name} className="btn btn-line btn-sm" title={`Send an inquiry to ${p.company.name}`} />
         </div>
       </div>
     </article>

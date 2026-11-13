@@ -48,8 +48,9 @@ export async function verifyCode(prev: SignInState, form: FormData): Promise<Sig
     const t = await post('/auth/otp/verify', {
       challengeId: String(form.get('challengeId') ?? ''),
       code: String(form.get('code') ?? '').trim(),
-      role: 'SUPPLIER',
-      deviceName: 'Supplier dashboard (web)',
+      // Only used when this sign-in creates the account. Buyers arrive from the requirement form.
+      role: form.get('role') === 'BUYER' ? 'BUYER' : 'SUPPLIER',
+      deviceName: 'Website',
       ...(name && { name }),
     });
     await saveSession(t);
