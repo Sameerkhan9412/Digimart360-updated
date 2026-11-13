@@ -10,7 +10,10 @@ const text = (f: FormData, k: string) => String(f.get(k) ?? '').trim();
 const opt = (f: FormData, k: string) => text(f, k) || undefined;
 const num = (f: FormData, k: string) => (text(f, k) ? Number(text(f, k).replace(/,/g, '')) : undefined);
 
-export async function postRfq(_: FormState, f: FormData): Promise<FormState> {
+/** Form state that also carries what was typed, so an error does not wipe the form. */
+export type RfqState = FormState & { values?: Record<string, string> };
+
+export async function postRfq(_: RfqState, f: FormData): Promise<RfqState> {
   let rfq: BuyerRfq;
   try {
     rfq = await authedJson<BuyerRfq>('/rfqs', {
@@ -30,7 +33,9 @@ export async function postRfq(_: FormState, f: FormData): Promise<FormState> {
       },
     });
   } catch (e) {
-    return { error: messageOf(e) };
+    const values: Record<string, string> = {};
+    for (const k of ['title', 'categoryId', 'quantity', 'unit', 'budget', 'city', 'state', 'description', 'closesInDays']) values[k] = text(f, k);
+    return { error: messageOf(e), values };
   }
   revalidatePath('/account', 'layout');
   redirect(`/account/rfqs/${rfq.id}?posted=1`);

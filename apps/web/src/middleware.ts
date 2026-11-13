@@ -13,9 +13,11 @@ const MARKET_HOSTS = (() => {
 
 interface HostMatch { slug: string; canonicalHost: string }
 const hostCache = new Map<string, { value: HostMatch | null; until: number }>();
+/** The lookup itself failed (API down): not the same as "this is not a supplier website". */
+const LOOKUP_FAILED = 'lookup-failed' as const;
 
 /** Which supplier website lives at this host? Cached briefly so most requests skip the API call. */
-async function siteFor(host: string): Promise<HostMatch | null> {
+async function siteFor(host: string): Promise<HostMatch | null | typeof LOOKUP_FAILED> {
   const hit = hostCache.get(host);
   if (hit && hit.until > Date.now()) return hit.value;
   let value: HostMatch | null = null;
@@ -37,13 +39,18 @@ async function siteFor(host: string): Promise<HostMatch | null> {
   if (ttl > 0) {
     if (hostCache.size > 2000) hostCache.clear();
     hostCache.set(host, { value, until: Date.now() + ttl });
+    return value;
   }
-  return value;
+  return LOOKUP_FAILED;
 }
 
 /** A supplier's own website: send the visitor to its canonical address, or serve /sites/<slug>/... */
 async function storefront(req: NextRequest, host: string): Promise<NextResponse | null> {
   const match = await siteFor(host);
+  if (match === LOOKUP_FAILED) {
+    // Do not show the marketplace under a supplier's domain just because the API blinked.
+    return new NextResponse('This website is temporarily unavailable. Please try again in a minute.', { status: 503, headers: { 'Retry-After': '30' } });
+  }
   if (!match) return null;
 
   if (match.canonicalHost !== host) {
@@ -73,8 +80,12 @@ export async function middleware(req: NextRequest) {
     if (res) return res;
   }
 
+  // Only this middleware may say "this is a supplier website"; ignore the header if a visitor sends it.
+  const clean = new Headers(req.headers);
+  clean.delete('x-site-slug');
+
   const path = req.nextUrl.pathname;
-  if (!GUARDED.some((p) => path === p || path.startsWith(p + '/'))) return NextResponse.next();
+  if (!GUARDED.some((p) => path === p || path.startsWith(p + '/'))) return NextResponse.next({ request: { headers: clean } });
 
   const login = () => {
     const url = new URL('/signin', req.url);
@@ -85,7 +96,7 @@ export async function middleware(req: NextRequest) {
     return res;
   };
 
-  if (req.cookies.get(ACCESS_COOKIE)) return NextResponse.next();
+  if (req.cookies.get(ACCESS_COOKIE)) return NextResponse.next({ request: { headers: clean } });
   const refresh = req.cookies.get(REFRESH_COOKIE)?.value;
   if (!refresh) return login();
 
@@ -106,9 +117,8 @@ export async function middleware(req: NextRequest) {
   // Pass the new token on to this very request, and store it in the browser.
   req.cookies.set(ACCESS_COOKIE, tokens.accessToken);
   req.cookies.set(REFRESH_COOKIE, tokens.refreshToken);
-  const headers = new Headers(req.headers);
-  headers.set('cookie', req.cookies.toString());
-  const res = NextResponse.next({ request: { headers } });
+  clean.set('cookie', req.cookies.toString());
+  const res = NextResponse.next({ request: { headers: clean } });
   res.cookies.set(accessCookie(tokens));
   res.cookies.set(refreshCookie(tokens));
   return res;

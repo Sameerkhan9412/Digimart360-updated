@@ -45,6 +45,8 @@ describe('Storefronts (e2e)', () => {
   it('validates and saves branding', async () => {
     await http.patch('/me/storefront', { accent: 'orange' }, owner).expect(400);
     await http.patch('/me/storefront', { theme: 'NEON' }, owner).expect(400);
+    await http.patch('/me/storefront', { theme: null }, owner).expect(400);
+    await http.patch('/me/storefront', { showAbout: null }, owner).expect(400);
     await http.patch('/me/storefront', { bannerUrl: 'https://evil.example/x.jpg' }, owner).expect(400);
     const { body } = await http
       .patch('/me/storefront', { theme: 'FORGE', accent: '#C2410C', tagline: 'Precision since 1998', showContact: false, certificates: ['ISO 9001:2015', ' CE '] }, owner)

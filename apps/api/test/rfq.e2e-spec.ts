@@ -148,6 +148,31 @@ describe('RFQs (e2e)', () => {
     await http.put(`/me/rfq-inbox/${old.body.id}/quote`, { unitPrice: 10, deliveryDays: 1 }, supplierA).expect(409);
   });
 
+  it('a supplier keeps access to a requirement they quoted on after it closes, even if never invited', async () => {
+    const prisma = app.get(PrismaService);
+    const r = await http.post('/rfqs', requirement({ title: 'Ball valves, fourth lot' }), buyer).expect(201);
+    await http.put(`/me/rfq-inbox/${r.body.id}/quote`, { unitPrice: 100, deliveryDays: 3 }, supplierA).expect(200);
+    await prisma.rfqInvite.deleteMany({ where: { rfqId: r.body.id } }); // as if they found it in the open feed
+    await http.post(`/me/rfqs/${r.body.id}/close`, {}, buyer).expect(200);
+    const seen = await http.get(`/me/rfq-inbox/${r.body.id}`, supplierA).expect(200);
+    expect(seen.body.status).toBe('CLOSED');
+    const list = (await http.get('/me/rfq-inbox', supplierA).expect(200)).body;
+    expect(list.map((x: { id: string }) => x.id)).toContain(r.body.id);
+  });
+
+  it('two awards at once cannot both succeed', async () => {
+    const r = await http.post('/rfqs', requirement({ title: 'Ball valves, fifth lot' }), buyer).expect(201);
+    const a = (await http.put(`/me/rfq-inbox/${r.body.id}/quote`, { unitPrice: 100, deliveryDays: 3 }, supplierA).expect(200)).body;
+    const b = (await http.put(`/me/rfq-inbox/${r.body.id}/quote`, { unitPrice: 90, deliveryDays: 5 }, supplierB).expect(200)).body;
+    const results = await Promise.all([
+      http.post(`/me/rfqs/${r.body.id}/award`, { quoteId: a.myQuote.id }, buyer),
+      http.post(`/me/rfqs/${r.body.id}/award`, { quoteId: b.myQuote.id }, buyer),
+    ]);
+    expect(results.map((x) => x.status).sort()).toEqual([200, 409]);
+    const final = (await http.get(`/me/rfqs/${r.body.id}`, buyer).expect(200)).body;
+    expect(final.quotes.filter((q: { status: string }) => q.status === 'AWARDED')).toHaveLength(1);
+  });
+
   it('a named supplier is always invited, even outside the category', async () => {
     const other = (await http.get('/categories').expect(200)).body
       .flatMap((g: { children: { slug: string; id: string }[] }) => g.children)

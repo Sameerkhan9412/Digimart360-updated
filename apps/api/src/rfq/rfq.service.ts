@@ -67,7 +67,7 @@ export class RfqService {
     const companyIds = await this.matching.match(rfq, buyerId);
     if (companyIds.length) {
       await this.prisma.rfqInvite.createMany({ data: companyIds.map((id) => ({ rfqId: rfq.id, companyId: id })), skipDuplicates: true });
-      void this.notifySuppliers(rfq, companyIds);
+      this.fire(this.notifySuppliers(rfq, companyIds));
     }
     return this.buyerGet(buyerId, rfq.id);
   }
@@ -142,19 +142,23 @@ export class RfqService {
       where: { rfqId: id, id: { not: quoteId }, status: QuoteStatus.SUBMITTED },
       include: { company: { include: { owner: true } } },
     });
-    await this.prisma.$transaction([
-      this.prisma.rfq.update({ where: { id }, data: { status: RfqStatus.AWARDED, awardedQuoteId: quoteId } }),
-      this.prisma.quote.update({ where: { id: quoteId }, data: { status: QuoteStatus.AWARDED } }),
-      this.prisma.quote.updateMany({ where: { id: { in: others.map((o) => o.id) } }, data: { status: QuoteStatus.NOT_SELECTED } }),
-    ]);
-    void this.notifyAward(rfq, quote.company, others.map((o) => o.company));
+    // Every write is conditional, so two awards at once (or an award racing a withdrawal) cannot both win.
+    await this.prisma.$transaction(async (tx) => {
+      const open = await tx.rfq.updateMany({ where: { id, status: RfqStatus.OPEN }, data: { status: RfqStatus.AWARDED, awardedQuoteId: quoteId } });
+      if (open.count !== 1) throw new ConflictException('This requirement is no longer open');
+      const won = await tx.quote.updateMany({ where: { id: quoteId, status: QuoteStatus.SUBMITTED }, data: { status: QuoteStatus.AWARDED } });
+      if (won.count !== 1) throw new ConflictException('That quote is no longer available');
+      await tx.quote.updateMany({ where: { rfqId: id, id: { not: quoteId }, status: QuoteStatus.SUBMITTED }, data: { status: QuoteStatus.NOT_SELECTED } });
+    });
+    this.fire(this.notifyAward(rfq, quote.company, others.map((o) => o.company)));
     return this.buyerGet(buyerId, id);
   }
 
   async close(buyerId: string, id: string): Promise<BuyerRfq> {
     await this.expireDue();
     await this.ownOpen(buyerId, id);
-    await this.prisma.rfq.update({ where: { id }, data: { status: RfqStatus.CLOSED } });
+    const closed = await this.prisma.rfq.updateMany({ where: { id, status: RfqStatus.OPEN }, data: { status: RfqStatus.CLOSED } });
+    if (closed.count !== 1) throw new ConflictException('This requirement is no longer open');
     return this.buyerGet(buyerId, id);
   }
 
@@ -182,7 +186,12 @@ export class RfqService {
       where: {
         buyerId: { not: userId },
         ...(status && { status }),
-        OR: [{ invites: { some: { companyId: company.id } } }, { status: RfqStatus.OPEN, categoryId: { in: [...visible] } }],
+        OR: [
+          { invites: { some: { companyId: company.id } } },
+          // A supplier keeps access to requirements they quoted on, even after they close or are awarded.
+          { quotes: { some: { companyId: company.id } } },
+          { status: RfqStatus.OPEN, categoryId: { in: [...visible] } },
+        ],
       },
       include: { category: true, quotes: true, invites: { where: { companyId: company.id } } },
       orderBy: { createdAt: 'desc' },
@@ -228,7 +237,7 @@ export class RfqService {
     } else {
       await this.prisma.quote.create({ data: { ...fields, rfqId: id, companyId: company.id } });
     }
-    if (!mine || mine.status === QuoteStatus.WITHDRAWN) void this.notifyNewQuote(r, company);
+    if (!mine || mine.status === QuoteStatus.WITHDRAWN) this.fire(this.notifyNewQuote(r, company));
 
     return this.inboxGet(userId, id);
   }
@@ -241,7 +250,8 @@ export class RfqService {
     if (!mine || mine.status !== QuoteStatus.SUBMITTED || r.status !== RfqStatus.OPEN) {
       throw new ConflictException('There is no open quote of yours to withdraw');
     }
-    await this.prisma.quote.update({ where: { id: mine.id }, data: { status: QuoteStatus.WITHDRAWN } });
+    const done = await this.prisma.quote.updateMany({ where: { id: mine.id, status: QuoteStatus.SUBMITTED }, data: { status: QuoteStatus.WITHDRAWN } });
+    if (done.count !== 1) throw new ConflictException('There is no open quote of yours to withdraw');
     return this.inboxGet(userId, id);
   }
 
@@ -250,7 +260,7 @@ export class RfqService {
     return graph.visibleTo(mine);
   }
 
-  /** The RFQ if this supplier may see it (invited, or open in their categories). Own RFQs are never visible. */
+  /** The RFQ if this supplier may see it (invited, already quoted, or open in their categories). Own RFQs are never visible. */
   private async visibleRfq(companyId: string, userId: string, id: string) {
     const r = await this.prisma.rfq.findFirst({
       where: { id },
@@ -258,7 +268,8 @@ export class RfqService {
     });
     if (!r || r.buyerId === userId) throw new NotFoundException('Requirement not found');
     const invited = r.invites.length > 0;
-    if (!invited && !(r.status === RfqStatus.OPEN && (await this.visibleCategories(companyId)).has(r.categoryId))) {
+    const quoted = r.quotes.some((q) => q.companyId === companyId);
+    if (!invited && !quoted && !(r.status === RfqStatus.OPEN && (await this.visibleCategories(companyId)).has(r.categoryId))) {
       throw new NotFoundException('Requirement not found');
     }
     return r;
@@ -328,6 +339,11 @@ export class RfqService {
 
   private link(path: string) {
     return this.config.get('WEB_URL', { infer: true }).replace(/\/$/, '') + path;
+  }
+
+  /** Run an email job in the background. A failure is logged, never thrown (an unhandled rejection would stop the API). */
+  private fire(job: Promise<unknown>) {
+    job.catch((e) => this.logger.warn(`Notification failed: ${(e as Error).message}`));
   }
 
   private send(to: string | null | undefined, subject: string, text: string) {

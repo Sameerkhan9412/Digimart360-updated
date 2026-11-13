@@ -5,7 +5,12 @@
 # Alerts repeat at most once an hour while the problem lasts.
 set -uo pipefail
 cd "$(dirname "$0")"
-set -a; [ -f .env ] && . ./.env; set +a
+# Read only the keys we need. (.env is not a shell script: values like MAIL_FROM=DIGI MART <x@y> would break `source`.)
+env_get() { grep -E "^$1=" .env 2>/dev/null | head -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//'; }
+DOMAIN="${DOMAIN:-$(env_get DOMAIN)}"
+ALERT_EMAIL="${ALERT_EMAIL:-$(env_get ALERT_EMAIL)}"
+ALERT_WEBHOOK="${ALERT_WEBHOOK:-$(env_get ALERT_WEBHOOK)}"
+[ -n "$DOMAIN" ] || { echo "check.sh: DOMAIN is not set in .env" >&2; exit 2; }
 STATE="${TMPDIR:-/tmp}/digimart-check.last"
 problems=()
 
@@ -18,7 +23,7 @@ probe "API" "https://${DOMAIN}/api/v1/health"
 # A container that has stopped or keeps restarting.
 while read -r name state; do
   [ "$state" = "running" ] || problems+=("container $name is $state")
-done < <(docker compose ps --format '{{.Service}} {{.State}}' | grep -v '^migrate ')
+done < <(docker compose ps -a --format '{{.Service}} {{.State}}' | grep -v '^migrate ')
 
 # Disk almost full (database, uploads and backups all live here).
 used=$(df --output=pcent / | tail -1 | tr -dc '0-9')
