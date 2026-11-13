@@ -12,13 +12,14 @@ This is a stopgap. Later you can move to the paid VPS setup in `deploy/` (see RE
 
 ## 1. Database (Neon)
 
-1. Create a free project at neon.tech. Copy the **connection string** (it ends with `?sslmode=require`).
+1. Create a free project at neon.tech. In **Connect**, turn **off** "Connection pooling" and copy the **connection string**. It must end with `?sslmode=require` (delete `&channel_binding=require` if it is there). This is the value for `DATABASE_URL`.
+2. Nothing else is needed: the API applies its own database migrations when it starts. (Neon Auth and Realtime, if you enabled them, are not used by this app.)
 
 ## 2. API (Render)
 
 1. In Render: **New > Blueprint**, pick this GitHub repository. It reads `render.yaml`.
-2. Fill the values it asks for:
-   - `DATABASE_URL`: the Neon string.
+2. The blueprint puts the API in Render's Ohio region, next to Neon's `us-east-2`. Fill the values it asks for:
+   - `DATABASE_URL`: the Neon direct string from step 1.
    - `SEED_ADMIN_EMAIL`: the email you will sign in with as admin.
    - `WEB_URL` and `CORS_ORIGINS`: your Vercel address, e.g. `https://digimart360.vercel.app` (choose the Vercel project name first; the address is `<name>.vercel.app`).
    - `MEDIA_BASE_URL`: your Render address plus `/media`, e.g. `https://digimart-api.onrender.com/media`. If you do not know the address yet, leave a placeholder, deploy once, then correct it under Environment.

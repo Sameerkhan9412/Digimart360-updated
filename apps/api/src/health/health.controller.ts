@@ -14,12 +14,12 @@ export class HealthController {
     private readonly prisma: PrismaService,
   ) {}
 
-  /** Liveness and database check, for load balancers and uptime monitors. */
+  /** Liveness and database check, for load balancers and uptime monitors. A remote database (Neon) can take over a second to answer. */
   @Get()
   @Public()
   @SkipThrottle()
   @HealthCheck()
   check() {
-    return this.health.check([() => this.db.pingCheck('database', this.prisma)]);
+    return this.health.check([() => this.db.pingCheck('database', this.prisma, { timeout: 5000 })]);
   }
 }

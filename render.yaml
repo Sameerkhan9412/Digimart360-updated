@@ -5,6 +5,8 @@ services:
     name: digimart-api
     runtime: docker
     plan: free
+    # Same region as the Neon database (us-east-2, Ohio) so queries are fast.
+    region: ohio
     dockerfilePath: apps/api/Dockerfile
     dockerContext: .
     healthCheckPath: /api/v1/health
@@ -13,7 +15,7 @@ services:
     envVars:
       - key: PORT
         value: "3000"
-      # Neon connection string, e.g. postgresql://USER:PASS@HOST/neondb?sslmode=require
+      # Neon's direct (unpooled) connection string with sslmode=require only. Remove "&channel_binding=require" if present.
       - key: DATABASE_URL
         sync: false
       - key: JWT_ACCESS_SECRET
