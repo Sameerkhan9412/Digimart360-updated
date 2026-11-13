@@ -21,7 +21,7 @@ describe('RFQs (e2e)', () => {
     app = await createApp();
     http = api(app);
     categoryId = (await http.get('/categories/ball-valves').expect(200)).body.id;
-    const list = (await http.get('/products?q=ball valve&pageSize=50').expect(200)).body.items;
+    const list = (await http.get('/products?category=ball-valves&pageSize=48').expect(200)).body.items;
     slugs = [...new Set<string>(list.map((p: { company: { slug: string } }) => p.company.slug))];
     expect(slugs.length).toBeGreaterThanOrEqual(3);
     buyer = (await signIn(app, 'buyer@rfq-test.example', { name: 'Rahul Buyer' })).accessToken;

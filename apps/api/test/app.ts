@@ -39,6 +39,7 @@ export function api(app: NestExpressApplication) {
     get: (p: string, token?: string) => wrap(http.get('/api/v1' + p), token),
     post: (p: string, body?: object, token?: string) => wrap(http.post('/api/v1' + p), token).send(body ?? {}),
     patch: (p: string, body: object, token?: string) => wrap(http.patch('/api/v1' + p), token).send(body),
+    put: (p: string, body: object, token?: string) => wrap(http.put('/api/v1' + p), token).send(body),
     delete: (p: string, token?: string) => wrap(http.delete('/api/v1' + p), token),
   };
 }
