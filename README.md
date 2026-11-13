@@ -36,6 +36,10 @@ In development, sign-in codes are printed in the API log instead of being emaile
 
 `npm run lint`, `npm test` and `npm run build` run across all apps; `npm run test:e2e -w @digimart/api` runs the end-to-end tests against a separate test database. GitHub Actions runs all of them on every push, against a real PostgreSQL.
 
+## Free hosting for now
+
+Vercel (website) + Render (API) + Neon (database): see [docs/DEPLOY-FREE.md](docs/DEPLOY-FREE.md). Photos do not persist and supplier subdomains are off there; move to the VPS setup below when ready.
+
 ## Deploy to a VPS
 
 Everything is in `deploy/`: `docker-compose.yml` (Postgres, migrations, API, web, Caddy), `Caddyfile`, `.env.example`, `backup.sh`.

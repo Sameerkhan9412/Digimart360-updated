@@ -1,0 +1,42 @@
+# Render blueprint for the API (free plan). The website goes on Vercel; the database on Neon.
+# Steps: docs/DEPLOY-FREE.md
+services:
+  - type: web
+    name: digimart-api
+    runtime: docker
+    plan: free
+    dockerfilePath: apps/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    # Apply migrations, make sure the admin exists, optionally load demo data, then start.
+    dockerCommand: sh -c 'npx prisma migrate deploy && npx prisma db seed && if [ "$SEED_DEMO" = "true" ]; then npx ts-node prisma/seed-demo.ts; fi && node dist/main'
+    envVars:
+      - key: PORT
+        value: "3000"
+      # Neon connection string, e.g. postgresql://USER:PASS@HOST/neondb?sslmode=require
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: INTERNAL_API_KEY
+        generateValue: true
+      - key: SEED_ADMIN_EMAIL
+        sync: false
+      - key: SEED_DEMO
+        value: "true"
+      # The Vercel website's address, e.g. https://digimart360.vercel.app
+      - key: WEB_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      # This service's own address + /media, e.g. https://digimart-api.onrender.com/media
+      - key: MEDIA_BASE_URL
+        sync: false
+      # console = sign-in codes appear in the Render logs (fine for a private demo).
+      # Switch to smtp + SMTP_URL (e.g. Brevo free) before real users arrive.
+      - key: MAIL_TRANSPORT
+        value: console
+      - key: SMTP_URL
+        sync: false
+      - key: ROOT_DOMAIN
+        value: localhost
