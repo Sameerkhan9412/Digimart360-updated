@@ -36,6 +36,19 @@ In development, sign-in codes are printed in the API log instead of being emaile
 
 `npm run lint`, `npm test` and `npm run build` run across all apps; `npm run test:e2e -w @digimart/api` runs the end-to-end tests against a separate test database. GitHub Actions runs all of them on every push, against a real PostgreSQL.
 
+## Deploy to a VPS
+
+Everything is in `deploy/`: `docker-compose.yml` (Postgres, migrations, API, web, Caddy), `Caddyfile`, `.env.example`, `backup.sh`.
+
+```bash
+cd deploy
+cp .env.example .env                       # set DOMAIN, secrets, SMTP_URL
+docker compose up -d --build               # builds, migrates, starts, gets HTTPS certificates
+docker compose run --rm api npx prisma db seed   # once: creates the admin account (SEED_ADMIN_EMAIL)
+```
+
+One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and the rest to the website. Run `backup.sh` nightly from cron and copy `backups/` off the server. Not yet verified: the image builds (no Docker daemon was available when these were written), so expect to fix small things on the first build.
+
 ## Decisions so far
 
 - **One API for every client.** Bearer tokens (not cookies), per-device refresh tokens, `/api/v1` versioning so installed mobile apps never break.
@@ -53,7 +66,7 @@ In development, sign-in codes are printed in the API log instead of being emaile
 5. ~~RFQs: post requirement, matching, quotes, buyer comparison~~ (email notifications only, no chat/POs; browser walkthrough pending)
 6. Storefront themes + custom domains (Caddy on-demand TLS, DNS verification, admin approval)
 7. ~~Admin: verification queue, moderation~~ (web at /admin; domain approvals come with item 6)
-8. Deployment: Docker images, Compose stack, backups, monitoring
+8. Deployment: Docker images, Compose stack, Caddy HTTPS, backups: files in `deploy/` (written, not yet built or run on a server; monitoring still to do)
 
 ## Known follow-ups
 

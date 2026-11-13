@@ -1,0 +1,18 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# The API and uploaded photos share the website's address, so browsers need no CORS.
+	handle /api/* {
+		reverse_proxy api:3000
+	}
+	handle /media/* {
+		reverse_proxy api:3000
+	}
+	handle {
+		reverse_proxy web:3001
+	}
+}
