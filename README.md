@@ -68,7 +68,7 @@ One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and
 5. ~~RFQs: post requirement, matching, quotes, buyer comparison~~ (email notifications only, no chat/POs; browser walkthrough pending)
 6. ~~Storefront themes + custom domains~~ (themes, subdomains, domain verification and admin approval built; Caddy on-demand TLS written but untested on a server; browser walkthrough pending)
 7. ~~Admin: verification queue, moderation~~ (web at /admin; domain approvals come with item 6)
-8. Deployment: Docker images, Compose stack, Caddy HTTPS, backups: files in `deploy/` (written, not yet built or run on a server; monitoring still to do)
+8. Deployment: Docker images, Compose stack, Caddy HTTPS, backups: files in `deploy/` (written; CI now builds both images on every push, but nothing has run on a server yet; monitoring still to do)
 
 ## Known follow-ups
 
