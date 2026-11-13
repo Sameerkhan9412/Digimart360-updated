@@ -49,7 +49,7 @@ docker compose run --rm api npx prisma db seed   # once: creates the admin accou
 
 DNS for supplier websites: an `A` record for `@` and `*` (wildcard) and `sites` pointing at the VPS. Suppliers connect their own domain by adding a TXT record (proof) and a CNAME to `sites.<your domain>` from the dashboard; staff approve it under Admin > Domains, and Caddy then issues its certificate on the first visit.
 
-One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and the rest to the website. Run `backup.sh` nightly from cron and copy `backups/` off the server. Not yet verified: the image builds (no Docker daemon was available when these were written), so expect to fix small things on the first build.
+One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and the rest to the website. Run `check.sh` every 5 minutes from cron (alerts by email or webhook when the site, the API, a container or the disk is unhealthy) and `backup.sh` nightly and copy `backups/` off the server. Not yet verified: the image builds (no Docker daemon was available when these were written), so expect to fix small things on the first build.
 
 ## Decisions so far
 
@@ -68,7 +68,7 @@ One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and
 5. ~~RFQs: post requirement, matching, quotes, buyer comparison~~ (email notifications only, no chat/POs; browser walkthrough pending)
 6. ~~Storefront themes + custom domains~~ (themes, subdomains, domain verification and admin approval built; Caddy on-demand TLS written but untested on a server; browser walkthrough pending)
 7. ~~Admin: verification queue, moderation~~ (web at /admin; domain approvals come with item 6)
-8. Deployment: Docker images, Compose stack, Caddy HTTPS, backups: files in `deploy/` (written; CI now builds both images on every push, but nothing has run on a server yet; monitoring still to do)
+8. Deployment: Docker images, Compose stack, Caddy HTTPS, backups: files in `deploy/` (written; CI now builds both images on every push, but nothing has run on a server yet; monitoring: container log limits and `deploy/check.sh` for cron, not yet run on a server)
 
 ## Known follow-ups
 

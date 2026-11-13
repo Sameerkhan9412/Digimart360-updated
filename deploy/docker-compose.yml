@@ -1,10 +1,16 @@
 # Production stack for one VPS.  From this folder:
 #   cp .env.example .env   (fill it in)
 #   docker compose up -d --build
+# Keep container logs from filling the disk: 10 MB x 5 files per container.
+x-logging: &logging
+  driver: json-file
+  options: { max-size: 10m, max-file: "5" }
+
 services:
   db:
     image: postgres:17-alpine
     restart: unless-stopped
+    logging: *logging
     environment:
       POSTGRES_USER: digimart
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
@@ -30,6 +36,7 @@ services:
   api:
     build: { context: .., dockerfile: apps/api/Dockerfile }
     restart: unless-stopped
+    logging: *logging
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://digimart:${POSTGRES_PASSWORD}@db:5432/digimart360?schema=public
@@ -58,6 +65,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: https://${DOMAIN}/api/v1
     restart: unless-stopped
+    logging: *logging
     environment:
       SITE_URL: https://${DOMAIN}
       ROOT_DOMAIN: ${DOMAIN}
@@ -70,6 +78,7 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    logging: *logging
     ports:
       - "80:80"
       - "443:443"
