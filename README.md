@@ -73,7 +73,7 @@ One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and
 ## Known follow-ups
 
 - Uploaded photos live in `UPLOAD_DIR` (default `apps/api/uploads`). In Docker, mount it as a volume and back it up; swap `LocalDiskStorage` for S3/R2 if the VPS fills up.
-- The dashboard can't clear an optional field once it is set (the API treats a missing field as unchanged).
+- Editing: a field left out of an update is kept; `null` clears it (the dashboard sends `null` for blank optional fields). Required fields (names, city, state, business types, category, price unit) cannot be cleared.
 
 - Upgrade Next.js to 15.5.29+ (or 16) once the release is two weeks old; postcss is pinned to 8.5.30 via `overrides` until then.
 

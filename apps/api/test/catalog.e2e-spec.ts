@@ -223,6 +223,31 @@ describe('Catalog API (e2e)', () => {
       expect(res.body.status).toBe(cur.status);
     });
 
+    it('null clears an optional product field; required ones cannot be cleared', async () => {
+      const before = (await http.get(`/me/products/${productId}`, supplier).expect(200)).body;
+      expect(before.moq).toBe(10);
+      const res = await http.patch(`/me/products/${productId}`, { moq: null, summary: null, priceMin: null, priceMax: null }, supplier).expect(200);
+      expect(res.body).toMatchObject({ moq: null, summary: null, price: { min: null, max: null } });
+      // Removing optional details is not a content change that needs a new review.
+      expect(res.body.status).toBe(before.status);
+      await http.patch(`/me/products/${productId}`, { name: null }, supplier).expect(400);
+      await http.patch(`/me/products/${productId}`, { priceUnit: null }, supplier).expect(400);
+      // Leaving a field out keeps it.
+      await http.patch(`/me/products/${productId}`, { moq: 25 }, supplier).expect(200);
+      expect((await http.get(`/me/products/${productId}`, supplier).expect(200)).body.moq).toBe(25);
+    });
+
+    it('null clears optional company details; required ones cannot be cleared', async () => {
+      await http.patch('/me/company', { website: 'https://sunrise.example', phone: '+919822012345', description: 'We make valves.' }, supplier).expect(200);
+      const cleared = await http.patch('/me/company', { website: null, phone: null, description: null }, supplier).expect(200);
+      expect(cleared.body).toMatchObject({ website: null, phone: null, description: null });
+      await http.patch('/me/company', { city: null }, supplier).expect(400);
+      await http.patch('/me/company', { businessTypes: null }, supplier).expect(400);
+      // Clearing the GSTIN drops the verified badge too.
+      const noGst = await http.patch('/me/company', { gstin: null }, supplier).expect(200);
+      expect(noGst.body).toMatchObject({ gstin: null, gstVerified: false });
+    });
+
     it('rejection reaches the supplier with a reason; resubmitting works', async () => {
       await http.post(`/admin/catalog/products/${productId}/reject`, { reason: 'Add a photo of the actual valve.' }, admin).expect(200);
       const mine = (await http.get(`/me/products/${productId}`, supplier).expect(200)).body;

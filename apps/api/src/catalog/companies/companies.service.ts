@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { Company, CompanyStatus, Prisma, ProductStatus, Role } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CompanyProfile, OwnCompany, toCompanySummary } from '../dto/views';
@@ -52,6 +52,10 @@ export class CompaniesService {
 
   async update(userId: string, dto: UpdateCompanyDto): Promise<OwnCompany> {
     const current = await this.requireMine(userId);
+    // null clears an optional field; leaving a field out keeps it. Required fields cannot be cleared.
+    for (const k of ['name', 'businessTypes', 'city', 'state', 'exportsTo'] as const) {
+      if ((dto as Record<string, unknown>)[k] === null) throw new BadRequestException(`${k} cannot be removed`);
+    }
     const data: Prisma.CompanyUpdateInput = { ...dto };
     // A changed GSTIN has to be verified again.
     if (dto.gstin !== undefined && dto.gstin !== current.gstin) data.gstVerifiedAt = null;

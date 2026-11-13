@@ -74,18 +74,27 @@ export class SupplierProductsService {
     if (dto.categoryId) await this.assertCategory(dto.categoryId);
     this.media.assertOwnImages(company.id, dto.images);
 
-    const { submit, specs, ...fields } = dto;
+    // null clears an optional field (summary, description, prices, MOQ, specs, photos); leaving it out keeps it.
+    for (const k of ['name', 'categoryId', 'priceUnit'] as const) {
+      if ((dto as Record<string, unknown>)[k] === null) throw new BadRequestException(`${k} cannot be removed`);
+    }
+    const { submit, specs: rawSpecs, images: rawImages, ...fields } = dto;
+    const specs = rawSpecs === null ? [] : rawSpecs;
+    const images = rawImages === null ? [] : rawImages;
     const prices = this.prices(
       dto.priceMin !== undefined ? dto.priceMin : current.priceMin == null ? undefined : Number(current.priceMin),
       dto.priceMax !== undefined ? dto.priceMax : current.priceMax == null ? undefined : Number(current.priceMax),
     );
 
     // Forms send every field every time, so only a real change counts as one.
-    const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+    const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+    // "Not set" is the same whether it is null, undefined or an empty string / list.
+    const norm = (f: (typeof REVIEWED_FIELDS)[number], v: unknown) =>
+      f === 'specs' || f === 'images' ? (v ?? []) : f === 'summary' || f === 'description' ? (v === '' ? null : (v ?? null)) : v;
     const contentChanged = REVIEWED_FIELDS.some((f) => {
       if (dto[f] === undefined) return false;
       const before = f === 'specs' ? toOwnProduct(current).specs : current[f];
-      return !same(dto[f], f === 'summary' || f === 'description' ? (before ?? '') : before);
+      return !same(norm(f, dto[f]), norm(f, before));
     });
     let status = current.status;
     if (submit && (status === ProductStatus.DRAFT || status === ProductStatus.REJECTED)) {
@@ -99,6 +108,7 @@ export class SupplierProductsService {
       where: { id },
       data: {
         ...fields,
+        ...(images !== undefined && { images }),
         ...prices,
         ...(specs !== undefined && { specs: specs as unknown as Prisma.InputJsonValue }),
         status,

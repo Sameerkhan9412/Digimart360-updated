@@ -14,25 +14,29 @@ const text = (f: FormData, k: string) => String(f.get(k) ?? '').trim();
 /** Only send what was filled in: the API treats a missing field as "unchanged". */
 const opt = (f: FormData, k: string) => text(f, k) || undefined;
 const num = (f: FormData, k: string) => (text(f, k) ? Number(text(f, k).replace(/,/g, '')) : undefined);
+/** Editing: a blank optional field means "remove it" (null). Creating: leave it out. */
+const orClear = <T,>(editing: boolean, v: T | undefined): T | null | undefined => (v === undefined && editing ? null : v);
 
 export async function saveCompany(_: FormState, f: FormData): Promise<FormState> {
   const exists = text(f, 'exists') === '1';
   const gstin = opt(f, 'gstin')?.toUpperCase();
+  const gstinWas = text(f, 'gstinWas');
+  const clear = <T,>(v: T | undefined) => orClear(exists, v);
   const body = {
     name: text(f, 'name'),
-    legalName: opt(f, 'legalName'),
-    // Leaving the GSTIN as it was keeps its verified badge.
-    gstin: gstin && gstin !== text(f, 'gstinWas') ? gstin : exists ? undefined : gstin,
+    legalName: clear(opt(f, 'legalName')),
+    // Leaving the GSTIN as it was keeps its verified badge; emptying it removes it.
+    gstin: gstin ? (gstin !== gstinWas ? gstin : exists ? undefined : gstin) : exists && gstinWas ? null : undefined,
     businessTypes: f.getAll('businessTypes').map(String),
-    yearEstablished: num(f, 'yearEstablished'),
-    description: opt(f, 'description'),
-    phone: opt(f, 'phone'),
-    email: opt(f, 'email'),
-    website: opt(f, 'website'),
-    addressLine: opt(f, 'addressLine'),
+    yearEstablished: clear(num(f, 'yearEstablished')),
+    description: clear(opt(f, 'description')),
+    phone: clear(opt(f, 'phone')),
+    email: clear(opt(f, 'email')),
+    website: clear(opt(f, 'website')),
+    addressLine: clear(opt(f, 'addressLine')),
     city: text(f, 'city'),
     state: text(f, 'state'),
-    pincode: opt(f, 'pincode'),
+    pincode: clear(opt(f, 'pincode')),
     exportsTo: text(f, 'exportsTo')
       .split(',')
       .map((s) => s.trim())
@@ -65,15 +69,18 @@ export async function saveProduct(_: FormState, f: FormData): Promise<FormState>
   const specs = parseSpecs(text(f, 'specs'));
   if (specs.some((s) => !s.value)) return { error: 'Write each specification as "Label: value", one per line.' };
 
+  const editing = Boolean(id);
+  const clear = <T,>(v: T | undefined) => orClear(editing, v);
+  const priceMin = num(f, 'priceMin');
   const body = {
     name: text(f, 'name'),
     categoryId: text(f, 'categoryId'),
-    summary: id ? text(f, 'summary') : opt(f, 'summary'),
-    description: id ? text(f, 'description') : opt(f, 'description'),
-    priceMin: num(f, 'priceMin'),
-    priceMax: num(f, 'priceMax') ?? num(f, 'priceMin'),
+    summary: clear(opt(f, 'summary')),
+    description: clear(opt(f, 'description')),
+    priceMin: clear(priceMin),
+    priceMax: clear(num(f, 'priceMax') ?? priceMin),
     priceUnit: opt(f, 'priceUnit'),
-    moq: num(f, 'moq'),
+    moq: clear(num(f, 'moq')),
     specs,
     images: f.getAll('images').map(String),
     // "Save draft" sends submit=0; "Publish" sends submit=1.
