@@ -31,8 +31,9 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false
-      # This service's own address + /media, e.g. https://digimart-api.onrender.com/media
-      - key: MEDIA_BASE_URL
+      # Photos are stored on Cloudinary (Render's disk is wiped on every restart).
+      # Format: cloudinary://API_KEY:API_SECRET@CLOUD_NAME (Cloudinary dashboard > API Keys)
+      - key: CLOUDINARY_URL
         sync: false
       # console = sign-in codes appear in the Render logs (fine for a private demo).
       # Switch to smtp + SMTP_URL (e.g. Brevo free) before real users arrive.

@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createHash } from 'node:crypto';
 import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { Env } from '../config/env.validation';
 
 /**
  * Where uploaded files live. LocalDiskStorage is for development and single-server
- * setups (the VPS keeps uploads on a Docker volume). An S3 / Cloudflare R2
- * implementation can replace it without touching callers.
+ * setups (the VPS keeps uploads on a Docker volume). CloudinaryStorage is used when
+ * CLOUDINARY_URL is set (hosts with no persistent disk, such as Render's free plan).
  */
 export abstract class Storage {
   abstract put(key: string, body: Buffer, contentType: string): Promise<string>;
@@ -52,5 +53,71 @@ export class LocalDiskStorage extends Storage {
     const file = path.resolve(this.root, key);
     if (!file.startsWith(this.root + path.sep)) throw new Error(`Invalid storage key: ${key}`);
     return file;
+  }
+}
+
+/**
+ * Photos on Cloudinary, uploaded with its signed REST API (no SDK needed).
+ * CLOUDINARY_URL looks like cloudinary://API_KEY:API_SECRET@CLOUD_NAME.
+ * Files land in the "digimart" folder; a key such as companies/<id>/<uuid>.jpg becomes
+ * https://res.cloudinary.com/<cloud>/image/upload/digimart/companies/<id>/<uuid>.jpg
+ */
+@Injectable()
+export class CloudinaryStorage extends Storage {
+  private readonly logger = new Logger(CloudinaryStorage.name);
+  private readonly cloud: string;
+  private readonly apiKey: string;
+  private readonly apiSecret: string;
+
+  constructor(config: ConfigService<Env, true>) {
+    super();
+    const u = new URL(config.get('CLOUDINARY_URL', { infer: true }) as string);
+    this.cloud = u.hostname;
+    this.apiKey = decodeURIComponent(u.username);
+    this.apiSecret = decodeURIComponent(u.password);
+  }
+
+  get baseUrl(): string {
+    return `https://res.cloudinary.com/${this.cloud}/image/upload/digimart`;
+  }
+
+  /** Cloudinary signs the sorted "name=value" pairs plus the secret with SHA-1. */
+  private sign(params: Record<string, string>): string {
+    const text = Object.keys(params)
+      .sort()
+      .map((k) => `${k}=${params[k]}`)
+      .join('&');
+    return createHash('sha1').update(text + this.apiSecret).digest('hex');
+  }
+
+  private publicId(key: string): string {
+    return `digimart/${key.replace(/\.[a-z0-9]+$/i, '')}`;
+  }
+
+  async put(key: string, body: Buffer, contentType: string): Promise<string> {
+    const params = { public_id: this.publicId(key), timestamp: String(Math.floor(Date.now() / 1000)) };
+    const form = new FormData();
+    form.set('file', new Blob([new Uint8Array(body)], { type: contentType }), key.split('/').pop());
+    for (const [k, v] of Object.entries(params)) form.set(k, v);
+    form.set('api_key', this.apiKey);
+    form.set('signature', this.sign(params));
+
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${this.cloud}/image/upload`, { method: 'POST', body: form });
+    if (!res.ok) {
+      this.logger.error(`Cloudinary upload failed (${res.status}): ${(await res.text()).slice(0, 200)}`);
+      throw new Error('Photo storage is unavailable. Please try again.');
+    }
+    return `${this.baseUrl}/${key}`;
+  }
+
+  async remove(key: string): Promise<void> {
+    const params = { public_id: this.publicId(key), timestamp: String(Math.floor(Date.now() / 1000)) };
+    const form = new URLSearchParams({ ...params, api_key: this.apiKey, signature: this.sign(params) });
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${this.cloud}/image/destroy`, { method: 'POST', body: form });
+      if (!res.ok) this.logger.warn(`Could not delete ${key} (${res.status})`);
+    } catch (e) {
+      this.logger.warn(`Could not delete ${key}: ${(e as Error).message}`);
+    }
   }
 }

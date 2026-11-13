@@ -102,6 +102,12 @@ export class Env {
   @IsString()
   SITES_TARGET?: string;
 
+  /** Cloudinary account for photos: cloudinary://API_KEY:API_SECRET@CLOUD_NAME. Empty = save photos on local disk. */
+  @Transform(({ value }) => (typeof value === 'string' && value.trim() ? value.trim() : undefined))
+  @IsOptional()
+  @Matches(/^cloudinary:\/\/[^:]+:[^@]+@[^/]+$/, { message: 'CLOUDINARY_URL must look like cloudinary://API_KEY:API_SECRET@CLOUD_NAME' })
+  CLOUDINARY_URL?: string;
+
   /** Folder for uploaded product photos. In Docker this is a mounted volume. */
   @IsString()
   UPLOAD_DIR = './uploads';

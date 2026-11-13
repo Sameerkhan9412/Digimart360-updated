@@ -38,7 +38,7 @@ In development, sign-in codes are printed in the API log instead of being emaile
 
 ## Free hosting for now
 
-Vercel (website) + Render (API) + Neon (database): see [docs/DEPLOY-FREE.md](docs/DEPLOY-FREE.md). Photos do not persist and supplier subdomains are off there; move to the VPS setup below when ready.
+Vercel (website) + Render (API) + Neon (database): see [docs/DEPLOY-FREE.md](docs/DEPLOY-FREE.md). Photos go to Cloudinary there, and supplier subdomains are off; move to the VPS setup below when ready.
 
 ## Deploy to a VPS
 
@@ -76,7 +76,7 @@ One domain serves everything: Caddy sends `/api/*` and `/media/*` to the API and
 
 ## Known follow-ups
 
-- Uploaded photos live in `UPLOAD_DIR` (default `apps/api/uploads`). In Docker, mount it as a volume and back it up; swap `LocalDiskStorage` for S3/R2 if the VPS fills up.
+- Uploaded photos live in `UPLOAD_DIR` (default `apps/api/uploads`). In Docker, mount it as a volume and back it up; or set `CLOUDINARY_URL` to store photos on Cloudinary instead (an S3/R2 implementation can be added the same way).
 - Editing: a field left out of an update is kept; `null` clears it (the dashboard sends `null` for blank optional fields). Required fields (names, city, state, business types, category, price unit) cannot be cleared.
 
 - Upgrade Next.js to 15.5.29+ (or 16) once the release is two weeks old; postcss is pinned to 8.5.30 via `overrides` until then.

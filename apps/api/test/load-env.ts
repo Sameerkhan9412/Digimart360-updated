@@ -21,6 +21,7 @@ export function useTestEnv(): void {
   process.env.NODE_ENV = 'test';
   process.env.UPLOAD_DIR = path.join(require('node:os').tmpdir(), 'digimart-e2e-uploads');
   process.env.MEDIA_BASE_URL = 'http://localhost:3000/media';
+  delete process.env.CLOUDINARY_URL; // tests always use the local uploads folder, never a real Cloudinary account
   process.env.MAIL_TRANSPORT = 'console';
   process.env.ROOT_DOMAIN = 'digimart.test';
   process.env.SITES_TARGET = 'sites.digimart.test';

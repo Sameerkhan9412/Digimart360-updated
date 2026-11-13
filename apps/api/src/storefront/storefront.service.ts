@@ -5,6 +5,7 @@ import { randomBytes } from 'node:crypto';
 import { resolveTxt } from 'node:dns/promises';
 import { CompaniesService } from '../catalog/companies/companies.service';
 import { Env } from '../config/env.validation';
+import { Storage } from '../media/storage';
 import { PrismaService } from '../prisma/prisma.service';
 import {
   DomainView,
@@ -45,6 +46,7 @@ export class StorefrontService {
     private readonly prisma: PrismaService,
     private readonly companies: CompaniesService,
     private readonly config: ConfigService<Env, true>,
+    private readonly storage: Storage,
   ) {}
 
   private get root(): string {
@@ -80,7 +82,7 @@ export class StorefrontService {
   async update(userId: string, dto: UpdateStorefrontDto): Promise<StorefrontView> {
     const c = await this.companies.requireMine(userId);
     if (dto.bannerUrl !== undefined) {
-      const base = this.config.get('MEDIA_BASE_URL', { infer: true }).replace(/\/$/, '') + '/';
+      const base = this.storage.baseUrl + '/';
       if (dto.bannerUrl && !dto.bannerUrl.startsWith(base)) throw new BadRequestException('Use a photo uploaded to DIGI MART 360');
     }
     // Only accent, tagline and banner can be cleared (null); the rest always have a value.

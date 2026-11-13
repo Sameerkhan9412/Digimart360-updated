@@ -5,8 +5,9 @@ This is a stopgap. Later you can move to the paid VPS setup in `deploy/` (see RE
 | Part | Where | Free-plan limits to know |
 |---|---|---|
 | Website (`apps/web`) | Vercel | none that matter yet |
-| API (`apps/api`) | Render, from `render.yaml` | sleeps after ~15 min idle (first visit takes ~30-60 s to wake); **uploaded photos are lost whenever it restarts or redeploys** |
+| API (`apps/api`) | Render, from `render.yaml` | sleeps after ~15 min idle (first visit takes ~30-60 s to wake) |
 | Database | Neon | 0.5 GB |
+| Photos | Cloudinary | free credits; photos survive restarts |
 
 **Not available on this setup:** suppliers' own subdomains and custom domains (they need your own domain and DNS; Vercel's `*.vercel.app` has no wildcard). Supplier pages still work at `/store/<slug>` on the marketplace.
 
@@ -22,7 +23,7 @@ This is a stopgap. Later you can move to the paid VPS setup in `deploy/` (see RE
    - `DATABASE_URL`: the Neon direct string from step 1.
    - `SEED_ADMIN_EMAIL`: the email you will sign in with as admin.
    - `WEB_URL` and `CORS_ORIGINS`: your Vercel address, e.g. `https://digimart360.vercel.app` (choose the Vercel project name first; the address is `<name>.vercel.app`).
-   - `MEDIA_BASE_URL`: your Render address plus `/media`, e.g. `https://digimart-api.onrender.com/media`. If you do not know the address yet, leave a placeholder, deploy once, then correct it under Environment.
+   - `CLOUDINARY_URL`: from the Cloudinary dashboard, **Settings > API Keys**, copy the "API environment variable" (`cloudinary://KEY:SECRET@CLOUD_NAME`).
 3. Deploy. When it is up, `https://<your-api>.onrender.com/api/v1/health` should answer `ok`.
 4. Open the service's **Environment** tab and copy the generated `INTERNAL_API_KEY` (the website needs the same value).
 5. `SEED_DEMO=true` loads the sample suppliers and products. Set it to `false` and redeploy for an empty marketplace.
@@ -48,5 +49,4 @@ This is a stopgap. Later you can move to the paid VPS setup in `deploy/` (see RE
 ## Later: real users
 
 - Email: set `MAIL_TRANSPORT=smtp` and `SMTP_URL` (Brevo, Amazon SES or similar) so sign-in codes are emailed.
-- Photos: move uploads to object storage (Cloudflare R2 or S3). The storage layer is already pluggable, but only local disk is written so far.
 - Domain: buy one, then use the VPS setup in `deploy/` for supplier subdomains and custom domains.
