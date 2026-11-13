@@ -53,6 +53,10 @@ describe('Storefronts (e2e)', () => {
     // A partial save keeps everything else.
     const again = await http.patch('/me/storefront', { tagline: 'New line' }, owner).expect(200);
     expect(again.body).toMatchObject({ theme: 'FORGE', tagline: 'New line' });
+    // null clears a field; leaving it out keeps it.
+    const cleared = await http.patch('/me/storefront', { accent: null, tagline: null }, owner).expect(200);
+    expect(cleared.body).toMatchObject({ theme: 'FORGE', accent: null, tagline: null });
+    await http.patch('/me/storefront', { tagline: 'New line' }, owner).expect(200);
     const pub = (await http.get(`/storefronts/${slug}`).expect(200)).body;
     expect(pub).toMatchObject({ slug, theme: 'FORGE', canonicalHost: `${slug}.digimart.test` });
   });
