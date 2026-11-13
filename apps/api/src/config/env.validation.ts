@@ -93,6 +93,15 @@ export class Env {
   @Matches(/^https?:\/\//, { message: 'WEB_URL must start with http:// or https://' })
   WEB_URL = 'http://localhost:3001';
 
+  /** Suppliers get <slug>.ROOT_DOMAIN as their own website. Use "localhost" in development. */
+  @IsString()
+  ROOT_DOMAIN = 'localhost';
+
+  /** Host name suppliers point their own domain's CNAME at (shown in the dashboard). */
+  @IsOptional()
+  @IsString()
+  SITES_TARGET?: string;
+
   /** Folder for uploaded product photos. In Docker this is a mounted volume. */
   @IsString()
   UPLOAD_DIR = './uploads';

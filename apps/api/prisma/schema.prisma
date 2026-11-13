@@ -177,6 +177,8 @@ model Company {
   products Product[]
   invites  RfqInvite[]
   quotes   Quote[]
+  storefront   Storefront?
+  customDomain CustomDomain?
 
   @@index([status, city])
   @@index([businessTypes], type: Gin, map: "companies_business_types_idx")
@@ -314,4 +316,63 @@ model Quote {
   @@unique([rfqId, companyId])
   @@index([companyId, status])
   @@map("quotes")
+}
+
+// ───────────────────────────── Storefronts ─────────────────────────────
+
+enum StorefrontTheme {
+  BAZAAR
+  FORGE
+  HERITAGE
+  MERIDIAN
+}
+
+enum DomainStatus {
+  /// Waiting for the supplier to add the DNS record that proves ownership.
+  PENDING_DNS
+  /// Ownership proven; waiting for staff approval.
+  PENDING_APPROVAL
+  ACTIVE
+  REJECTED
+}
+
+/// How a supplier's own website looks. One per company; created on first save.
+model Storefront {
+  id               String          @id @default(uuid()) @db.Uuid
+  companyId        String          @unique @db.Uuid
+  theme            StorefrontTheme @default(MERIDIAN)
+  /// Brand colour as #rrggbb; null = the theme's own.
+  accent           String?
+  tagline          String?
+  bannerUrl        String?
+  showAbout        Boolean         @default(true)
+  showProducts     Boolean         @default(true)
+  showCertificates Boolean         @default(true)
+  showContact      Boolean         @default(true)
+  certificates     String[]
+  updatedAt        DateTime        @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("storefronts")
+}
+
+/// A supplier's own domain (www.theirbrand.com) pointing at their storefront.
+model CustomDomain {
+  id              String       @id @default(uuid()) @db.Uuid
+  companyId       String       @unique @db.Uuid
+  /// Lower-case host name, unique across suppliers.
+  host            String       @unique
+  /// The supplier proves ownership by publishing this as a TXT record at _digimart-verify.<host>.
+  verifyToken     String
+  status          DomainStatus @default(PENDING_DNS)
+  rejectionReason String?
+  verifiedAt      DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("custom_domains")
 }

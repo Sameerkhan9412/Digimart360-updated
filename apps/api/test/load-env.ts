@@ -22,6 +22,8 @@ export function useTestEnv(): void {
   process.env.UPLOAD_DIR = path.join(require('node:os').tmpdir(), 'digimart-e2e-uploads');
   process.env.MEDIA_BASE_URL = 'http://localhost:3000/media';
   process.env.MAIL_TRANSPORT = 'console';
+  process.env.ROOT_DOMAIN = 'digimart.test';
+  process.env.SITES_TARGET = 'sites.digimart.test';
   process.env.JWT_ACCESS_SECRET ||= 'e2e-secret-that-is-at-least-32-characters-long';
   process.env.INTERNAL_API_KEY ||= 'e2e-internal-key-that-is-at-least-32-characters';
   process.env.SEED_ADMIN_EMAIL ||= 'admin@digimart360.local';

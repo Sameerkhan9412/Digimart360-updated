@@ -4,6 +4,7 @@ import { OtpChannel } from '@prisma/client';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { configureApp } from '../src/app.setup';
+import { PrismaService } from '../src/prisma/prisma.service';
 import { OTP_SENDERS, OtpSender } from '../src/notifications/otp-senders';
 import { useTestEnv } from './load-env';
 
@@ -47,6 +48,9 @@ export function api(app: NestExpressApplication) {
 /** Sign in by email code the way a client would. Returns tokens + user. */
 export async function signIn(app: NestExpressApplication, email: string, extra: object = {}) {
   const client = api(app);
+  // Suites share one database and sign in as the same people (the admin, demo suppliers); forget earlier
+  // codes so the per-email cooldown (60 s) and hourly cap don't make suites depend on run order.
+  await app.get(PrismaService).otpChallenge.deleteMany({ where: { destination: email } });
   const req = await client.post('/auth/otp/email', { email }).expect(202);
   const code = [...outbox].reverse().find((m) => m.to === email)!.code;
   const res = await client.post('/auth/otp/verify', { challengeId: req.body.challengeId, code, ...extra }).expect(200);

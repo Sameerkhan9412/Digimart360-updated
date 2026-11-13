@@ -12,6 +12,7 @@ import { HealthModule } from './health/health.module';
 import { MediaModule } from './media/media.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { RfqModule } from './rfq/rfq.module';
+import { StorefrontModule } from './storefront/storefront.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 
@@ -28,6 +29,7 @@ import { UsersModule } from './users/users.module';
     MediaModule,
     CatalogModule,
     RfqModule,
+    StorefrontModule,
   ],
   providers: [
     // Order matters: rate limit, then authenticate, then check role.
