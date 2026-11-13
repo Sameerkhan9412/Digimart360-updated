@@ -4,6 +4,8 @@ import { PrismaService } from '../prisma/prisma.service';
 
 /** Most suppliers told about one RFQ. Keeps inboxes useful and email volume sane. */
 export const MAX_INVITES = 15;
+/** How many suppliers per tier are looked at before the final ordering. Far more than MAX_INVITES, still bounded. */
+const CANDIDATES = 200;
 
 /**
  * "Related" categories for an RFQ in category X: X itself, everything below it,
@@ -42,15 +44,18 @@ export class CategoryGraph {
     return out;
   }
 
-  /** Every category whose RFQs a seller of `productCategoryIds` should see. */
+  /**
+   * Every category whose RFQs a seller of `productCategoryIds` should see.
+   * A category c is visible when some product category p is in related(c). Walking up from each p is
+   * cheap: c qualifies if it is an ancestor-or-self of p, or a sibling of one (same parent).
+   */
   visibleTo(productCategoryIds: Set<string>): Set<string> {
     const out = new Set<string>();
-    for (const id of this.parent.keys()) {
-      for (const x of this.related(id)) {
-        if (productCategoryIds.has(x)) {
-          out.add(id);
-          break;
-        }
+    for (const p of productCategoryIds) {
+      for (let a: string | null | undefined = this.has(p) ? p : null; a; a = this.parent.get(a)) {
+        out.add(a);
+        const up = this.parent.get(a);
+        if (up) (this.children.get(up) ?? []).forEach((sibling) => out.add(sibling));
       }
     }
     return out;
@@ -61,8 +66,14 @@ export class CategoryGraph {
 export class MatchingService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private cached: { graph: CategoryGraph; until: number } | null = null;
+
+  /** The category tree changes rarely, so it is reused for 30 seconds instead of being loaded on every request. */
   async graph(): Promise<CategoryGraph> {
-    return new CategoryGraph(await this.prisma.category.findMany({ select: { id: true, parentId: true } }));
+    if (this.cached && this.cached.until > Date.now()) return this.cached.graph;
+    const graph = new CategoryGraph(await this.prisma.category.findMany({ select: { id: true, parentId: true } }));
+    this.cached = { graph, until: Date.now() + 30_000 };
+    return graph;
   }
 
   /** Category ids a supplier currently sells in (live products only). */
@@ -85,27 +96,6 @@ export class MatchingService {
     const exact = graph.exact(rfq.categoryId);
     const related = graph.related(rfq.categoryId);
 
-    const rows = await this.prisma.product.findMany({
-      where: {
-        status: ProductStatus.ACTIVE,
-        categoryId: { in: [...related] },
-        company: { status: CompanyStatus.ACTIVE, ownerId: { not: buyerId } },
-      },
-      select: { categoryId: true, company: { select: { id: true, state: true, trustSeal: true, gstVerifiedAt: true } } },
-    });
-
-    // One entry per supplier. Selling in the exact category outranks everything else.
-    const score = new Map<string, number>();
-    const exactSeller = new Set<string>();
-    for (const { categoryId, company: c } of rows) {
-      if (!score.has(c.id)) {
-        score.set(c.id, (c.trustSeal ? 20 : 0) + (c.gstVerifiedAt ? 10 : 0) + (c.state.toLowerCase() === rfq.state.toLowerCase() ? 5 : 0));
-      }
-      if (exact.has(categoryId)) exactSeller.add(c.id);
-    }
-    const total = (id: string) => (score.get(id) ?? 0) + (exactSeller.has(id) ? 100 : 0);
-    const ranked = [...score.keys()].sort((a, b) => total(b) - total(a));
-
     const ids: string[] = [];
     if (rfq.companyId) {
       const asked = await this.prisma.company.findFirst({
@@ -114,7 +104,27 @@ export class MatchingService {
       });
       if (asked) ids.push(asked.id);
     }
-    for (const id of ranked) if (!ids.includes(id)) ids.push(id);
-    return ids.slice(0, MAX_INVITES);
+
+    // Suppliers selling in the exact category come first, then those in related categories.
+    // Each tier is a bounded supplier query (never a scan of products), best-trusted first.
+    for (const tier of [exact, related]) {
+      if (ids.length >= MAX_INVITES) break;
+      const found = await this.prisma.company.findMany({
+        where: {
+          status: CompanyStatus.ACTIVE,
+          ownerId: { not: buyerId },
+          id: { notIn: ids },
+          products: { some: { status: ProductStatus.ACTIVE, categoryId: { in: [...tier] } } },
+        },
+        orderBy: [{ trustSeal: 'desc' }, { gstVerifiedAt: { sort: 'desc', nulls: 'last' } }],
+        take: CANDIDATES,
+        select: { id: true, state: true, trustSeal: true, gstVerifiedAt: true },
+      });
+      // Trust, then GST, then "same state as the delivery" as the final tie-break (the sort is stable).
+      const weight = (c: (typeof found)[number]) => (c.trustSeal ? 20 : 0) + (c.gstVerifiedAt ? 10 : 0) + (c.state.toLowerCase() === rfq.state.toLowerCase() ? 5 : 0);
+      found.sort((a, b) => weight(b) - weight(a));
+      for (const c of found) if (ids.length < MAX_INVITES) ids.push(c.id);
+    }
+    return ids;
   }
 }
