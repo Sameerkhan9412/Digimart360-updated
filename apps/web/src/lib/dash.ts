@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ApiError } from './api';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from './session-shared';
-import type { BuyerRfq, OwnCompany, OwnProduct, RfqSummary, SupplierRfq } from './types';
+import type { BuyerRfq, CompanyStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
 
@@ -109,6 +109,22 @@ export const rfqs = {
     return res.json();
   },
   inboxItem: (id: string) => orNull<SupplierRfq>(`/me/rfq-inbox/${encodeURIComponent(id)}`),
+};
+
+export const admin = {
+  /** 'forbidden' when the signed-in person is not an admin. */
+  async companies(status: CompanyStatus): Promise<Page<ModerationCompany> | 'forbidden'> {
+    const res = await authed(`/admin/catalog/companies?status=${status}`);
+    if (res.status === 403) return 'forbidden';
+    if (!res.ok) throw await errorFrom(res);
+    return res.json();
+  },
+  async products(status: ProductStatus): Promise<Page<OwnProduct> | 'forbidden'> {
+    const res = await authed(`/admin/catalog/products?status=${status}`);
+    if (res.status === 403) return 'forbidden';
+    if (!res.ok) throw await errorFrom(res);
+    return res.json();
+  },
 };
 
 /** Readable message from any thrown error, for forms. */

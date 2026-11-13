@@ -205,3 +205,15 @@ export interface SupplierRfq extends RfqSummary {
   myQuote: QuoteView | null;
   buyerContact: Contact | null;
 }
+
+/* Admin moderation */
+
+export interface ModerationCompany extends CompanySummary {
+  status: CompanyStatus;
+  gstin: string | null;
+  ownerEmail: string;
+  productCount: number;
+  createdAt: string;
+}
+
+export interface Page<T> { items: T[]; total: number; page: number }

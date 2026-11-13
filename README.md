@@ -52,7 +52,7 @@ In development, sign-in codes are printed in the API log instead of being emaile
 4. ~~Supplier dashboard: company profile, GST verification request, product management, image uploads~~ (browser walkthrough pending)
 5. ~~RFQs: post requirement, matching, quotes, buyer comparison~~ (email notifications only, no chat/POs; browser walkthrough pending)
 6. Storefront themes + custom domains (Caddy on-demand TLS, DNS verification, admin approval)
-7. Admin: verification queue, moderation, domain approvals
+7. ~~Admin: verification queue, moderation~~ (web at /admin; domain approvals come with item 6)
 8. Deployment: Docker images, Compose stack, backups, monitoring
 
 ## Known follow-ups
