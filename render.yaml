@@ -12,7 +12,8 @@ services:
     healthCheckPath: /api/v1/health
     # Apply migrations, make sure the admin exists, optionally load demo data, then start.
     # Seeding (admin + demo data) is run once from a laptop: ts-node is too heavy for the free 512 MB instance.
-    dockerCommand: npx prisma migrate deploy && node dist/main
+    # Render does not run this through a shell, so the && chain lives in an npm script.
+    dockerCommand: npm run start:render
     envVars:
       - key: PORT
         value: "3000"
