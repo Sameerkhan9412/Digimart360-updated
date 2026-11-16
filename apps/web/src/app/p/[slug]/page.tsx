@@ -5,6 +5,7 @@ import { Breadcrumbs, JsonLd, Monogram, PriceLine, ProductTile, RatingLine, Trus
 import { LeadButton } from '@/components/LeadButton';
 import { ProductVisual } from '@/components/ProductVisual';
 import { api } from '@/lib/api';
+import { trackView } from '@/lib/track';
 import { businessTypeLabel, priceRange } from '@/lib/format';
 import { breadcrumbLd, productLd, productPath, storePath } from '@/lib/seo';
 
@@ -34,6 +35,7 @@ export default async function ProductPage({ params }: Props) {
   const p = await api.product((await params).slug);
   if (!p) notFound();
   const c = p.company;
+  await trackView('product', p.slug);
 
   return (
     <>

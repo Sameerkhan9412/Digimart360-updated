@@ -176,12 +176,13 @@ model Company {
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
-  owner    User        @relation(fields: [ownerId], references: [id], onDelete: Restrict)
-  products Product[]
-  invites  RfqInvite[]
-  quotes   Quote[]
+  owner        User               @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  products     Product[]
+  invites      RfqInvite[]
+  quotes       Quote[]
   storefront   Storefront?
   customDomain CustomDomain?
+  dailyViews   CompanyDailyView[]
 
   @@index([status, city])
   @@index([businessTypes], type: Gin, map: "companies_business_types_idx")
@@ -215,8 +216,9 @@ model Product {
   /// Full-text search document, maintained by PostgreSQL (generated column).
   searchVector    Unsupported("tsvector")?
 
-  company  Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  company    Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category   Category           @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  dailyViews ProductDailyView[]
 
   @@index([status, categoryId])
   @@index([companyId, status])
@@ -378,4 +380,40 @@ model CustomDomain {
 
   @@index([status])
   @@map("custom_domains")
+}
+
+// ───────────────────────────── Analytics ─────────────────────────────
+// Daily counters, not one row per visit: a supplier's numbers stay cheap to read and the table
+// grows by at most (products x days). Days are Indian calendar days (Asia/Kolkata).
+
+enum CompanyViewKind {
+  /// The supplier's page on the marketplace (/store/<slug>).
+  PROFILE
+  /// The supplier's own website (subdomain or custom domain).
+  SITE
+}
+
+model ProductDailyView {
+  productId String   @db.Uuid
+  day       DateTime @db.Date
+  count     Int      @default(0)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, day])
+  @@index([day])
+  @@map("product_daily_views")
+}
+
+model CompanyDailyView {
+  companyId String          @db.Uuid
+  kind      CompanyViewKind
+  day       DateTime        @db.Date
+  count     Int             @default(0)
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([companyId, kind, day])
+  @@index([day])
+  @@map("company_daily_views")
 }

@@ -5,6 +5,7 @@ import { Breadcrumbs, JsonLd, Monogram, RatingLine, TrustBadges } from '@/compon
 import { LeadButton } from '@/components/LeadButton';
 import { hrefWith, ListingBody, readParams } from '@/components/Listing';
 import { api } from '@/lib/api';
+import { trackView } from '@/lib/track';
 import { businessTypeLabel, plural } from '@/lib/format';
 import { organizationLd, storePath } from '@/lib/seo';
 
@@ -35,6 +36,7 @@ export default async function StorePage({ params, searchParams }: Props) {
   const c = await api.company(slug);
   if (!c) notFound();
   const p = readParams(sp);
+  await trackView('company', c.slug);
   const base = storePath(c.slug);
   const data = await api.products({ ...p, company: c.slug, city: undefined, pageSize: 20 });
   // Pages past the end would be empty, thin pages: treat them as not found.

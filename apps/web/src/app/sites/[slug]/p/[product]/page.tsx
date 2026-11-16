@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { JsonLd } from '@/components/bits';
 import { ProductVisual } from '@/components/ProductVisual';
 import { api } from '@/lib/api';
+import { trackView } from '@/lib/track';
 import { priceRange } from '@/lib/format';
 import { productLd, SITE_URL } from '@/lib/seo';
 import { Shell, quoteUrl } from '../../Shell';
@@ -39,6 +40,7 @@ export default async function SiteProduct({ params }: Props) {
   const d = await load(slug, product);
   if (!d) notFound();
   const { p, c, s } = d;
+  await trackView('product', p.slug);
   const price = priceRange(p.price);
 
   return (

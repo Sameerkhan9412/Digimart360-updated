@@ -5,6 +5,22 @@
 
 export type BusinessType = 'MANUFACTURER' | 'EXPORTER' | 'WHOLESALER' | 'TRADER' | 'RETAILER' | 'SERVICE_PROVIDER';
 
+/* Supplier analytics */
+
+export interface AnalyticsMetric { value: number; previous: number; changePct: number | null }
+export interface AnalyticsDay { day: string; productViews: number; profileViews: number; siteViews: number }
+export interface AnalyticsReport {
+  days: number;
+  from: string;
+  to: string;
+  productViews: AnalyticsMetric;
+  profileViews: AnalyticsMetric;
+  siteViews: AnalyticsMetric;
+  series: AnalyticsDay[];
+  topProducts: { id: string; name: string; slug: string; views: number }[];
+  rfq: { invited: number; opened: number; quoted: number; won: number };
+}
+
 /** The signed-in person, as returned by GET /users/me. */
 export interface Me {
   id: string;

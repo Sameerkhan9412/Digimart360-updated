@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductVisual } from '@/components/ProductVisual';
 import { ApiError, api } from '@/lib/api';
+import { trackView } from '@/lib/track';
 import { plural, priceRange } from '@/lib/format';
 import { SITE_URL } from '@/lib/seo';
 import { Shell } from '../Shell';
@@ -26,6 +27,7 @@ export default async function SiteProducts({ params, searchParams }: Props) {
   const page = Math.max(1, Number((await searchParams).page) || 1);
   const [c, s] = await Promise.all([api.company(slug), api.storefront(slug)]);
   if (!c || !s || !s.showProducts) notFound();
+  await trackView('site', c.slug);
   // A page number the API rejects is just a page that does not exist.
   const data = await api.products({ company: c.slug, pageSize: PAGE, page }).catch((e) => {
     if (e instanceof ApiError && e.status === 400) notFound();

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ProductVisual } from '@/components/ProductVisual';
 import { api } from '@/lib/api';
+import { trackView } from '@/lib/track';
 import { businessTypeLabel, plural, priceRange } from '@/lib/format';
 import { SITE_URL } from '@/lib/seo';
 import { Shell, quoteUrl } from './Shell';
@@ -30,6 +31,7 @@ export default async function Site({ params }: Props) {
   const { slug } = await params;
   const [c, s] = await Promise.all([api.company(slug), api.storefront(slug)]);
   if (!c || !s) notFound();
+  await trackView('site', c.slug);
   const products = s.showProducts ? await api.products({ company: c.slug, pageSize: 12 }) : null;
 
   const quote = quoteUrl(c);

@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { ApiError } from './api';
 import { internalHeaders } from './client-ip';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from './session-shared';
-import type { BuyerRfq, DomainInfo, Me, ModerationDomain, StorefrontSettings, CompanyStatus, DomainStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
+import type { AnalyticsReport, BuyerRfq, DomainInfo, Me, ModerationDomain, StorefrontSettings, CompanyStatus, DomainStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
 
@@ -72,6 +72,7 @@ export async function authedJson<T>(path: string, init: RequestInit & { json?: u
 
 export const dash = {
   me: () => authedJson<Me>('/users/me'),
+  analytics: (days: number) => authedJson<AnalyticsReport>(`/me/analytics?days=${days}`),
   /** null = the user has not created a company yet. */
   async company(): Promise<OwnCompany | null> {
     const res = await authed('/me/company');

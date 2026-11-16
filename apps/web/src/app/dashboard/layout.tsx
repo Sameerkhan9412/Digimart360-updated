@@ -11,6 +11,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Link href="/dashboard">Overview</Link>
         <Link href="/dashboard/rfqs">Requirements</Link>
         <Link href="/dashboard/products/new">Add product</Link>
+        <Link href="/dashboard/analytics">Analytics</Link>
         <Link href="/dashboard/website">My website</Link>
         <Link href="/dashboard/company">Company profile</Link>
         <Link href="/account/profile">My profile</Link>
