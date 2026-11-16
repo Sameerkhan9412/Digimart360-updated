@@ -5,6 +5,17 @@
 
 export type BusinessType = 'MANUFACTURER' | 'EXPORTER' | 'WHOLESALER' | 'TRADER' | 'RETAILER' | 'SERVICE_PROVIDER';
 
+/** The signed-in person, as returned by GET /users/me. */
+export interface Me {
+  id: string;
+  name: string;
+  email: string | null;
+  emailVerified: boolean;
+  phone: string | null;
+  phoneVerified: boolean;
+  role: 'BUYER' | 'SUPPLIER' | 'ADMIN';
+}
+
 export interface Spec { label: string; value: string }
 export interface Price { min: number | null; max: number | null; unit: string }
 export interface Ref { name: string; slug: string }

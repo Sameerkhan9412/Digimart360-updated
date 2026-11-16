@@ -8,6 +8,7 @@ describe('Sign in with a WhatsApp code', () => {
   let prisma: PrismaService;
   const phone = '+919811100001';
   const squatted = '+919811100002';
+  const mine = '+919811100004';
 
   async function codeFor(number: string) {
     await prisma.otpChallenge.deleteMany({ where: { destination: number } });
@@ -20,10 +21,10 @@ describe('Sign in with a WhatsApp code', () => {
     app = await createApp();
     http = api(app);
     prisma = app.get(PrismaService);
-    await prisma.user.deleteMany({ where: { phone: { in: [phone, squatted] } } });
+    await prisma.user.deleteMany({ where: { phone: { in: [phone, squatted, mine] } } });
   });
   afterAll(async () => {
-    await prisma.user.deleteMany({ where: { phone: { in: [phone, squatted] } } });
+    await prisma.user.deleteMany({ where: { phone: { in: [phone, squatted, mine] } } });
     await app.close();
   });
 
@@ -90,5 +91,53 @@ describe('Sign in with a WhatsApp code', () => {
     const moved = await http.patch('/users/me', { phone: '+919811100003' }, body.accessToken).expect(200);
     expect(moved.body).toMatchObject({ phone: '+919811100003', phoneVerified: false });
     await prisma.user.deleteMany({ where: { phone: '+919811100003' } });
+  });
+
+  it('a signed-in user can verify the number on their profile, then sign in with it', async () => {
+    const email = 'verify-me@example.com';
+    await prisma.user.deleteMany({ where: { email } });
+    await prisma.otpChallenge.deleteMany({ where: { destination: { in: [email, mine] } } });
+    const req = await http.post('/auth/otp/email', { email }).expect(202);
+    const emailCode = [...outbox].reverse().find((m) => m.to === email)!.code;
+    const user = (await http.post('/auth/otp/verify', { challengeId: req.body.challengeId, code: emailCode }).expect(200)).body;
+    const token = user.accessToken as string;
+
+    // No number yet; nothing to verify.
+    await http.post('/auth/phone/verify/request', {}, token).expect(400);
+    await http.post('/auth/phone/verify/request', {}).expect(401);
+
+    await http.patch('/users/me', { phone: mine }, token).expect(200);
+    const asked = await http.post('/auth/phone/verify/request', {}, token).expect(202);
+    const code = [...outbox].reverse().find((m) => m.to === mine)!.code;
+
+    await http.post('/auth/phone/verify', { challengeId: asked.body.challengeId, code: code === '000000' ? '111111' : '000000' }, token).expect(400);
+    const done = await http.post('/auth/phone/verify', { challengeId: asked.body.challengeId, code }, token).expect(200);
+    expect(done.body).toMatchObject({ phone: mine, phoneVerified: true, email });
+
+    // Already verified: nothing more to do. The number now signs in to this same account.
+    await http.post('/auth/phone/verify/request', {}, token).expect(409);
+    const back = await codeFor(mine);
+    const signedIn = await http.post('/auth/otp/verify', back).expect(200);
+    expect(signedIn.body.isNewUser).toBe(false);
+    expect(signedIn.body.user.id).toBe(user.user.id);
+
+    await prisma.user.deleteMany({ where: { email } });
+  });
+
+  it("a code sent to someone else's number cannot verify mine", async () => {
+    const email = 'verify-other@example.com';
+    await prisma.user.deleteMany({ where: { email } });
+    await prisma.otpChallenge.deleteMany({ where: { destination: { in: [email, phone] } } });
+    const req = await http.post('/auth/otp/email', { email }).expect(202);
+    const emailCode = [...outbox].reverse().find((m) => m.to === email)!.code;
+    const user = (await http.post('/auth/otp/verify', { challengeId: req.body.challengeId, code: emailCode }).expect(200)).body;
+    await http.patch('/users/me', { phone: '+919811100005' }, user.accessToken).expect(200);
+
+    // A valid code for a different number (anyone can request one) does not count.
+    const foreign = await codeFor(phone);
+    await http.post('/auth/phone/verify', foreign, user.accessToken).expect(400);
+    expect((await http.get('/users/me', user.accessToken).expect(200)).body.phoneVerified).toBe(false);
+
+    await prisma.user.deleteMany({ where: { email } });
   });
 });

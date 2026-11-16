@@ -13,6 +13,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Link href="/dashboard/products/new">Add product</Link>
         <Link href="/dashboard/website">My website</Link>
         <Link href="/dashboard/company">Company profile</Link>
+        <Link href="/account/profile">My profile</Link>
         <form action={signOut}><button type="submit">Sign out</button></form>
       </nav>
       <div className="dbody">{children}</div>

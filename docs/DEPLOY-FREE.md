@@ -61,7 +61,7 @@ Render must be able to read your GitHub repository (a public repo, or the Render
 
 ## WhatsApp sign-in codes (Twilio)
 
-People can sign in with a phone number instead of an email: the sign-in page shows an Email / WhatsApp switch once Twilio is configured. A new number creates an account with no email (the person can add one later).
+People can sign in with a phone number instead of an email: the sign-in page shows an Email / WhatsApp switch once Twilio is configured. A new number creates an account with no email (the person can add one later). Signed-in users can save and verify their number on **My profile** (`/account/profile`); only a verified number can sign in.
 
 1. Create a Twilio account. In the console go to **Messaging > Try it out > Send a WhatsApp message** (the sandbox).
 2. Join the sandbox from your phone: send the shown `join <word>` message to the sandbox number. Each tester must do this once (the sandbox only reaches phones that joined).

@@ -243,3 +243,50 @@ describe('AuthService · WhatsApp OTP', () => {
     expect(otp.request).toHaveBeenCalledWith('WHATSAPP', phone, '1.2.3.4');
   });
 });
+
+describe('AuthService · verify my number', () => {
+  const phone = '+919822012345';
+  const mine = { ...baseUser, phone, phoneVerifiedAt: null };
+
+  it('sends the code to the number on the profile', async () => {
+    const { service, prisma, otp } = setup();
+    prisma.user.findUniqueOrThrow.mockResolvedValue(mine);
+    await service.requestPhoneVerification(mine.id, '1.2.3.4');
+    expect(otp.request).toHaveBeenCalledWith('WHATSAPP', phone, '1.2.3.4');
+  });
+
+  it('needs a number, and refuses one that is already verified', async () => {
+    const { service, prisma, otp } = setup();
+    prisma.user.findUniqueOrThrow.mockResolvedValue({ ...baseUser, phone: null });
+    await expect(service.requestPhoneVerification(baseUser.id)).rejects.toThrow('Add your phone number first');
+    prisma.user.findUniqueOrThrow.mockResolvedValue({ ...mine, phoneVerifiedAt: new Date() });
+    await expect(service.requestPhoneVerification(baseUser.id)).rejects.toThrow('already verified');
+    expect(otp.request).not.toHaveBeenCalled();
+  });
+
+  it('marks the number verified only when the code was sent to that very number', async () => {
+    const { service, prisma, otp } = setup();
+    Object.assign(prisma.user, { updateMany: jest.fn().mockResolvedValue({ count: 1 }) });
+    prisma.user.findUnique.mockResolvedValue({ ...mine, phoneVerifiedAt: new Date() });
+    otp.verify.mockResolvedValue({ channel: 'WHATSAPP', destination: phone });
+    const res = await service.confirmPhoneVerification(mine.id, verifyDto);
+
+    expect((prisma.user as unknown as { updateMany: jest.Mock }).updateMany).toHaveBeenCalledWith({
+      where: { id: mine.id, phone, phoneVerifiedAt: null },
+      data: { phoneVerifiedAt: expect.any(Date) },
+    });
+    expect(res.phoneVerified).toBe(true);
+  });
+
+  it('rejects a code that was sent to another number or over email', async () => {
+    const { service, prisma, otp } = setup();
+    Object.assign(prisma.user, { updateMany: jest.fn().mockResolvedValue({ count: 0 }) });
+    prisma.user.findUniqueOrThrow.mockResolvedValue(mine);
+
+    otp.verify.mockResolvedValue({ channel: 'WHATSAPP', destination: '+919000000000' });
+    await expect(service.confirmPhoneVerification(mine.id, verifyDto)).rejects.toThrow('different number');
+
+    otp.verify.mockResolvedValue({ channel: 'EMAIL', destination: 'rahul@example.com' });
+    await expect(service.confirmPhoneVerification(mine.id, verifyDto)).rejects.toThrow('different number');
+  });
+});

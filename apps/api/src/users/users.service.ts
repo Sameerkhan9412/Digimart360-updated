@@ -32,8 +32,8 @@ export class UsersService {
   async updateMe(id: string, dto: UpdateMeDto): Promise<PublicUser> {
     try {
       // A changed number is unverified until its owner signs in with it by WhatsApp.
-      const current = dto.phone ? await this.prisma.user.findUnique({ where: { id }, select: { phone: true } }) : null;
-      const phoneChanged = !!dto.phone && dto.phone !== current?.phone;
+      const current = dto.phone !== undefined ? await this.prisma.user.findUnique({ where: { id }, select: { phone: true } }) : null;
+      const phoneChanged = dto.phone !== undefined && dto.phone !== current?.phone;
       const user = await this.prisma.user.update({
         where: { id },
         data: { name: dto.name?.trim(), phone: dto.phone, ...(phoneChanged && { phoneVerifiedAt: null }) },

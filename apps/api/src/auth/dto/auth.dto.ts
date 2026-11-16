@@ -41,6 +41,16 @@ export class PhoneOtpRequestDto {
   phone: string;
 }
 
+export class PhoneVerifyDto {
+  @ApiProperty({ description: 'From POST /auth/phone/verify/request' })
+  @IsUUID()
+  challengeId: string;
+
+  @ApiProperty({ example: '048213' })
+  @Matches(/^\d{6}$/, { message: 'code must be the 6 digits we sent you' })
+  code: string;
+}
+
 export class OtpRequestResponse {
   @ApiProperty({ description: 'Send this back with the code to /auth/otp/verify' })
   challengeId: string;

@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { ApiError } from '@/lib/api';
 import { clearSession, saveSession } from '@/lib/dash';
+import { toE164 } from '@/lib/phone';
 import { safeNext } from '@/lib/session-shared';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
@@ -35,15 +36,6 @@ async function post(path: string, body: object) {
     throw new ApiError(res.status, message);
   }
   return res.json();
-}
-
-/** "98220 12345" and "+91 98220 12345" both become +919822012345; other countries need their +code. */
-function toE164(input: string): string | null {
-  const s = input.replace(/[\s().-]/g, '');
-  if (/^\+[1-9]\d{7,14}$/.test(s)) return s;
-  if (/^[6-9]\d{9}$/.test(s)) return '+91' + s;
-  if (/^0[6-9]\d{9}$/.test(s)) return '+91' + s.slice(1);
-  return null;
 }
 
 export async function requestCode(_: SignInState, form: FormData): Promise<SignInState> {

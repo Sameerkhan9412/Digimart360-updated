@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { OtpChannel, Prisma, Role, User, UserStatus } from '@prisma/client';
@@ -6,8 +6,8 @@ import { createHash, randomBytes } from 'node:crypto';
 import { AccessPayload } from '../common/guards/jwt-auth.guard';
 import { Env } from '../config/env.validation';
 import { PrismaService } from '../prisma/prisma.service';
-import { UsersService } from '../users/users.service';
-import { GoogleSignInDto, OtpVerifyDto, TokensResponse } from './dto/auth.dto';
+import { PublicUser, UsersService } from '../users/users.service';
+import { GoogleSignInDto, OtpVerifyDto, PhoneVerifyDto, TokensResponse } from './dto/auth.dto';
 import { GoogleService } from './google.service';
 import { OtpService } from './otp.service';
 
@@ -54,6 +54,33 @@ export class AuthService {
 
   requestPhoneOtp(phone: string, ip?: string) {
     return this.otp.request(OtpChannel.WHATSAPP, phone, ip);
+  }
+
+  /** Signed-in user: send a WhatsApp code to the number saved on their profile. */
+  async requestPhoneVerification(userId: string, ip?: string) {
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    if (!user.phone) throw new BadRequestException('Add your phone number first');
+    if (user.phoneVerifiedAt) throw new ConflictException('This number is already verified');
+    return this.otp.request(OtpChannel.WHATSAPP, user.phone, ip);
+  }
+
+  /** Signed-in user: prove the number on their profile with the code we sent. */
+  async confirmPhoneVerification(userId: string, dto: PhoneVerifyDto): Promise<PublicUser> {
+    const { channel, destination } = await this.otp.verify(dto.challengeId, dto.code);
+    // Only a code sent to this very number counts, whoever asked for it.
+    const marked =
+      channel === OtpChannel.WHATSAPP
+        ? await this.prisma.user.updateMany({
+            where: { id: userId, phone: destination, phoneVerifiedAt: null },
+            data: { phoneVerifiedAt: new Date() },
+          })
+        : { count: 0 };
+    if (marked.count === 0) {
+      const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+      if (user.phone === destination && user.phoneVerifiedAt) return this.users.toPublic(user);
+      throw new BadRequestException('This code was sent to a different number. Request a new one for the number on your profile.');
+    }
+    return this.users.findById(userId);
   }
 
   async verifyOtp(dto: OtpVerifyDto): Promise<TokensResponse> {

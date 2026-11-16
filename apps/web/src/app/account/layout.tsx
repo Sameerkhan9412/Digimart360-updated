@@ -10,6 +10,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       <nav className="dnav panel" aria-label="My account">
         <Link href="/account/rfqs">My requirements</Link>
         <Link href="/rfq/new">Post requirement</Link>
+        <Link href="/account/profile">My profile</Link>
         <Link href="/dashboard">Sell on DIGI MART</Link>
         <form action={signOut}><button type="submit">Sign out</button></form>
       </nav>

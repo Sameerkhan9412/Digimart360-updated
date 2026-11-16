@@ -10,11 +10,13 @@ import {
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { AuthUser, CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
+import { PublicUser } from '../users/users.service';
 import { AuthService } from './auth.service';
 import {
   AuthConfigResponse,
   EmailOtpRequestDto,
   PhoneOtpRequestDto,
+  PhoneVerifyDto,
   GoogleSignInDto,
   OtpRequestResponse,
   OtpVerifyDto,
@@ -56,6 +58,25 @@ export class AuthController {
   @ApiTooManyRequestsResponse({ description: 'Asked again within 60 s, or more than 5 times in an hour' })
   requestPhoneOtp(@Body() dto: PhoneOtpRequestDto, @Ip() ip: string): Promise<OtpRequestResponse> {
     return this.auth.requestPhoneOtp(dto.phone, ip);
+  }
+
+  /** Signed in: send a WhatsApp code to the number on your profile, to prove it is yours. */
+  @Post('phone/verify/request')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiAcceptedResponse({ type: OtpRequestResponse })
+  @ApiTooManyRequestsResponse({ description: 'Asked again within 60 s, or more than 5 times in an hour' })
+  requestPhoneVerification(@CurrentUser() user: AuthUser, @Ip() ip: string): Promise<OtpRequestResponse> {
+    return this.auth.requestPhoneVerification(user.id, ip);
+  }
+
+  /** Signed in: confirm the code. The number can then be used to sign in. */
+  @Post('phone/verify')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({ type: PublicUser })
+  confirmPhoneVerification(@CurrentUser() user: AuthUser, @Body() dto: PhoneVerifyDto): Promise<PublicUser> {
+    return this.auth.confirmPhoneVerification(user.id, dto);
   }
 
   /** Check the code and sign in. Creates the account on first sign-in. */
