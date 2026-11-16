@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { internalHeaders } from '@/lib/client-ip';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from '@/lib/session-shared';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
@@ -104,7 +105,7 @@ export async function middleware(req: NextRequest) {
   try {
     const r = await fetch(`${API_URL}/auth/refresh`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Internal-Key': process.env.INTERNAL_API_KEY ?? '' },
+      headers: { 'Content-Type': 'application/json', ...internalHeaders(req.headers) },
       body: JSON.stringify({ refreshToken: refresh }),
       cache: 'no-store',
     });

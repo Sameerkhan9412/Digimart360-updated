@@ -1,7 +1,8 @@
 import 'server-only';
-import { cookies } from 'next/headers';
+import { cookies, headers as requestHeaders } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ApiError } from './api';
+import { internalHeaders } from './client-ip';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from './session-shared';
 import type { BuyerRfq, DomainInfo, Me, ModerationDomain, StorefrontSettings, CompanyStatus, DomainStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
 
@@ -51,7 +52,7 @@ export async function authed(path: string, init: RequestInit & { json?: unknown 
     ...rest,
     headers: {
       Authorization: `Bearer ${token}`,
-      'X-Internal-Key': process.env.INTERNAL_API_KEY ?? '',
+      ...internalHeaders(await requestHeaders()),
       Accept: 'application/json',
       ...(json !== undefined && { 'Content-Type': 'application/json' }),
       ...headers,

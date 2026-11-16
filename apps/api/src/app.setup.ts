@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
 import path from 'node:path';
+import { trustForwardedClientIp } from './common/guards/throttle.guard';
 import { Env } from './config/env.validation';
 
 /** Everything that shapes HTTP behaviour. Shared by main.ts and the end-to-end tests. */
@@ -11,6 +12,8 @@ export function configureApp(app: NestExpressApplication): void {
 
   // Behind one reverse proxy (Caddy) in production: use its X-Forwarded-For for client IPs.
   app.set('trust proxy', 1);
+  // Visitors of our own website: believe the client address it forwards (see trustForwardedClientIp).
+  app.use(trustForwardedClientIp);
   app.use(helmet());
 
   // Uploaded photos. Served outside /api so URLs stay stable; files get random names, so cache them for a year.

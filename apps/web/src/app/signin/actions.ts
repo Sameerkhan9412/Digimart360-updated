@@ -1,8 +1,10 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ApiError } from '@/lib/api';
 import { clearSession, saveSession } from '@/lib/dash';
+import { internalHeaders } from '@/lib/client-ip';
 import { toE164 } from '@/lib/phone';
 import { safeNext } from '@/lib/session-shared';
 
@@ -23,7 +25,7 @@ export interface SignInState {
 async function post(path: string, body: object) {
   const res = await fetch(API_URL + path, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Internal-Key': process.env.INTERNAL_API_KEY ?? '' },
+    headers: { 'Content-Type': 'application/json', ...internalHeaders(await headers()) },
     body: JSON.stringify(body),
     cache: 'no-store',
   });
