@@ -193,11 +193,18 @@ export class RfqService {
           { status: RfqStatus.OPEN, categoryId: { in: [...visible] } },
         ],
       },
-      include: { category: true, quotes: true, invites: { where: { companyId: company.id } } },
+      // Only this supplier's own quote is loaded; other suppliers' quotes are just counted.
+      include: { category: true, quotes: { where: { companyId: company.id } }, invites: { where: { companyId: company.id } } },
       orderBy: { createdAt: 'desc' },
       take: 200,
     });
-    return rows.map((r) => this.supplierView(r, company.id, r.invites.length > 0));
+    const counts = await this.prisma.quote.groupBy({
+      by: ['rfqId'],
+      where: { rfqId: { in: rows.map((r) => r.id) }, status: { not: QuoteStatus.WITHDRAWN } },
+      _count: { _all: true },
+    });
+    const byRfq = new Map(counts.map((c) => [c.rfqId, c._count._all]));
+    return rows.map((r) => this.supplierView(r, company.id, r.invites.length > 0, undefined, byRfq.get(r.id) ?? 0));
   }
 
   async inboxGet(userId: string, id: string): Promise<SupplierRfq> {
@@ -321,11 +328,13 @@ export class RfqService {
     };
   }
 
-  private supplierView(r: RfqRow & { quotes: QuoteRow[] }, companyId: string, invited: boolean, buyer?: User): SupplierRfq {
+  /** `quoteCount` overrides the count taken from `r.quotes` when the caller loaded only this supplier's own quote. */
+  private supplierView(r: RfqRow & { quotes: QuoteRow[] }, companyId: string, invited: boolean, buyer?: User, quoteCount?: number): SupplierRfq {
     const mine = r.quotes.find((q) => q.companyId === companyId);
     const won = mine?.status === QuoteStatus.AWARDED;
     return {
       ...this.summary(r, r.quotes),
+      ...(quoteCount !== undefined && { quoteCount }),
       description: r.description,
       invited,
       buyerLocation: `${r.city}, ${r.state}`,

@@ -99,6 +99,13 @@ describe('RFQs (e2e)', () => {
     expect(view.myQuote.unitPrice).toBe(1950);
     expect(view.quoteCount).toBe(2); // they know there is competition, nothing more
     expect(JSON.stringify(view)).not.toContain('1880');
+
+    // The inbox list gives the same answers without loading anyone else's quote.
+    const list = (await http.get('/me/rfq-inbox', supplierA).expect(200)).body as { id: string; quoteCount: number; myQuote: { unitPrice: number } | null }[];
+    const row = list.find((r) => r.id === rfqId)!;
+    expect(row.quoteCount).toBe(2);
+    expect(row.myQuote?.unitPrice).toBe(1950);
+    expect(JSON.stringify(list)).not.toContain('1880');
   });
 
   it('a supplier can revise or withdraw while the requirement is open', async () => {
