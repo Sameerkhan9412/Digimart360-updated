@@ -59,6 +59,13 @@ Render must be able to read your GitHub repository (a public repo, or the Render
 
 4. Deploy. Then open the site, sign in with the admin email at `/signin?next=/admin`, and read the code in Render's logs.
 
+## Keeping the free API awake
+
+`.github/workflows/keepalive.yml` pings `/api/v1/health` every 10 minutes (GitHub may delay runs a few minutes). Notes:
+- It uses your repository's GitHub Actions minutes: unlimited for a public repo, but a private repo's free allowance (2,000 min/month) would not cover it.
+- GitHub pauses scheduled workflows after 60 days without repository activity. Re-enable it in the Actions tab if that happens.
+- If you rename the Render service, update the URL in that file. Delete the file when you move to paid hosting.
+
 ## Later: real users
 
 - Email: set `MAIL_TRANSPORT=smtp` and `SMTP_URL` (Brevo, Amazon SES or similar) so sign-in codes are emailed.
