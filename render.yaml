@@ -11,7 +11,8 @@ services:
     dockerContext: .
     healthCheckPath: /api/v1/health
     # Apply migrations, make sure the admin exists, optionally load demo data, then start.
-    dockerCommand: sh -c 'npx prisma migrate deploy && npx prisma db seed && if [ "$SEED_DEMO" = "true" ]; then npx ts-node prisma/seed-demo.ts; fi && node dist/main'
+    # Seeding (admin + demo data) is run once from a laptop: ts-node is too heavy for the free 512 MB instance.
+    dockerCommand: npx prisma migrate deploy && node dist/main
     envVars:
       - key: PORT
         value: "3000"
@@ -39,6 +40,9 @@ services:
       # Switch to smtp + SMTP_URL (e.g. Brevo free) before real users arrive.
       - key: MAIL_TRANSPORT
         value: console
+      # Production normally refuses console mail; this opt-in is for the private demo only.
+      - key: ALLOW_CONSOLE_MAIL
+        value: "true"
       - key: SMTP_URL
         sync: false
       - key: ROOT_DOMAIN

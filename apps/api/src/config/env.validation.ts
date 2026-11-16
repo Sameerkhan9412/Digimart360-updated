@@ -79,8 +79,13 @@ export class Env {
   @IsString()
   SMTP_URL?: string;
 
+  /** Explicit opt-in for private demos: sign-in codes go to the logs instead of email. */
+  @IsOptional()
   @IsString()
-  MAIL_FROM = 'DIGI MART 360 <no-reply@digimart360.local>';
+  ALLOW_CONSOLE_MAIL?: string;
+
+  @IsString()
+  MAIL_FROM ='DIGI MART 360 <no-reply@digimart360.local>';
 
   @Transform(({ value }) => Number(value))
   @IsInt()
@@ -129,7 +134,7 @@ export function validateEnv(raw: Record<string, unknown>): Env {
   if (env.MAIL_TRANSPORT === MailTransport.Smtp && !env.SMTP_URL) {
     messages.push('SMTP_URL is required when MAIL_TRANSPORT=smtp');
   }
-  if (env.NODE_ENV === NodeEnv.Production && env.MAIL_TRANSPORT === MailTransport.Console) {
+  if (env.NODE_ENV === NodeEnv.Production && env.MAIL_TRANSPORT === MailTransport.Console && env.ALLOW_CONSOLE_MAIL !== 'true') {
     messages.push('MAIL_TRANSPORT=console is not allowed in production (codes would only be logged)');
   }
   if (messages.length) {
