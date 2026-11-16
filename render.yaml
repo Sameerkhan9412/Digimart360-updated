@@ -26,8 +26,6 @@ services:
         generateValue: true
       - key: SEED_ADMIN_EMAIL
         sync: false
-      - key: SEED_DEMO
-        value: "true"
       # The Vercel website's address, e.g. https://digimart360.vercel.app
       - key: WEB_URL
         sync: false
