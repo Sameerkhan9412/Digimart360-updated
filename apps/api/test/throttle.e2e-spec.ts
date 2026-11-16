@@ -35,6 +35,14 @@ describe('Rate limits per visitor', () => {
     await hit({ 'X-Internal-Key': 'x'.repeat(40), 'X-Client-IP': '198.51.100.98' }).expect(429);
   });
 
+  it('limits searches per visitor (each one is a database query)', async () => {
+    const search = (ip: string) =>
+      request(app.getHttpServer()).get('/api/v1/products?q=valve').set({ 'X-Internal-Key': key(), 'X-Client-IP': ip });
+    for (let i = 0; i < 40; i++) await search('203.0.113.50').expect(200);
+    await search('203.0.113.50').expect(429);
+    await search('203.0.113.51').expect(200);
+  });
+
   it('ignores a malformed client address', async () => {
     // The key is valid but the address is not an IP: treated as a call that names no visitor.
     for (let i = 0; i < 12; i++) await hit({ 'X-Internal-Key': key(), 'X-Client-IP': 'not-an-ip' }).expect(400);

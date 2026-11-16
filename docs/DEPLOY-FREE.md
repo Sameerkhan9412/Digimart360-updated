@@ -41,6 +41,8 @@ Render must be able to read your GitHub repository (a public repo, or the Render
 6. Sign-in codes appear in the service's **Logs** while `MAIL_TRANSPORT=console`.
 7. The start command is `npm run start:render` (migrate, then start). Render does not run `dockerCommand` through a shell, so do not put `&&` chains or `sh -c '...'` there.
 8. If a deploy says "Application exited early" with no app output, run the API locally with `NODE_ENV=production` and the same variables. The startup error (for example an invalid variable) shows up there.
+9. The interactive API docs (`/api/docs`) are off in production. Set `ENABLE_API_DOCS=true` to switch them on.
+10. **Rate limits:** the website passes each visitor's address to the API (`X-Client-IP`, believed only together with the secret `INTERNAL_API_KEY`), so limits apply per visitor. If you put another proxy between the website and the API, check the visitor address still arrives, or everyone will share one limit. Searches are limited to 40 a minute per visitor.
 
 ## 3. Website (Vercel)
 

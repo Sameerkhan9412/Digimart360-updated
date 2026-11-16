@@ -81,6 +81,11 @@ export class Env {
   @IsString()
   SMTP_URL?: string;
 
+  /** Set to "true" to serve the Swagger docs at /api/docs in production (always on in development). */
+  @IsOptional()
+  @IsString()
+  ENABLE_API_DOCS?: string;
+
   /** Explicit opt-in for private demos: sign-in codes go to the logs instead of email. */
   @IsOptional()
   @IsString()

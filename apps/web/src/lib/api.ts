@@ -1,4 +1,6 @@
 import 'server-only';
+import { headers } from 'next/headers';
+import { internalHeaders } from './client-ip';
 import type {
   CategoryNode,
   CategoryPage,
@@ -25,10 +27,15 @@ export class ApiError extends Error {
  * Server-side API call. Sends the internal key so per-IP rate limits apply to
  * visitors, not to this server. `revalidate` = seconds Next.js may reuse the response.
  */
-async function get<T>(path: string, revalidate: number): Promise<T> {
+async function get<T>(path: string, revalidate: number, onBehalfOfVisitor = false): Promise<T> {
+  // Searches with free-form input are never cached (every variation would be a database query), so
+  // they carry the visitor's address and the API rate-limits each visitor. Cached calls name no one.
   const res = await fetch(API_URL + path, {
-    headers: { 'X-Internal-Key': process.env.INTERNAL_API_KEY ?? '', Accept: 'application/json' },
-    next: { revalidate },
+    headers: {
+      ...(onBehalfOfVisitor ? internalHeaders(await headers()) : { 'X-Internal-Key': process.env.INTERNAL_API_KEY ?? '' }),
+      Accept: 'application/json',
+    },
+    ...(onBehalfOfVisitor ? { cache: 'no-store' as const } : { next: { revalidate } }),
   });
   if (!res.ok) {
     let message = res.statusText;
@@ -61,10 +68,15 @@ export function toQuery(params: ListingParams): string {
   return s ? `?${s}` : '';
 }
 
+/** Text or numbers a visitor typed: practically unlimited variations, so not worth caching. */
+function isFreeForm(p: ListingParams): boolean {
+  return !!(p.q || p.city || p.minPrice != null || p.maxPrice != null);
+}
+
 export const api = {
   categories: () => get<CategoryNode[]>('/categories', 300),
   category: (slug: string) => getOrNull<CategoryPage>(`/categories/${encodeURIComponent(slug)}`, 300),
-  products: (params: ListingParams) => get<ProductPage>('/products' + toQuery(params), 60),
+  products: (params: ListingParams) => get<ProductPage>('/products' + toQuery(params), 60, isFreeForm(params)),
   product: (slug: string) => getOrNull<ProductDetail>(`/products/${encodeURIComponent(slug)}`, 300),
   company: (slug: string) => getOrNull<CompanyProfile>(`/companies/${encodeURIComponent(slug)}`, 300),
   storefront: (slug: string) => getOrNull<PublicStorefront>(`/storefronts/${encodeURIComponent(slug)}`, 60),

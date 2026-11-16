@@ -1,5 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../common/decorators/public.decorator';
 import { ProductDetail, ProductPage } from '../dto/views';
 import { ListingQueryDto, SuggestQueryDto } from './listing.dto';
@@ -13,6 +14,8 @@ export class ProductsController {
   /** Search and browse live products. Powers category pages, search results and supplier catalogues. */
   @Get('products')
   @Public()
+  // Each search is a database query; a person browsing stays far below this.
+  @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOkResponse({ type: ProductPage })
   list(@Query() query: ListingQueryDto): Promise<ProductPage> {
     return this.products.list(query);
@@ -37,6 +40,7 @@ export class ProductsController {
   /** Search-box suggestions as the user types (2+ characters). */
   @Get('search/suggest')
   @Public()
+  @Throttle({ default: { ttl: 60_000, limit: 90 } })
   @ApiOkResponse({ type: Suggestions })
   suggest(@Query() { q }: SuggestQueryDto): Promise<Suggestions> {
     return this.products.suggest(q);

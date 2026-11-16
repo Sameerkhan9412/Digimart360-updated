@@ -1,5 +1,6 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { internalHeaders } from '@/lib/client-ip';
+import { buildCsp, originOf } from '@/lib/csp';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from '@/lib/session-shared';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
@@ -74,7 +75,7 @@ async function storefront(req: NextRequest, host: string): Promise<NextResponse 
  *    expired we swap the refresh token for a new pair here (the only place that can set cookies
  *    before the page renders), then let the request through with the fresh token.
  */
-export async function middleware(req: NextRequest) {
+async function route(req: NextRequest) {
   const host = (req.headers.get('host') ?? '').toLowerCase().replace(/:\d+$/, '');
   if (host && !MARKET_HOSTS.has(host)) {
     const res = await storefront(req, host);
@@ -122,6 +123,25 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next({ request: { headers: clean } });
   res.cookies.set(accessCookie(tokens));
   res.cookies.set(refreshCookie(tokens));
+  return res;
+}
+
+/**
+ * Every response carries a Content-Security-Policy with a fresh nonce. The policy is also put on the
+ * request headers so Next.js stamps its own inline scripts with that nonce while rendering.
+ */
+export async function middleware(req: NextRequest) {
+  const nonce = btoa(crypto.randomUUID());
+  const csp = buildCsp(nonce, {
+    dev: process.env.NODE_ENV !== 'production',
+    apiOrigin: originOf(process.env.NEXT_PUBLIC_API_URL ?? process.env.API_URL),
+    https: req.nextUrl.protocol === 'https:' || req.headers.get('x-forwarded-proto') === 'https',
+  });
+  const headers = new Headers(req.headers);
+  headers.set('x-nonce', nonce);
+  headers.set('content-security-policy', csp);
+  const res = await route(new NextRequest(req, { headers }));
+  res.headers.set('Content-Security-Policy', csp);
   return res;
 }
 
