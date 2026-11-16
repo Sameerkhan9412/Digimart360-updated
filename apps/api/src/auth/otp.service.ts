@@ -46,6 +46,11 @@ export class OtpService {
     @Inject(OTP_SENDERS) private readonly senders: OtpSender[],
   ) {}
 
+  /** Channels that can deliver codes right now. */
+  channels(): OtpChannel[] {
+    return this.senders.map((s) => s.channel);
+  }
+
   async request(channel: OtpChannel, destination: string, ip?: string): Promise<OtpRequestResult> {
     const sender = this.senders.find((s) => s.channel === channel);
     if (!sender) throw new BadRequestException(`Sign-in codes by ${channel.toLowerCase()} are not available yet`);

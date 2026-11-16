@@ -31,6 +31,16 @@ export class EmailOtpRequestDto {
   email: string;
 }
 
+/** "+91 98220-12345" and "+919822012345" are the same number. */
+const phoneNumber = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.replace(/[\s().-]/g, '') : value);
+
+export class PhoneOtpRequestDto {
+  @ApiProperty({ example: '+919822012345', description: 'E.164 format, with the country code' })
+  @Transform(phoneNumber)
+  @Matches(/^\+[1-9]\d{7,14}$/, { message: 'phone must include the country code, e.g. +919822012345' })
+  phone: string;
+}
+
 export class OtpRequestResponse {
   @ApiProperty({ description: 'Send this back with the code to /auth/otp/verify' })
   challengeId: string;
@@ -48,7 +58,7 @@ export class OtpVerifyDto extends NewAccountFields {
   challengeId: string;
 
   @ApiProperty({ example: '048213' })
-  @Matches(/^\d{6}$/, { message: 'code must be the 6 digits from the email' })
+  @Matches(/^\d{6}$/, { message: 'code must be the 6 digits we sent you' })
   code: string;
 
   @ApiPropertyOptional({ example: 'Rahul Sharma', description: 'Used only when this sign-in creates the account' })
@@ -98,6 +108,6 @@ export class AuthConfigResponse {
   @ApiProperty({ description: 'Whether "Continue with Google" should be shown' })
   google: boolean;
 
-  @ApiProperty({ example: ['EMAIL'], description: 'Channels that can deliver sign-in codes' })
+  @ApiProperty({ example: ['EMAIL', 'WHATSAPP'], description: 'Channels that can deliver sign-in codes' })
   otpChannels: string[];
 }

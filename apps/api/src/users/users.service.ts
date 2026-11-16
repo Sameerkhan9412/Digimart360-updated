@@ -8,9 +8,10 @@ import { UpdateMeDto } from './dto/update-me.dto';
 export class PublicUser {
   @ApiProperty() id: string;
   @ApiProperty() name: string;
-  @ApiProperty() email: string;
+  @ApiPropertyOptional({ nullable: true, type: String, description: 'Null for accounts created by phone until an email is added' }) email: string | null;
   @ApiProperty() emailVerified: boolean;
   @ApiPropertyOptional({ nullable: true, type: String }) phone: string | null;
+  @ApiProperty({ description: 'True once the number was proved with a WhatsApp code; only then can it sign in' }) phoneVerified: boolean;
   @ApiPropertyOptional({ nullable: true, type: String }) avatarUrl: string | null;
   @ApiProperty() hasGoogle: boolean;
   @ApiProperty({ enum: Role }) role: Role;
@@ -30,9 +31,12 @@ export class UsersService {
 
   async updateMe(id: string, dto: UpdateMeDto): Promise<PublicUser> {
     try {
+      // A changed number is unverified until its owner signs in with it by WhatsApp.
+      const current = dto.phone ? await this.prisma.user.findUnique({ where: { id }, select: { phone: true } }) : null;
+      const phoneChanged = !!dto.phone && dto.phone !== current?.phone;
       const user = await this.prisma.user.update({
         where: { id },
-        data: { name: dto.name?.trim(), phone: dto.phone },
+        data: { name: dto.name?.trim(), phone: dto.phone, ...(phoneChanged && { phoneVerifiedAt: null }) },
       });
       return this.toPublic(user);
     } catch (e) {
@@ -50,6 +54,7 @@ export class UsersService {
       email: user.email,
       emailVerified: !!user.emailVerifiedAt,
       phone: user.phone,
+      phoneVerified: !!user.phoneVerifiedAt,
       avatarUrl: user.avatarUrl,
       hasGoogle: !!user.googleId,
       role: user.role,

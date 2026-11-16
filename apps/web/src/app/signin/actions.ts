@@ -9,7 +9,12 @@ const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
 
 export interface SignInState {
   step: 'email' | 'code';
+  method?: 'email' | 'phone';
   email?: string;
+  /** What the person typed for the phone. */
+  phone?: string;
+  /** Where the code went: the email address or the E.164 number. */
+  sentTo?: string;
   challengeId?: string;
   error?: string;
 }
@@ -32,13 +37,35 @@ async function post(path: string, body: object) {
   return res.json();
 }
 
+/** "98220 12345" and "+91 98220 12345" both become +919822012345; other countries need their +code. */
+function toE164(input: string): string | null {
+  const s = input.replace(/[\s().-]/g, '');
+  if (/^\+[1-9]\d{7,14}$/.test(s)) return s;
+  if (/^[6-9]\d{9}$/.test(s)) return '+91' + s;
+  if (/^0[6-9]\d{9}$/.test(s)) return '+91' + s.slice(1);
+  return null;
+}
+
 export async function requestCode(_: SignInState, form: FormData): Promise<SignInState> {
+  if (form.get('method') === 'phone') {
+    const typed = String(form.get('phone') ?? '').trim();
+    const phone = toE164(typed);
+    if (!phone) {
+      return { step: 'email', method: 'phone', phone: typed, error: 'Enter a 10-digit mobile number, or include your country code, e.g. +971 50 123 4567.' };
+    }
+    try {
+      const r = await post('/auth/otp/phone', { phone });
+      return { step: 'code', method: 'phone', phone: typed, sentTo: phone, challengeId: r.challengeId };
+    } catch (e) {
+      return { step: 'email', method: 'phone', phone: typed, error: e instanceof ApiError ? e.message : 'Could not send the code.' };
+    }
+  }
   const email = String(form.get('email') ?? '').trim().toLowerCase();
   try {
     const r = await post('/auth/otp/email', { email });
-    return { step: 'code', email, challengeId: r.challengeId };
+    return { step: 'code', method: 'email', email, sentTo: email, challengeId: r.challengeId };
   } catch (e) {
-    return { step: 'email', email, error: e instanceof ApiError ? e.message : 'Could not send the code.' };
+    return { step: 'email', method: 'email', email, error: e instanceof ApiError ? e.message : 'Could not send the code.' };
   }
 }
 

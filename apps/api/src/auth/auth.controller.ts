@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import {
   AuthConfigResponse,
   EmailOtpRequestDto,
+  PhoneOtpRequestDto,
   GoogleSignInDto,
   OtpRequestResponse,
   OtpVerifyDto,
@@ -45,6 +46,16 @@ export class AuthController {
   @ApiTooManyRequestsResponse({ description: 'Asked again within 60 s, or more than 5 times in an hour' })
   requestEmailOtp(@Body() dto: EmailOtpRequestDto, @Ip() ip: string): Promise<OtpRequestResponse> {
     return this.auth.requestEmailOtp(dto.email, ip);
+  }
+
+  /** WhatsApp a 6-digit sign-in code to a phone number. Works for new and existing accounts alike. */
+  @Post('otp/phone')
+  @Public()
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiAcceptedResponse({ type: OtpRequestResponse })
+  @ApiTooManyRequestsResponse({ description: 'Asked again within 60 s, or more than 5 times in an hour' })
+  requestPhoneOtp(@Body() dto: PhoneOtpRequestDto, @Ip() ip: string): Promise<OtpRequestResponse> {
+    return this.auth.requestPhoneOtp(dto.phone, ip);
   }
 
   /** Check the code and sign in. Creates the account on first sign-in. */

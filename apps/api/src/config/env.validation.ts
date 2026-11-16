@@ -25,6 +25,8 @@ export enum MailTransport {
   Smtp = 'smtp',
 }
 
+const blankToUndefined = ({ value }: { value: unknown }) => (typeof value === 'string' && value.trim() ? value.trim() : undefined);
+
 const csv = ({ value }: { value: unknown }) =>
   Array.isArray(value)
     ? value
@@ -125,6 +127,29 @@ export class Env {
   @IsOptional()
   @IsEmail()
   SEED_ADMIN_EMAIL?: string;
+
+  /** Twilio WhatsApp sign-in codes. All three of SID, token and sender must be set to turn it on. */
+  @Transform(blankToUndefined)
+  @IsOptional()
+  @Matches(/^AC[0-9a-f]{32}$/i, { message: 'TWILIO_ACCOUNT_SID must look like ACxxxxxxxx… (34 characters)' })
+  TWILIO_ACCOUNT_SID?: string;
+
+  @Transform(blankToUndefined)
+  @IsOptional()
+  @IsString()
+  TWILIO_AUTH_TOKEN?: string;
+
+  /** The WhatsApp sender, e.g. whatsapp:+14155238886 (the Twilio sandbox) or your approved number. */
+  @Transform(blankToUndefined)
+  @IsOptional()
+  @Matches(/^whatsapp:\+[1-9]\d{7,14}$/, { message: 'TWILIO_WHATSAPP_FROM must look like whatsapp:+14155238886' })
+  TWILIO_WHATSAPP_FROM?: string;
+
+  /** Approved authentication template (HX…). Needed in production; leave empty on the sandbox to send plain text. */
+  @Transform(blankToUndefined)
+  @IsOptional()
+  @Matches(/^HX[0-9a-f]{32}$/i, { message: 'TWILIO_CONTENT_SID must look like HXxxxxxxxx… (34 characters)' })
+  TWILIO_CONTENT_SID?: string;
 }
 
 export function validateEnv(raw: Record<string, unknown>): Env {
@@ -136,6 +161,13 @@ export function validateEnv(raw: Record<string, unknown>): Env {
   }
   if (env.NODE_ENV === NodeEnv.Production && env.MAIL_TRANSPORT === MailTransport.Console && env.ALLOW_CONSOLE_MAIL !== 'true') {
     messages.push('MAIL_TRANSPORT=console is not allowed in production (codes would only be logged)');
+  }
+  const twilio = [env.TWILIO_ACCOUNT_SID, env.TWILIO_AUTH_TOKEN, env.TWILIO_WHATSAPP_FROM];
+  if (twilio.some(Boolean) && !twilio.every(Boolean)) {
+    messages.push('TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_WHATSAPP_FROM must be set together');
+  }
+  if (env.TWILIO_CONTENT_SID && !twilio.every(Boolean)) {
+    messages.push('TWILIO_CONTENT_SID needs TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and TWILIO_WHATSAPP_FROM');
   }
   if (messages.length) {
     throw new Error(`Invalid environment configuration:\n  - ${messages.join('\n  - ')}\nSee .env.example.`);

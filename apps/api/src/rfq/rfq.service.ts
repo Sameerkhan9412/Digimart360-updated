@@ -389,7 +389,7 @@ export class RfqService {
       this.send(
         winner.email ?? winner.owner.email,
         `You won ${rfq.number}: ${rfq.title}`,
-        `The buyer chose your quote.\nBuyer: ${buyer?.name}\nEmail: ${buyer?.email}\nPhone: ${buyer?.phone ?? 'not given'}\n\nDetails: ${this.link(`/dashboard/rfqs/${rfq.id}`)}`,
+        `The buyer chose your quote.\nBuyer: ${buyer?.name}\nEmail: ${buyer?.email ?? 'not given'}\nPhone: ${buyer?.phone ?? 'not given'}\n\nDetails: ${this.link(`/dashboard/rfqs/${rfq.id}`)}`,
       ),
       ...losers.map((c) =>
         this.send(c.email ?? c.owner.email, `${rfq.number} was awarded to another supplier`, `Thank you for quoting on "${rfq.title}". The buyer chose a different supplier this time.`),

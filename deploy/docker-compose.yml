@@ -50,6 +50,10 @@ services:
       UPLOAD_DIR: /data/uploads
       # Optional: store photos on Cloudinary instead of the uploads volume.
       CLOUDINARY_URL: ${CLOUDINARY_URL:-}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM:-}
+      TWILIO_CONTENT_SID: ${TWILIO_CONTENT_SID:-}
       MAIL_TRANSPORT: ${MAIL_TRANSPORT:-smtp}
       SMTP_URL: ${SMTP_URL:-}
       MAIL_FROM: ${MAIL_FROM:-DIGI MART 360 <no-reply@digimart360.com>}

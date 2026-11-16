@@ -232,7 +232,7 @@ export class StorefrontService {
     const [rows, total] = await this.prisma.$transaction([
       this.prisma.customDomain.findMany({
         where,
-        include: { company: { include: { owner: { select: { email: true } } } } },
+        include: { company: { include: { owner: { select: { email: true, phone: true } } } } },
         orderBy: { updatedAt: 'asc' },
         skip: (page - 1) * PAGE,
         take: PAGE,
@@ -243,7 +243,7 @@ export class StorefrontService {
       ...this.domainView(d),
       companyName: d.company.name,
       companySlug: d.company.slug,
-      ownerEmail: d.company.owner.email ?? '',
+      ownerEmail: d.company.owner.email ?? d.company.owner.phone ?? '',
       createdAt: d.createdAt,
     }));
     return { items, total, page };

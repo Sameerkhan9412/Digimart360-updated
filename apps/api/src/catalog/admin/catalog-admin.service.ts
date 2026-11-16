@@ -58,7 +58,7 @@ export class CatalogAdminService {
     const [rows, total] = await Promise.all([
       this.prisma.company.findMany({
         where,
-        include: { owner: { select: { email: true } }, _count: { select: { products: true } } },
+        include: { owner: { select: { email: true, phone: true } }, _count: { select: { products: true } } },
         orderBy: { createdAt: 'asc' },
         skip: (page - 1) * PAGE,
         take: PAGE,
@@ -70,7 +70,7 @@ export class CatalogAdminService {
         ...toCompanySummary(c),
         status: c.status,
         gstin: c.gstin,
-        ownerEmail: c.owner.email,
+        ownerEmail: c.owner.email ?? c.owner.phone ?? '',
         productCount: c._count.products,
         createdAt: c.createdAt,
       })),

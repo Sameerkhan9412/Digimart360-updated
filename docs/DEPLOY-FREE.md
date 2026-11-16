@@ -59,6 +59,25 @@ Render must be able to read your GitHub repository (a public repo, or the Render
 
 4. Deploy. Then open the site, sign in with the admin email at `/signin?next=/admin`, and read the code in Render's logs.
 
+## WhatsApp sign-in codes (Twilio)
+
+People can sign in with a phone number instead of an email: the sign-in page shows an Email / WhatsApp switch once Twilio is configured. A new number creates an account with no email (the person can add one later).
+
+1. Create a Twilio account. In the console go to **Messaging > Try it out > Send a WhatsApp message** (the sandbox).
+2. Join the sandbox from your phone: send the shown `join <word>` message to the sandbox number. Each tester must do this once (the sandbox only reaches phones that joined).
+3. In Render > your service > **Environment**, set:
+
+   | Name | Value |
+   |---|---|
+   | `TWILIO_ACCOUNT_SID` | `AC…` from the Twilio console home page |
+   | `TWILIO_AUTH_TOKEN` | the auth token next to it |
+   | `TWILIO_WHATSAPP_FROM` | `whatsapp:+14155238886` (the sandbox number shown in step 1) |
+
+   Save; Render redeploys. `/api/v1/auth/config` then lists `WHATSAPP` under `otpChannels`.
+4. **For real users** the sandbox is not enough. Register a WhatsApp sender in Twilio (needs a Meta business account), create an **authentication** message template (Content Template Builder), wait for approval, then set `TWILIO_WHATSAPP_FROM` to your number and `TWILIO_CONTENT_SID` to the template's `HX…` id. Without an approved template WhatsApp refuses business-initiated messages.
+5. Each code message is billed by Twilio and WhatsApp. The API still allows one code per minute and five per hour per number.
+6. If a code never arrives, the Render **Logs** show `Twilio WhatsApp send failed … (Twilio <code>: …)`. Code 63016 means the number has not joined the sandbox or the template is missing.
+
 ## Keeping the free API awake
 
 `.github/workflows/keepalive.yml` pings `/api/v1/health` every 10 minutes (GitHub may delay runs a few minutes). Notes:

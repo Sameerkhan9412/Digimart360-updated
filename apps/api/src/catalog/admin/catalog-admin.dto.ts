@@ -69,7 +69,7 @@ export class ModerationProductPage {
 export class ModerationCompany extends CompanySummary {
   @ApiProperty({ enum: CompanyStatus }) status: CompanyStatus;
   @ApiPropertyOptional({ nullable: true, type: String }) gstin: string | null;
-  @ApiProperty() ownerEmail: string;
+  @ApiProperty({ description: 'Empty when the owner signed up by phone' }) ownerEmail: string;
   @ApiProperty() productCount: number;
   @ApiProperty() createdAt: Date;
 }

@@ -17,10 +17,15 @@ const captureEmail: OtpSender = {
   send: async (to, code) => void outbox.push({ to, code }),
 };
 
+const captureWhatsApp: OtpSender = {
+  channel: OtpChannel.WHATSAPP,
+  send: async (to, code) => void outbox.push({ to, code }),
+};
+
 export async function createApp(): Promise<NestExpressApplication> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(OTP_SENDERS)
-    .useValue([captureEmail])
+    .useValue([captureEmail, captureWhatsApp])
     .compile();
   const app = moduleRef.createNestApplication<NestExpressApplication>();
   configureApp(app);

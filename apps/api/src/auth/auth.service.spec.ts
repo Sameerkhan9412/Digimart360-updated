@@ -12,6 +12,7 @@ const baseUser: User = {
   id: '11111111-1111-1111-1111-111111111111',
   email: 'rahul@example.com',
   emailVerifiedAt: new Date('2026-01-01'),
+  phoneVerifiedAt: null,
   phone: null,
   name: 'Rahul',
   avatarUrl: null,
@@ -189,5 +190,56 @@ describe('AuthService · refresh tokens', () => {
     const { service, prisma } = setup();
     prisma.refreshToken.findUnique.mockResolvedValue(stored({ expiresAt: new Date(Date.now() - 1000) }));
     await expect(service.refresh('expired-token-value-x')).rejects.toThrow('Session expired');
+  });
+});
+
+describe('AuthService · WhatsApp OTP', () => {
+  const phone = '+919822012345';
+
+  it('a new number creates a phone-only account that is already verified', async () => {
+    const { service, prisma, otp } = setup();
+    otp.verify.mockResolvedValue({ channel: 'WHATSAPP', destination: phone });
+    const res = await service.verifyOtp({ ...verifyDto, name: 'Rahul Sharma', role: Role.SUPPLIER });
+
+    expect(res.isNewUser).toBe(true);
+    const data = prisma.user.create.mock.calls[0][0].data;
+    expect(data).toMatchObject({ phone, name: 'Rahul Sharma', role: Role.SUPPLIER, phoneVerifiedAt: expect.any(Date) });
+    expect(data.email).toBeUndefined();
+  });
+
+  it('the verified owner of a number signs in to their existing account', async () => {
+    const { service, prisma, otp } = setup();
+    otp.verify.mockResolvedValue({ channel: 'WHATSAPP', destination: phone });
+    prisma.user.findUnique.mockResolvedValue({ ...baseUser, phone, phoneVerifiedAt: new Date('2026-02-01') });
+    const res = await service.verifyOtp({ ...verifyDto, role: Role.SUPPLIER });
+
+    expect(res.isNewUser).toBe(false);
+    expect(res.user.role).toBe(Role.BUYER); // the role in the request is ignored
+    expect(prisma.user.create).not.toHaveBeenCalled();
+  });
+
+  it('an unverified claim on the number never blocks the person who just proved it', async () => {
+    const { service, prisma, otp } = setup();
+    otp.verify.mockResolvedValue({ channel: 'WHATSAPP', destination: phone });
+    prisma.user.findUnique.mockResolvedValue({ ...baseUser, id: 'squatter', phone, phoneVerifiedAt: null });
+    const res = await service.verifyOtp(verifyDto);
+
+    expect(prisma.user.update).toHaveBeenCalledWith({ where: { id: 'squatter' }, data: { phone: null } });
+    expect(prisma.user.create).toHaveBeenCalledTimes(1);
+    expect(res.isNewUser).toBe(true);
+    expect(res.user.id).toBe('new-id');
+  });
+
+  it('a suspended phone account cannot sign in', async () => {
+    const { service, prisma, otp } = setup();
+    otp.verify.mockResolvedValue({ channel: 'WHATSAPP', destination: phone });
+    prisma.user.findUnique.mockResolvedValue({ ...baseUser, phone, phoneVerifiedAt: new Date(), status: UserStatus.SUSPENDED });
+    await expect(service.verifyOtp(verifyDto)).rejects.toThrow(UnauthorizedException);
+  });
+
+  it('requesting a code goes out on the WhatsApp channel', async () => {
+    const { service, otp } = setup();
+    await service.requestPhoneOtp(phone, '1.2.3.4');
+    expect(otp.request).toHaveBeenCalledWith('WHATSAPP', phone, '1.2.3.4');
   });
 });

@@ -69,4 +69,6 @@ export const api = {
   company: (slug: string) => getOrNull<CompanyProfile>(`/companies/${encodeURIComponent(slug)}`, 300),
   storefront: (slug: string) => getOrNull<PublicStorefront>(`/storefronts/${encodeURIComponent(slug)}`, 60),
   sitemap: () => get<SitemapData>('/sitemap', 3600),
+  /** Which sign-in options the API offers (e.g. whether WhatsApp codes are on). */
+  authConfig: () => get<{ google: boolean; otpChannels: string[] }>('/auth/config', 60),
 };

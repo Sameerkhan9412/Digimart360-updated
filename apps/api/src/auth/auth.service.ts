@@ -45,15 +45,20 @@ export class AuthService {
   ) {}
 
   getConfig(): { google: boolean; otpChannels: string[] } {
-    return { google: this.google.enabled, otpChannels: [OtpChannel.EMAIL] };
+    return { google: this.google.enabled, otpChannels: this.otp.channels() };
   }
 
   requestEmailOtp(email: string, ip?: string) {
     return this.otp.request(OtpChannel.EMAIL, email, ip);
   }
 
+  requestPhoneOtp(phone: string, ip?: string) {
+    return this.otp.request(OtpChannel.WHATSAPP, phone, ip);
+  }
+
   async verifyOtp(dto: OtpVerifyDto): Promise<TokensResponse> {
     const { channel, destination } = await this.otp.verify(dto.challengeId, dto.code);
+    if (channel === OtpChannel.WHATSAPP) return this.signInWithPhone(destination, dto);
     if (channel !== OtpChannel.EMAIL) throw new UnauthorizedException('Unsupported sign-in channel');
 
     const existing = await this.prisma.user.findUnique({ where: { email: destination } });
@@ -68,6 +73,26 @@ export class AuthService {
       email: destination,
       emailVerifiedAt: new Date(),
       name: dto.name?.trim() || nameFromEmail(destination),
+      role: dto.role ?? Role.BUYER,
+    });
+    return this.signIn(user, true, dto.deviceName);
+  }
+
+  /**
+   * The person just proved they control this number over WhatsApp.
+   * - A verified owner of the number signs in.
+   * - Otherwise a new account is made. If someone typed this number into their profile without ever
+   *   verifying it, the number moves to the person who just proved it (an unverified claim never blocks the real owner).
+   */
+  private async signInWithPhone(phone: string, dto: OtpVerifyDto): Promise<TokensResponse> {
+    const holder = await this.prisma.user.findUnique({ where: { phone } });
+    if (holder?.phoneVerifiedAt) return this.signIn(holder, false, dto.deviceName);
+    if (holder) await this.prisma.user.update({ where: { id: holder.id }, data: { phone: null } });
+
+    const user = await this.createUser({
+      phone,
+      phoneVerifiedAt: new Date(),
+      name: dto.name?.trim() || 'New user',
       role: dto.role ?? Role.BUYER,
     });
     return this.signIn(user, true, dto.deviceName);
@@ -153,7 +178,7 @@ export class AuthService {
     } catch (e) {
       // Two first sign-ins raced; the other one created the account.
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
-        return this.prisma.user.findUniqueOrThrow({ where: { email: data.email } });
+        return this.prisma.user.findUniqueOrThrow({ where: data.email ? { email: data.email } : { phone: data.phone as string } });
       }
       throw e;
     }

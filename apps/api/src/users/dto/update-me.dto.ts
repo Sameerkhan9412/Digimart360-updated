@@ -8,7 +8,7 @@ export class UpdateMeDto {
   @Length(2, 100)
   name?: string;
 
-  @ApiPropertyOptional({ example: '+919876543210', description: 'E.164 format. Will be verified by WhatsApp OTP later.' })
+  @ApiPropertyOptional({ example: '+919876543210', description: 'E.164 format. Signing in with this number by WhatsApp code verifies it.' })
   @IsOptional()
   @Matches(/^\+[1-9]\d{7,14}$/, { message: 'phone must be in E.164 format, e.g. +919876543210' })
   phone?: string;
