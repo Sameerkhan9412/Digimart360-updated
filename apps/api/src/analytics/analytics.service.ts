@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { CompanyStatus, ProductStatus, QuoteStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { addDays, changePct, eachDay, istDay, istStart, periodEndingToday } from './analytics.dates';
@@ -35,10 +35,32 @@ interface DayRow {
 }
 
 @Injectable()
-export class AnalyticsService {
+export class AnalyticsService implements OnModuleInit, OnModuleDestroy {
   private readonly recent = new RecentViews();
+  private readonly log = new Logger(AnalyticsService.name);
+  private timer?: NodeJS.Timeout;
 
   constructor(private readonly prisma: PrismaService) {}
+
+  onModuleInit() {
+    if (process.env.NODE_ENV === 'test') return;
+    this.timer = setInterval(() => void this.purgeOld().catch((e) => this.log.warn(`purge failed: ${e}`)), 24 * 3600_000);
+    this.timer.unref();
+  }
+
+  onModuleDestroy() {
+    if (this.timer) clearInterval(this.timer);
+  }
+
+  /** Daily counters older than about 13 months are never shown (the longest report is 90 days); drop them. */
+  async purgeOld(now = new Date()): Promise<number> {
+    const cutoff = new Date(`${addDays(istDay(now), -400)}T00:00:00Z`);
+    const [a, b] = await this.prisma.$transaction([
+      this.prisma.productDailyView.deleteMany({ where: { day: { lt: cutoff } } }),
+      this.prisma.companyDailyView.deleteMany({ where: { day: { lt: cutoff } } }),
+    ]);
+    return a.count + b.count;
+  }
 
   /**
    * Count one view of a live product, supplier page or supplier website.
