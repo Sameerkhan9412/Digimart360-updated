@@ -50,3 +50,10 @@ export async function closeRfq(rfqId: string) {
   await authedJson(`/me/rfqs/${rfqId}/close`, { method: 'POST', json: {} });
   revalidatePath('/account', 'layout');
 }
+
+/** Add a supplier to the shortlist, or take it off. Both are safe to repeat. */
+export async function setSaved(companyId: string, save: boolean) {
+  await authedJson(`/me/saved-suppliers/${encodeURIComponent(companyId)}`, { method: save ? 'PUT' : 'DELETE' });
+  revalidatePath('/account/saved');
+  revalidatePath('/store', 'layout');
+}

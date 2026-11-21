@@ -12,6 +12,7 @@ import { validateEnv } from './config/env.validation';
 import { HealthModule } from './health/health.module';
 import { MediaModule } from './media/media.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { SavedModule } from './saved/saved.module';
 import { RfqModule } from './rfq/rfq.module';
 import { StorefrontModule } from './storefront/storefront.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -32,6 +33,7 @@ import { UsersModule } from './users/users.module';
     RfqModule,
     StorefrontModule,
     AnalyticsModule,
+    SavedModule,
   ],
   providers: [
     // Order matters: rate limit, then authenticate, then check role.

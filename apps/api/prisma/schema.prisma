@@ -47,9 +47,10 @@ model User {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
 
-  sessions RefreshToken[]
-  company  Company?
-  rfqs     Rfq[]
+  sessions       RefreshToken[]
+  company        Company?
+  rfqs           Rfq[]
+  savedSuppliers SavedSupplier[]
 
   @@map("users")
 }
@@ -183,6 +184,7 @@ model Company {
   storefront   Storefront?
   customDomain CustomDomain?
   dailyViews   CompanyDailyView[]
+  savedBy      SavedSupplier[]
 
   @@index([status, city])
   @@index([businessTypes], type: Gin, map: "companies_business_types_idx")
@@ -416,4 +418,18 @@ model CompanyDailyView {
   @@id([companyId, kind, day])
   @@index([day])
   @@map("company_daily_views")
+}
+
+/// A buyer's shortlist: suppliers they want to find again.
+model SavedSupplier {
+  userId    String   @db.Uuid
+  companyId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, companyId])
+  @@index([userId, createdAt])
+  @@map("saved_suppliers")
 }

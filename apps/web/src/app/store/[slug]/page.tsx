@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation';
 import { Breadcrumbs, JsonLd, Monogram, RatingLine, TrustBadges } from '@/components/bits';
 import { LeadButton } from '@/components/LeadButton';
 import { hrefWith, ListingBody, readParams } from '@/components/Listing';
+import { SaveSupplier } from '@/components/SaveSupplier';
 import { api } from '@/lib/api';
+import { saved } from '@/lib/dash';
 import { trackView } from '@/lib/track';
 import { businessTypeLabel, plural } from '@/lib/format';
 import { organizationLd, storePath } from '@/lib/seo';
@@ -37,6 +39,7 @@ export default async function StorePage({ params, searchParams }: Props) {
   if (!c) notFound();
   const p = readParams(sp);
   await trackView('company', c.slug);
+  const savedIds = await saved.ids();
   const base = storePath(c.slug);
   const data = await api.products({ ...p, company: c.slug, city: undefined, pageSize: 20 });
   // Pages past the end would be empty, thin pages: treat them as not found.
@@ -55,7 +58,10 @@ export default async function StorePage({ params, searchParams }: Props) {
           <TrustBadges c={c} />
           <RatingLine c={c} />
         </div>
-        <LeadButton label="Contact supplier" companyId={c.id} supplier={c.name} title={`Send your requirement to ${c.name}`} />
+        <div className="store-actions">
+          <SaveSupplier companyId={c.id} name={c.name} next={base} state={savedIds === null ? 'signed-out' : savedIds.includes(c.id) ? 'saved' : 'unsaved'} />
+          <LeadButton label="Contact supplier" companyId={c.id} supplier={c.name} title={`Send your requirement to ${c.name}`} />
+        </div>
       </section>
 
       <div className="below" style={{ marginTop: 14 }}>

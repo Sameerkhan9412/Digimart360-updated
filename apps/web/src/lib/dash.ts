@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { ApiError } from './api';
 import { internalHeaders } from './client-ip';
 import { ACCESS_COOKIE, REFRESH_COOKIE, accessCookie, refreshCookie, type Tokens } from './session-shared';
-import type { AnalyticsReport, BuyerRfq, DomainInfo, Me, ModerationDomain, StorefrontSettings, CompanyStatus, DomainStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
+import type { AnalyticsReport, CompanySummary, BuyerRfq, DomainInfo, Me, ModerationDomain, StorefrontSettings, CompanyStatus, DomainStatus, ModerationCompany, OwnCompany, Page, ProductStatus, OwnProduct, RfqSummary, SupplierRfq } from './types';
 
 const API_URL = process.env.API_URL ?? 'http://localhost:3000/api/v1';
 
@@ -99,6 +99,29 @@ async function orNull<T>(path: string): Promise<T | null> {
   if (!res.ok) throw await errorFrom(res);
   return res.json();
 }
+
+export const saved = {
+  /** The signed-in buyer's shortlist, newest first. */
+  list: () => authedJson<CompanySummary[]>('/me/saved-suppliers'),
+  /**
+   * Ids of saved suppliers for a public page. Never redirects: null means not signed in (or the session
+   * could not be checked), and the page simply shows "Save" as a link to sign in.
+   */
+  async ids(): Promise<string[] | null> {
+    const token = (await cookies()).get(ACCESS_COOKIE)?.value;
+    if (!token) return null;
+    try {
+      const res = await fetch(`${API_URL}/me/saved-suppliers/ids`, {
+        headers: { Authorization: `Bearer ${token}`, ...internalHeaders(await requestHeaders()), Accept: 'application/json' },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(4000),
+      });
+      return res.ok ? ((await res.json()) as string[]) : null;
+    } catch {
+      return null;
+    }
+  },
+};
 
 export const rfqs = {
   /** The signed-in person's own requirements. */

@@ -9,6 +9,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     <div className="dash">
       <nav className="dnav panel" aria-label="My account">
         <Link href="/account/rfqs">My requirements</Link>
+        <Link href="/account/saved">Saved suppliers</Link>
         <Link href="/rfq/new">Post requirement</Link>
         <Link href="/account/profile">My profile</Link>
         <Link href="/dashboard">Sell on DIGI MART</Link>
