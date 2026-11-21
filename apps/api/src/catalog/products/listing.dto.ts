@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { BusinessType } from '@prisma/client';
 import { Transform, Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
+import { ArrayMaxSize, ArrayNotEmpty, IsArray, Matches, IsBoolean, IsEnum, IsIn, IsInt, IsNumber, IsOptional, IsString, Max, MaxLength, Min } from 'class-validator';
 
 export const SORTS = ['relevance', 'price_asc', 'price_desc', 'newest', 'rating'] as const;
 export type Sort = (typeof SORTS)[number];
@@ -103,4 +103,17 @@ export class SuggestQueryDto {
   @IsString()
   @MaxLength(60)
   q: string;
+}
+
+export const MAX_COMPARE = 4;
+
+/** `?slugs=a,b,c`: one to four product slugs. */
+export class CompareQueryDto {
+  @ApiPropertyOptional({ example: 'ss304-ball-valve-k3x9p,gate-valve-a1b2c', description: 'Comma-separated product slugs (1 to 4)' })
+  @Transform(({ value }) => (typeof value === 'string' ? value.split(',').map((s) => s.trim()).filter(Boolean) : value))
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayMaxSize(MAX_COMPARE)
+  @Matches(/^[a-z0-9][a-z0-9-]{0,119}$/, { each: true, message: 'each slug must be a valid product slug' })
+  slugs: string[];
 }

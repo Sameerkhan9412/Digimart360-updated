@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Breadcrumbs, JsonLd, Monogram, PriceLine, ProductTile, RatingLine, TrustBadges } from '@/components/bits';
+import { CompareButton } from '@/components/CompareButton';
 import { LeadButton } from '@/components/LeadButton';
 import { ProductVisual } from '@/components/ProductVisual';
 import { api } from '@/lib/api';
@@ -70,6 +71,7 @@ export default async function ProductPage({ params }: Props) {
           <div className="ctas">
             <LeadButton label="Get Best Price" product={p.name} productId={p.id} categoryId={p.category.id} companyId={c.id} supplier={c.name} className="btn btn-orange btn-lg" />
             <LeadButton label="Send Inquiry" product={p.name} productId={p.id} categoryId={p.category.id} companyId={c.id} supplier={c.name} className="btn btn-line btn-lg" title={`Send an inquiry to ${c.name}`} />
+            <CompareButton slug={p.slug} className="btn btn-line btn-lg" />
           </div>
         </section>
 

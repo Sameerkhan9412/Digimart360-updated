@@ -69,6 +69,11 @@ export class ProductDetail extends ProductCard {
   @ApiProperty({ type: [ProductCard] }) related: ProductCard[];
 }
 
+/** A product with every specification, for side-by-side comparison. */
+export class CompareItem extends ProductCard {
+  @ApiProperty({ type: [Spec], description: 'All specifications' }) declare specs: Spec[];
+}
+
 export class FacetValue {
   @ApiProperty() value: string;
   @ApiProperty() count: number;

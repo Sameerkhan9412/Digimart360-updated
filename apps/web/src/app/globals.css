@@ -553,3 +553,22 @@ p { margin: 0; }
 .srow a:hover { color: var(--green-dark); }
 .srow-act { display: flex; gap: 8px; }
 @media (max-width: 600px) { .srow { grid-template-columns: auto minmax(0, 1fr); } .srow .srow-act { grid-column: 1 / -1; } .srow .srow-act > *, .srow-act form .btn { flex: 1; width: 100%; } }
+
+/* Product comparison */
+.cmp-wrap { overflow-x: auto; margin-top: 12px; }
+.cmp { border-collapse: collapse; width: 100%; min-width: 640px; table-layout: fixed; font-size: 13.5px; }
+.cmp th, .cmp td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+.cmp tbody th[scope='row'] { width: 150px; position: sticky; left: 0; background: #fff; color: var(--muted); font-weight: 600; z-index: 1; }
+.cmp thead td { width: 150px; }
+.cmp thead th { font-weight: 400; }
+.cmp-head { display: grid; gap: 8px; }
+.cmp-head .pv { aspect-ratio: 4 / 3; min-height: 0; border-radius: 8px; }
+.cmp-head b { color: var(--navy); }
+.cmp-sec th { background: #f4f6f8; color: var(--navy) !important; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; position: static !important; }
+.cmp tr.diff td, .cmp tr.diff th[scope='row'] { background: #fff8ec; }
+.cmp-flag { color: var(--orange-btn); font-weight: 700; }
+.cmp-act td { padding-top: 14px; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--navy); font: inherit; font-size: 12.5px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.link-btn:hover { color: var(--green-dark); }
+.cmp-wrap:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; }
+@media (max-width: 600px) { .cmp { min-width: 520px; } .cmp tbody th[scope='row'], .cmp thead td { width: 104px; } }

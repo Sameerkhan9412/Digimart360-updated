@@ -4,6 +4,7 @@ import { BUSINESS_TYPES, businessTypeLabel, plural } from '@/lib/format';
 import { productPath, storePath } from '@/lib/seo';
 import type { BusinessType, ListingParams, ProductCard, ProductPage, Sort } from '@/lib/types';
 import { Monogram, PriceLine, RatingLine, TrustBadges } from './bits';
+import { CompareButton } from './CompareButton';
 import { LeadButton } from './LeadButton';
 import { ProductVisual } from './ProductVisual';
 import { SortSelect } from './SortSelect';
@@ -166,6 +167,7 @@ export function ListingCard({ p, tag }: { p: ProductCard; tag?: string }) {
         <div className="ctas">
           <LeadButton label="Get Best Price" product={p.name} productId={p.id} categoryId={p.category.id} companyId={p.company.id} supplier={p.company.name} />
           <LeadButton label="Send Inquiry" product={p.name} productId={p.id} categoryId={p.category.id} companyId={p.company.id} supplier={p.company.name} className="btn btn-line btn-sm" title={`Send an inquiry to ${p.company.name}`} />
+          <CompareButton slug={p.slug} />
         </div>
       </div>
     </article>

@@ -2,8 +2,8 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { Public } from '../../common/decorators/public.decorator';
-import { ProductDetail, ProductPage } from '../dto/views';
-import { ListingQueryDto, SuggestQueryDto } from './listing.dto';
+import { CompareItem, ProductDetail, ProductPage } from '../dto/views';
+import { CompareQueryDto, ListingQueryDto, SuggestQueryDto } from './listing.dto';
 import { ProductsService, SitemapData, Suggestions } from './products.service';
 
 @ApiTags('catalog')
@@ -19,6 +19,15 @@ export class ProductsController {
   @ApiOkResponse({ type: ProductPage })
   list(@Query() query: ListingQueryDto): Promise<ProductPage> {
     return this.products.list(query);
+  }
+
+  /** Up to 4 live products side by side: `?slugs=a,b,c`. Unknown ones are left out. */
+  @Get('products/compare')
+  @Public()
+  @Throttle({ default: { ttl: 60_000, limit: 40 } })
+  @ApiOkResponse({ type: [CompareItem] })
+  compare(@Query() { slugs }: CompareQueryDto): Promise<CompareItem[]> {
+    return this.products.compare(slugs);
   }
 
   /** A live product with full specs, breadcrumb, more from the supplier and related products. */

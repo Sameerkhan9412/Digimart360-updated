@@ -6,6 +6,7 @@ import type {
   CategoryPage,
   CompanyProfile,
   ListingParams,
+  ProductCard,
   ProductDetail,
   ProductPage,
   PublicStorefront,
@@ -77,6 +78,8 @@ export const api = {
   categories: () => get<CategoryNode[]>('/categories', 300),
   category: (slug: string) => getOrNull<CategoryPage>(`/categories/${encodeURIComponent(slug)}`, 300),
   products: (params: ListingParams) => get<ProductPage>('/products' + toQuery(params), 60, isFreeForm(params)),
+  /** 1 to 4 products with all specs, in the order given. */
+  compare: (slugs: string[]) => get<ProductCard[]>(`/products/compare?slugs=${slugs.map(encodeURIComponent).join(',')}`, 60),
   product: (slug: string) => getOrNull<ProductDetail>(`/products/${encodeURIComponent(slug)}`, 300),
   company: (slug: string) => getOrNull<CompanyProfile>(`/companies/${encodeURIComponent(slug)}`, 300),
   storefront: (slug: string) => getOrNull<PublicStorefront>(`/storefronts/${encodeURIComponent(slug)}`, 60),

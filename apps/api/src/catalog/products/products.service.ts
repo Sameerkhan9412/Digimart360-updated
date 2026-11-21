@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CompanyStatus, Prisma, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CategoriesService } from '../categories/categories.service';
-import { Breadcrumb, FacetValue, ProductCard, ProductDetail, ProductPage, toProductCard, toSpecs } from '../dto/views';
+import { Breadcrumb, CompareItem, FacetValue, ProductCard, ProductDetail, ProductPage, toProductCard, toSpecs } from '../dto/views';
 import { ListingQueryDto } from './listing.dto';
 
 export class SitemapEntry {
@@ -97,6 +97,18 @@ export class ProductsService {
       pageSize,
       facets: { cities: cities.map(facet), businessTypes: types.map(facet) },
     };
+  }
+
+  /** Live products by slug, in the order asked, with all specs. Unknown or hidden ones are left out. */
+  async compare(slugs: string[]): Promise<CompareItem[]> {
+    const unique = [...new Set(slugs)];
+    if (!unique.length) return [];
+    const found = await this.prisma.product.findMany({ where: { slug: { in: unique }, ...PUBLIC_WHERE }, include: INCLUDE });
+    const bySlug = new Map(found.map((p) => [p.slug, p]));
+    return unique.flatMap((s) => {
+      const p = bySlug.get(s);
+      return p ? [{ ...toProductCard(p), specs: toSpecs(p.specs) }] : [];
+    });
   }
 
   async detail(slug: string): Promise<ProductDetail> {
